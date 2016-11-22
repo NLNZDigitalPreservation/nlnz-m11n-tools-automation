@@ -1,5 +1,7 @@
 package nz.govt.nzqa.eqa.buildtools
 
+import java.util.regex.Matcher
+
 /**
  * Uploads artifacts to a nexus repository.
  */
@@ -88,11 +90,36 @@ ${classifierArgument}"
         uploadFileWithClassifier(groupId, artifactId, version, null, file)
     }
 
+    // Uploads a file (jar) to the given nexus repository
+    // and uses the filename itself for the groupId, artifactId and version
+    // the filename will have the form [groupId]-[artifactId]-[version] where [version] is [0-9]+.*
+    def uploadFileWithGroupIdArtifactIdVersionInFilename = { file ->
+        String filename = file.name
+        Matcher pathMatcher = file.name =~ /(.*?)-(.*?)-([0-9]+\..*?)\.jar/
+        def groupId = pathMatcher.find() ? pathMatcher.group(1) : null
+        def artifactId = groupId != null ? pathMatcher.group(2) : null
+        def version = groupId != null ? pathMatcher.group(3) : null
+        logger.logToFile("filename: [${filename}], groupId: [${groupId}], artifactId: [${artifactId}], version: [${version}]")
+        if (groupId != null && artifactId != null && version != null) {
+            uploadFile(groupId, version, file, artifactId)
+        } else {
+            logger.logToFile("uploadFileWithGroupIdArtifactIdVersionInFilename: Unable to upload artifact: Not enough extractable attributes")
+        }
+    }
+
     // Bulk upload of all jars in a folder
     def uploadAllJarsInFolder = { groupId, version, folderPath ->
         File folder = new File("${folderPath}")
         folder.eachFile() { folderFile ->
             uploadFile(groupId, version, folderFile)
+        }
+    }
+
+    // Bulk upload of all jars in a folder
+    def uploadAllJarsInFolderDerivingAttributes = { folderPath ->
+        File folder = new File("${folderPath}")
+        folder.eachFile() { folderFile ->
+            uploadFileWithGroupIdArtifactIdVersionInFilename(folderFile)
         }
     }
 }
