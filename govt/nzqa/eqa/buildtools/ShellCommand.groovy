@@ -10,6 +10,8 @@ class ShellCommand {
 
     def exitValue
     def output = ''
+    Boolean showOutput = false
+    Boolean clearOutputOnCommandCompletion = false
     Logger logger
 
     // Executes a shell command (linux only).
@@ -30,6 +32,12 @@ class ShellCommand {
         process.inputStream.eachLine { processOutput(it) }
         process.waitFor();
         exitValue = process.exitValue()
+        if (showOutput) {
+            println("${output}")
+        }
+        if (clearOutputOnCommandCompletion) {
+            output = ''
+        }
     }
 
     private def addShellPrefix(String command) {
