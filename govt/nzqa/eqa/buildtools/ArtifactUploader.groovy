@@ -4,6 +4,8 @@ import java.util.regex.Matcher
 
 /**
  * Uploads artifacts to a nexus repository.
+ *
+ * TODO: Pre-check to see if the artifact already exists before trying to upload
  */
 class ArtifactUploader {
     // Outputs the gradle dependency to the console so that it can be used in a gradle dependency
