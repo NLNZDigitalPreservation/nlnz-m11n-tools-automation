@@ -38,6 +38,8 @@ class ArtifactUploader {
             }
             if (fileName.endsWith(".zip")) {
                 compileGroup += ", ext: 'zip'"
+            } else if (fileName.endsWith(".exe")) {
+                compileGroup += ", ext: 'exe'"
             }
             logger.logToFile(compileGroup)
         }
@@ -49,6 +51,8 @@ class ArtifactUploader {
         String packaging = "jar"
         if (jarName.endsWith(".zip")) {
             packaging = "zip"
+        } else if (jarName.endsWith(".exe")) {
+            packaging = "exe"
         }
         def classifierArgument = ''
         if (classifier != null) {
@@ -72,7 +76,7 @@ ${classifierArgument}"
     def uploadFileWithClassifier = { groupId, artifactId, version, classifier, file ->
         String jarName = file.getName()
         if (doUploadToNexus) {
-            if (jarName.endsWith(".jar") || jarName.endsWith(".zip")) {
+            if (jarName ==~ /.*\.(jar|zip|exe)$/) {
                 //println "artifact: ${artifactName}, jar: ${jarName}: ${file.getAbsolutePath()}"
                 uploadToNexus(groupId, artifactId, version, file, classifier)
             } else {
