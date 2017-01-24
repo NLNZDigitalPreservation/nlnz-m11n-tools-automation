@@ -1,6 +1,11 @@
 package nz.govt.nzqa.eqa.buildtools
 
+import groovy.transform.Canonical
+import groovy.util.slurpersupport.GPathResult
+
 import java.util.regex.Matcher
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 
 /**
  * Uploads artifacts to a nexus repository.
@@ -29,10 +34,13 @@ class ArtifactUploader {
         filenameWithPath.lastIndexOf('.').with { it != -1 ? filenameWithPath[0..<it] : filenameWithPath}
     }
 
-    def showGradleDependency = { groupId, artifactId, version, file, classifier = null  ->
+    def showGradleDependency = { groupId, artifactId, version, File file, classifier = null, PomContainer pomContainer = null  ->
         String fileName = file.getName()
         if (outputGradleDependency && logger != null) {
             def compileGroup = "    compile group: '${groupId}', name: '${artifactId}', version: '${version}'"
+            if (pomContainer != null && pomContainer.isExtracted()) {
+                compileGroup =  "    compile group: '${pomContainer.groupId}', name: '${pomContainer.artifactId}', version: '${pomContainer.version}'"
+            }
             if (classifier != null) {
                 compileGroup += ", classifier: '${classifier}'"
             }
@@ -42,11 +50,15 @@ class ArtifactUploader {
                 compileGroup += ", ext: 'exe'"
             }
             logger.logToFile(compileGroup)
+            if (pomContainer != null && pomContainer.isExtracted()) {
+                logger.logToFile("NOTE replacement by pomContainer: group: ${groupId}->${pomContainer.groupId}, " +
+                        "name: ${artifactId}->${pomContainer.artifactId}, version: ${version}->${pomContainer.version}")
+            }
         }
     }
 
     // Uploads the artifact to the given nexus repository
-    def uploadToNexus = { groupId, artifactId, version, file, classifier = null ->
+    def uploadToNexus = { groupId, artifactId, version, File file, classifier = null, boolean usePomIfAvailable = true ->
         String jarName = file.getName()
         String packaging = "jar"
         if (jarName.endsWith(".zip")) {
@@ -58,48 +70,108 @@ class ArtifactUploader {
         if (classifier != null) {
             classifierArgument = " -Dclassifier=${classifier}"
         }
-        def uploadNexusCommand = "mvn deploy:deploy-file -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} \
--DgeneratePom=true -Dpackaging=${packaging} \
--DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
-${classifierArgument}"
-        shellCommand.executeOnShellWithWorkingDirectory(uploadNexusCommand, workingDirectory)
-        def uploadProcessExitValue = shellCommand.exitValue
-        //uploadProcess.text.eachLine { println theLine }
-        if (!uploadProcessExitValue) {
-            println("Upload of artifact ${jarName} failed")
-            println("*****")
-            println("*************************************************************")
+        String uploadNexusCommand
+        PomContainer pomContainer
+        if (packaging == "jar" || packaging == "zip") {
+            if (usePomIfAvailable) {
+                pomContainer = extractEmbeddedPom(file)
+                if (pomContainer != null && pomContainer.isExtracted()) {
+                    // from http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
+                    // maven 2.5+ mvn install:install-file -Dfile=<path-to-file>
+                    logger.logToFile("file ${file.getAbsolutePath()} has embedded pom, extracting to [${pomContainer}]")
+                    uploadNexusCommand = "mvn deploy:deploy-file -DpomFile=${pomContainer.extractedPom.getAbsolutePath()} \
+                                        -DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
+                                        ${classifierArgument}"
+                }
+            }
+            if (uploadNexusCommand == null) {
+                uploadNexusCommand = "mvn deploy:deploy-file -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} \
+                                        -DgeneratePom=true -Dpackaging=${packaging} \
+                                        -DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
+                                        ${classifierArgument}"
+            }
         }
-        showGradleDependency(groupId, artifactId, version, file, classifier)
+
+        if (uploadNexusCommand != null && !uploadNexusCommand.isEmpty()) {
+            shellCommand.executeOnShellWithWorkingDirectory(uploadNexusCommand, workingDirectory)
+            def uploadProcessExitValue = shellCommand.exitValue
+            //uploadProcess.text.eachLine { println theLine }
+            if (!uploadProcessExitValue) {
+                logger.logToFile("Upload of artifact ${jarName} failed")
+                logger.logToFile("*****")
+                logger.logToFile("*************************************************************")
+            }
+            showGradleDependency(groupId, artifactId, version, file, classifier, pomContainer)
+        } else {
+            logger.logToFile("No valid upload to nexus command, skipping upload... (file: [${file}])")
+        }
     }
 
-    def uploadFileWithClassifier = { groupId, artifactId, version, classifier, file ->
+    Closure<PomContainer> extractEmbeddedPom = { File file ->
+        boolean embeddedPomExists = false
+        PomContainer extractedPom
+        ZipFile fileAsZip = new ZipFile(file)
+        Collection<ZipEntry> embeddedPoms = fileAsZip.entries().findAll { ZipEntry entry -> !entry.directory }.findAll { ZipEntry entry ->
+            boolean isPom = false
+            if (entry.name ==~ /META-INF\/.*?\/pom.xml$/) {
+                logger.logToFile("unzipped entries: [${entry}], name: [${entry.name}], directory: [${entry.directory}]")
+                embeddedPomExists = true
+                isPom = true
+            }
+            isPom
+        }
+        if (embeddedPomExists) {
+            if (embeddedPoms.size() == 1) {
+                String pomContents = fileAsZip.getInputStream(embeddedPoms.first()).text
+                extractedPom = PomContainer.fromPomContents(pomContents)
+                logger.logToFile("Extracted from pomContents: [${extractedPom}]")
+
+                if (extractedPom.isValid()) {
+                    String pomFoldername = "${this.workingDirectory}/extracted-poms"
+                    String pomFilename = "${extractedPom.groupId}-${extractedPom.artifactId}-${extractedPom.version}-pom.xml"
+                    File extractedPomFolder = new File(pomFoldername)
+                    extractedPomFolder.mkdirs()
+                    File pomFile = new File("${pomFoldername}/${pomFilename}")
+                    pomFile.write(pomContents)
+                    extractedPom.extractedPom = pomFile
+                } else {
+                    logger.logToFile("${embeddedPoms.first()} does not contain a valid pom")
+                }
+            } else {
+                logger.logToFile("More embedded poms than expected: [${embeddedPoms.size()}]: [${embeddedPoms}]")
+            }
+        }
+        return extractedPom
+    }
+
+    def uploadFileWithClassifier = { groupId, artifactId, version, classifier, File file, boolean usePomIfAvailable = true ->
         String jarName = file.getName()
         if (doUploadToNexus) {
             if (jarName ==~ /.*\.(jar|zip|exe)$/) {
                 //println "artifact: ${artifactName}, jar: ${jarName}: ${file.getAbsolutePath()}"
-                uploadToNexus(groupId, artifactId, version, file, classifier)
+                uploadToNexus(groupId, artifactId, version, file, classifier, usePomIfAvailable)
             } else {
                 logger.logToFile("${jarName} NOT processed")
             }
         } else {
-            showGradleDependency(groupId, artifactId, version, file, classifier)
+            showGradleDependency(groupId, artifactId, version, file, classifier, usePomIfAvailable)
         }
     }
+
     // Uploads a file (jar) to the given nexus repository
     // If the artifact name is not given then the jar file name is used as the artifact id
-    def uploadFile = { groupId, version, file, possibleArtifactId = null ->
+    def uploadFile = { groupId, version, File file, possibleArtifactId = null, boolean usePomIfAvailable = true ->
         String artifactId = possibleArtifactId
         if (artifactId == null) {
             artifactId = getFilenameWithoutExtension(file.name)
         }
-        uploadFileWithClassifier(groupId, artifactId, version, null, file)
+        uploadFileWithClassifier(groupId, artifactId, version, null, file, usePomIfAvailable)
     }
 
     // Uploads a file (jar) to the given nexus repository
     // and uses the filename itself for the groupId, artifactId and version
     // the filename will have the form [groupId]-[artifactId]-[version] where [version] is [0-9]+.*
-    def uploadFileWithGroupIdArtifactIdVersionInFilename = { file ->
+    def uploadFileWithGroupIdArtifactIdVersionInFilename = { File file ->
         String filename = file.name
         Matcher pathMatcher = file.name =~ /(.*?)-(.*?)-([0-9]+\..*?)\.jar/
         def groupId = pathMatcher.find() ? pathMatcher.group(1) : null
@@ -114,10 +186,10 @@ ${classifierArgument}"
     }
 
     // Bulk upload of all jars in a folder
-    def uploadAllJarsInFolder = { groupId, version, folderPath ->
+    def uploadAllJarsInFolder = { groupId, version, folderPath, boolean usePomIfAvailable = true ->
         File folder = new File("${folderPath}")
         folder.eachFile() { folderFile ->
-            uploadFile(groupId, version, folderFile)
+            uploadFile(groupId, version, folderFile, null, usePomIfAvailable)
         }
     }
 
@@ -127,5 +199,38 @@ ${classifierArgument}"
         folder.eachFile() { folderFile ->
             uploadFileWithGroupIdArtifactIdVersionInFilename(folderFile)
         }
+    }
+}
+
+@Canonical
+class PomContainer {
+    String groupId
+    String artifactId
+    String version
+    File extractedPom
+
+    static PomContainer fromPomContents(String pomContents) {
+        GPathResult rootNode = new XmlSlurper().parseText(pomContents)
+        //println("rootNode.groupId: [${rootNode.groupId}], class: [${rootNode.groupId.getClass()}]")
+        GPathResult resultGroupId = rootNode.groupId
+        //println("resultGroupId: [${resultGroupId}], empty: [${resultGroupId.isEmpty()}], text: [${resultGroupId.text()}]")
+        String groupId = (rootNode.groupId == null || rootNode.groupId.isEmpty()) ? rootNode.parent.groupId.text() : rootNode.groupId.text()
+        String version = (rootNode.version == null || rootNode.version.isEmpty()) ? rootNode.parent.version.text() : rootNode.version.text()
+        PomContainer pomContainer = new PomContainer(groupId: groupId, artifactId: rootNode.artifactId,
+                version: version)
+        return pomContainer
+    }
+
+    public boolean isValid() {
+        return groupId != null && !groupId.isEmpty() && artifactId != null && !artifactId.isEmpty() &&
+                version != null && !version.isEmpty()
+    }
+
+    public boolean isExtracted() {
+        return isValid() && extractedPom != null && extractedPom.exists()
+    }
+
+    public String toString() {
+        return "groupId: ${groupId}, artifactId: ${artifactId}, version: ${version}, extractedPom: ${extractedPom}"
     }
 }
