@@ -84,12 +84,12 @@ class ArtifactUploader {
                                         ${classifierArgument}"
                 }
             }
-            if (uploadNexusCommand == null) {
-                uploadNexusCommand = "mvn deploy:deploy-file -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} \
-                                        -DgeneratePom=true -Dpackaging=${packaging} \
-                                        -DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
-                                        ${classifierArgument}"
-            }
+        }
+        if (uploadNexusCommand == null) {
+            uploadNexusCommand = "mvn deploy:deploy-file -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} \
+                                    -DgeneratePom=true -Dpackaging=${packaging} \
+                                    -DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
+                                    ${classifierArgument}"
         }
 
         if (uploadNexusCommand != null && !uploadNexusCommand.isEmpty()) {
