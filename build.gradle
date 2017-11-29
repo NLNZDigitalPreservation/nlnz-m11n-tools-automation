@@ -1,0 +1,46 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url = 'http://pdnexus01.nzqa.govt.nz:8081/nexus/content/groups/public'
+        }
+    }
+    dependencies {
+        classpath 'nz.govt.nzqa.eqa.tools.build:eqa-build-plugin:1.+'
+    }
+}
+
+ext {
+    // See {@link nz.govt.nzqa.eqa.tools.build.BuildChecker#getSubprojectDependencies} for the reasoning as to why
+    // these subproject dependencies must be declared here
+    subprojectDependenciesMap = [
+            'm11n-tools-automation-core' : [  ],
+            'm11n-tools-automation-plugin' : [ project(':m11n-tools-automation-core') ]
+    ]
+}
+
+subprojects {
+    // we put these variables first so that the nz.govt.nzqa.eqa.tools.build.plugin can use them
+    group 'nz.govt.nzqa.m11n.tools'
+    description = 'NZQA Modernisation (m11n) automation tools'
+
+    // we put these variables first so that the nz.govt.nzqa.eqa.tools.build.plugin can use them
+    project.ext {
+        vendor = "New Zealand Qualifications Authority"
+
+        // the version number is in the 1.0.* series
+        // if the build is built with the task 'release' then the version is 1.0.[latestVersion + 1]
+        // otherwise the build is built as a SNAPSHOT, which is the latest version that matches the wildcard
+        // See the documentation on nz.govt.nzqa.eqa.tools.build.version.BuildVersionFinder for more details
+        // since there is no default ('') (non-appendix) artifact, we choose one artifact appendix that will determine the versions
+        versionMask = "1.0.*"
+    }
+
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
+    configurations {
+        publishableArtifacts
+    }
+}

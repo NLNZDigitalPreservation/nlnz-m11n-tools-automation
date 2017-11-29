@@ -1,0 +1,8 @@
+rootProject.name = 'm11n-tools-automation'
+include ":core", ":plugin"
+
+// Correctly refer to the children build files
+rootProject.children.each { child ->
+    child.buildFileName = "${child.name}.gradle"
+    child.name = "${rootProject.name}-${child.name}"
+}

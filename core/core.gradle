@@ -1,0 +1,95 @@
+import nz.govt.nzqa.eqa.tools.build.ArtifactUploadParameters
+import nz.govt.nzqa.eqa.tools.build.EqaBuildTool
+import nz.govt.nzqa.eqa.tools.build.version.BuildVersion
+import nz.govt.nzqa.eqa.tools.build.version.DependencyVersionFactory
+
+plugins {
+    // required for jacoco test coverage checks
+    id 'com.github.kt3k.coveralls' version '2.6.3'
+}
+
+// we put these variables first so that the nz.govt.nzqa.eqa.tools.build.plugin can use them
+project.ext {
+    // There really should be no failures on PMD
+    ignorePmdFailures = true
+
+    // TODO There really should be no failures on FindBugs
+    ignoreFindBugsFailures = true
+
+    // TODO Generally the goal here is to have code coverage in the 80--90% range
+    // but it may be better to approach this with a more directed focus
+    // (i.e. increase code coverage when new functionality is added)
+    // TODO Write unit tests!
+    codeCoverageLimits = [
+            'instruction': 0.0, // currently at 0.0%
+            'branch'     : 0.0, // currently at 0.0%
+            'line'       : 0.0, // currently at 0.0%
+            'complexity' : 0.0, // currently at 0.0%
+            'method'     : 0.0, // currently at 0.0%
+            'class'      : 0.0  // currently at 0.0%
+    ]
+
+    artifactUploadParameters = ArtifactUploadParameters.fromArtifactTaskNames([])
+
+    artifactUploadParameters.add(new ArtifactUploadParameters(artifactTaskName: 'jar', sourceTaskName: 'jarSources'))
+}
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
+// run the findBugs checks with 'gradle check' or 'gradle findBugsMain' or 'gradle findBugsTest'
+apply plugin: 'findbugs'
+
+// run the pmd source code analyzer with 'gradle check' or 'gradle pmdMain' or 'gradle pmdTest'
+apply plugin: 'pmd' // source code analyzer
+
+// the EqaBuildPlugin
+apply plugin: 'nz.govt.nzqa.eqa.tools.build.plugin'
+
+setVersion(new BuildVersion(project, project.ext.versionMask, false))
+
+EqaBuildTool eqaBuildTool = project.eqaBuildPluginExtension.eqaBuildTool
+
+DependencyVersionFactory versionFactory = new DependencyVersionFactory(project, false)
+
+dependencies { dependencyHandler ->
+    // We use the latest groovy 2.x version for building this library
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+
+    compile group: 'org.jboss.tattletale', name: 'tattletale', version: '1.1.2.Final'
+    compile group: 'org.jboss.tattletale', name: 'tattletale-ant', version: '1.1.2.Final'
+    compile group: 'org.jboss.tattletale', name: 'tattletale-maven', version: '1.1.2.Final'
+
+    // We use the awesome Spock testing and specification framework
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    // latest version
+    testCompile 'junit:junit:4.12'
+
+    // latest version
+    testCompile 'org.mockito:mockito-all:1.10.19'
+
+    testRuntime 'log4j:log4j:1.2.17'
+}
+
+jar {
+    includeEmptyDirs = false
+
+    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Jar'))
+}
+
+task jarSources(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    includeEmptyDirs = false
+
+    from sourceSets.main.allSource
+
+    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Sources Jar'))
+}
+
+artifacts {
+    publishableArtifacts jar, jarSources
+}
+
+artifactOnlyBuild.dependsOn jar, jarSources
+build.dependsOn artifactOnlyBuild
