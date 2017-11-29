@@ -168,12 +168,51 @@ class GitCommander {
         shellCommand.executeOnShellWithWorkingDirectory(bigToSmallReportCommand, gitFolder)
 
         if (openReport) {
-            shellCommand.executeOnShellWithWorkingDirectory("subl ${bigToSmallReportFilename}", gitFolder)
+            shellCommand.executeOnShellWithWorkingDirectory("atom ${bigToSmallReportFilename}", gitFolder)
         }
     }
 
     def createFolder(String folderPath) {
         File folder = new File(folderPath)
         folder.mkdirs()
+    }
+
+    def mergeTwoRepositories(String repoToMerge, String repoToMergeDir, String finalRepositoryDir){
+        ShellCommand shellCommand = new ShellCommand()
+        shellCommand.logger = logger
+        shellCommand.executeOnShellWithWorkingDirectory("git remote add ${repoToMerge} ${repoToMergeDir}", finalRepositoryDir)
+        shellCommand.executeOnShellWithWorkingDirectory("git fetch ${repoToMerge}", finalRepositoryDir)
+        // --allow-unrelated-histories is only available for git >= 2.9
+//        shellCommand.executeOnShellWithWorkingDirectory("git merge --allow-unrelated-histories ${repoToMerge}/master", finalRepositoryDir)
+        shellCommand.executeOnShellWithWorkingDirectory("git merge ${repoToMerge}/master", finalRepositoryDir)
+        shellCommand.executeOnShellWithWorkingDirectory("git remote remove ${repoToMerge}", finalRepositoryDir)
+    }
+
+    def initGitFolder(String folderPath) {
+        ShellCommand shellCommand = new ShellCommand()
+        shellCommand.logger = logger
+        shellCommand.executeOnShellWithWorkingDirectory("git init", folderPath)
+    }
+
+    def createGitAttributes (String folderPath) {
+        ShellCommand shellCommand = new ShellCommand()
+        shellCommand.logger = logger
+        shellCommand.executeOnShellWithWorkingDirectory("git config merge.ours.driver true", folderPath)
+        shellCommand.executeOnShellWithWorkingDirectory("echo .gitignore merge=ours >> .gitattributes", folderPath)
+        shellCommand.executeOnShellWithWorkingDirectory("git add .gitattributes && git commit -m 'Add .gitattributes'", folderPath)
+    }
+
+    def moveToEqaRoot(String folderPath) {
+        ShellCommand shellCommand = new ShellCommand()
+        shellCommand.logger = logger
+        shellCommand.executeOnShellWithWorkingDirectory("mkdir -p ${folderpath}")
+        shellCommand.executeOnShellWithWorkingDirectory("git mv * ${folderpath}/", folderPath)
+        shellCommand.executeOnShellWithWorkingDirectory("git add -A && git commit -m 'Initial commit and folder structure setup'", folderPath)
+    }
+
+    def deleteGitIgnore(String folderPath) {
+        ShellCommand shellCommand = new ShellCommand()
+        shellCommand.logger = logger
+        shellCommand.executeOnShellWithWorkingDirectory("rm .gitignore", folderPath)
     }
 }
