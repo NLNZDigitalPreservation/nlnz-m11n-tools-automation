@@ -1,3 +1,6 @@
+import nz.govt.nzqa.eqa.tools.build.BuildException
+import nz.govt.nzqa.eqa.tools.build.RepositoryAttributes
+
 buildscript {
     repositories {
         mavenLocal()
@@ -12,6 +15,30 @@ buildscript {
 }
 
 ext {
+    // For the eqa-build-plugin, we upload it to pdnexus01, which is nzqa's repository
+    // The username and password must be specified on the command line, as in:
+    // gradle clean build -PuploadRepositoryUsername=[username] -PuploadRepositoryPassword=[password]
+    List<TaskExecutionRequest> taskExecutionRequestList = project.gradle.getStartParameter().getTaskRequests()
+    boolean hasPublish = taskExecutionRequestList.find { TaskExecutionRequest taskExecutionRequest ->
+        "publish" == taskExecutionRequest.args.find { argument ->
+            "publish".equals(argument)
+        }
+    }
+    // The upload repository is important to retrieve versioning information as well as for publishing
+    // TODO We may want to make the upload repository more generic
+    uploadRepository = new RepositoryAttributes(name: "pdnexus01-releases",
+            url: 'http://pdnexus01.nzqa.govt.nz:8081/nexus/content/repositories/releases',
+            artifactUrls: [ 'http://pdnexus01.nzqa.govt.nz:8081/nexus/content/repositories/releases' ],
+            userName: project.hasProperty('uploadRepositoryUsername') ? project.uploadRepositoryUsername : null,
+            password: project.hasProperty('uploadRepositoryPassword') ? project.uploadRepositoryPassword : null)
+    if (hasPublish) {
+        if (!project.hasProperty('uploadRepositoryUsername') || !project.hasProperty('uploadRepositoryPassword')) {
+            throw new BuildException("""A publish of the plugin must include the pdnexus01 uploadRepositoryUsername and uploadRepositoryPassword.
+Please include the command line arguments:
+-PuploadRepositoryUsername=[username] -PuploadRepositoryPassword=[password]""")
+        }
+    }
+
     // See {@link nz.govt.nzqa.eqa.tools.build.BuildChecker#getSubprojectDependencies} for the reasoning as to why
     // these subproject dependencies must be declared here
     subprojectDependenciesMap = [
