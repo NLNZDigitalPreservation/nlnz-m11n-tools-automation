@@ -55,7 +55,9 @@ DependencyVersionFactory versionFactory = new DependencyVersionFactory(project, 
 
 dependencies { dependencyHandler ->
     // We use the latest groovy 2.x version for building this library
-    compile 'org.codehaus.groovy:groovy-all:2.4.+'
+    // compile 'org.codehaus.groovy:groovy-all:2.4.+'
+    compile localGroovy()
+
 
     // Use the latest version
     compile "com.google.guava:guava:+"
@@ -95,6 +97,13 @@ task jarSources(type: Jar, dependsOn: classes) {
 
     setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Sources Jar'))
 }
+
+// We want to force a specific version as part of our dependency resolution
+//configurations.all {
+//    resolutionStrategy {
+//        force 'org.codehaus.groovy:groovy-all:2.4.+'
+//    }
+//}
 
 artifacts {
     publishableArtifacts jar, jarSources

@@ -62,6 +62,8 @@ dependencies { dependencyHandler ->
     BuildDependency coreDependency = new BuildDependency(project: project,
             projectName: 'm11n-tools-automation-core', dependencyHandler: dependencyHandler)
     compile coreDependency.asDependency()
+
+    compile gradleApi()
 }
 
 jar {
