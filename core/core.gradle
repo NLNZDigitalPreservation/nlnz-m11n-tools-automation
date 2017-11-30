@@ -55,7 +55,12 @@ DependencyVersionFactory versionFactory = new DependencyVersionFactory(project, 
 
 dependencies { dependencyHandler ->
     // We use the latest groovy 2.x version for building this library
-    compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile 'org.codehaus.groovy:groovy-all:2.4.+'
+
+    // Use the latest version
+    compile "com.google.guava:guava:+"
+    // Use the latest version
+    compile "org.apache.commons:commons-lang3:+"
 
     compile group: 'org.jboss.tattletale', name: 'tattletale', version: '1.1.2.Final'
     compile group: 'org.jboss.tattletale', name: 'tattletale-ant', version: '1.1.2.Final'

@@ -12,22 +12,30 @@ class ShellCommand {
     def output = ''
     Boolean showOutput = false
     Boolean clearOutputOnCommandCompletion = false
+    String commandUsed
+    boolean exceptionOnError
+    String exceptionMessagePrefix
 
     // Executes a shell command (linux only).
     // See http://www.joergm.com/2010/09/executing-shell-commands-in-groovy/
-    def executeOnShell(String command) {
-        return executeOnShellWithWorkingDirectory(command, System.properties.'user.dir')
+    ShellCommand executeOnShell(String command) {
+        this.commandUsed = command
+        File userDir = new File((String) System.properties.'user.dir')
+        return executeOnShellWithWorkingDirectory(command, userDir)
     }
 
-    def executeOnShellWithWorkingDirectory(String command, String workingDirectoryPath) {
-        log.info("Executing\n  ${command}\n  in: ${workingDirectoryPath}")
-        File workingDirectory = new File(workingDirectoryPath)
-        def process = new ProcessBuilder(addShellPrefix(command))
+    ShellCommand executeOnShellWithWorkingDirectory(String command, File workingDirectory) throws ShellException {
+        this.commandUsed = command
+        if (!workingDirectory?.exists()) {
+            throw new ShellException("Unable to execute (working directory does not exist) command=[${command}], workingDirectory=[${workingDirectory}]")
+        }
+        log.debug("Executing\n  ${command}\n  in: ${workingDirectory.getAbsolutePath()}")
+        def process = new ProcessBuilder(addCommandPrefix(command))
                 .directory(workingDirectory)
                 .redirectErrorStream(true)
                 .start()
         process.inputStream.eachLine { processOutput(it) }
-        process.waitFor();
+        process.waitFor()
         exitValue = process.exitValue()
         if (showOutput) {
             println("${output}")
@@ -35,19 +43,56 @@ class ShellCommand {
         if (clearOutputOnCommandCompletion) {
             output = ''
         }
+        if (this.hasError() && this.exceptionOnError) {
+            throw new ShellException("${exceptionMessagePrefix} using command=[${this.commandUsed}], exitValue=[${this.exitValue}]")
+        }
+        return this
     }
 
-    private def addShellPrefix(String command) {
-        def commandArray = new String[3]
+    private String[] addCommandPrefix(String command) {
+        OperatingSystemFinder.OperatingSystemType osType = OperatingSystemFinder.instance.operatingSystemType
+        String[] result
+        switch (osType) {
+            case OperatingSystemFinder.OperatingSystemType.Windows:
+                result = addWindowsShellPrefix(command)
+                break
+            case OperatingSystemFinder.OperatingSystemType.Linux:
+                result = addLinuxShellPrefix(command)
+                break
+            default:
+                result = { command }
+        }
+        return result
+    }
+
+    private static String[] addLinuxShellPrefix(String command) {
+        String[] commandArray = new String[3]
         commandArray[0] = "sh"
         commandArray[1] = "-c"
         commandArray[2] = command
         return commandArray
     }
 
-    def processOutput(String outputLine) {
+    // TODO Needs to be verified on Windows
+    private static String[] addWindowsShellPrefix(String command) {
+        String[] commandArray = new String[3]
+        commandArray[0] = "cmd"
+        commandArray[1] = "/c"
+        commandArray[2] = command
+        return commandArray
+    }
+
+    void processOutput(String outputLine) {
         output <<= outputLine
         output <<= '\n'
-        log.info(outputLine)
+        log.debug(outputLine)
+    }
+
+    String getOutput() {
+        return output.toString()
+    }
+
+    boolean hasError() {
+        return this.exitValue != 0
     }
 }
