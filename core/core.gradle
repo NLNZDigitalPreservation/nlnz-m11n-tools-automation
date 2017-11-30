@@ -61,6 +61,8 @@ dependencies { dependencyHandler ->
     compile group: 'org.jboss.tattletale', name: 'tattletale-ant', version: '1.1.2.Final'
     compile group: 'org.jboss.tattletale', name: 'tattletale-maven', version: '1.1.2.Final'
 
+    compileOnly 'org.slf4j:slf4j-api:1.7.+'
+
     // We use the awesome Spock testing and specification framework
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
     // latest version
@@ -69,7 +71,9 @@ dependencies { dependencyHandler ->
     // latest version
     testCompile 'org.mockito:mockito-all:1.10.19'
 
-    testRuntime 'log4j:log4j:1.2.17'
+    // use sl4j logging for tests
+    testCompile 'org.slf4j:slf4j-log4j12:1.7.+'
+
 }
 
 jar {

@@ -1,4 +1,8 @@
-package nz.govt.nzqa.eqa.buildtools
+package nz.govt.nzqa.m11n.tools.automation.maven.repository
+
+import groovy.util.logging.Slf4j
+import nz.govt.nzqa.m11n.tools.automation.maven.PomContainer
+import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
 
 import java.util.regex.Matcher
 import java.util.zip.ZipEntry
@@ -9,6 +13,7 @@ import java.util.zip.ZipFile
  *
  * TODO: Pre-check to see if the artifact already exists before trying to upload
  */
+@Slf4j
 class ArtifactUploader {
     // Outputs the gradle dependency to the console so that it can be used in a gradle dependency
     // To just output the dependency information set this variable to true and doUploadToNexus to false
@@ -22,7 +27,6 @@ class ArtifactUploader {
     String repositoryUrl
 
     ShellCommand shellCommand
-    Logger logger
 
     String workingDirectory = '/tmp'
 
@@ -33,7 +37,7 @@ class ArtifactUploader {
 
     def showGradleDependency = { groupId, artifactId, version, File file, classifier = null, PomContainer pomContainer = null  ->
         String fileName = file.getName()
-        if (outputGradleDependency && logger != null) {
+        if (outputGradleDependency) {
             def compileGroup = "    compile group: '${groupId}', name: '${artifactId}', version: '${version}'"
             if (pomContainer != null && pomContainer.isExtracted()) {
                 compileGroup =  "    compile group: '${pomContainer.groupId}', name: '${pomContainer.artifactId}', version: '${pomContainer.version}'"
@@ -46,9 +50,9 @@ class ArtifactUploader {
             } else if (fileName.endsWith(".exe")) {
                 compileGroup += ", ext: 'exe'"
             }
-            logger.logToFile(compileGroup)
+            log.info(compileGroup)
             if (pomContainer != null && pomContainer.isExtracted()) {
-                logger.logToFile("NOTE replacement by pomContainer: group: ${groupId}->${pomContainer.groupId}, " +
+                log.info("NOTE replacement by pomContainer: group: ${groupId}->${pomContainer.groupId}, " +
                         "name: ${artifactId}->${pomContainer.artifactId}, version: ${version}->${pomContainer.version}")
             }
         }
@@ -75,18 +79,18 @@ class ArtifactUploader {
                 if (pomContainer != null && pomContainer.isExtracted()) {
                     // from http://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
                     // maven 2.5+ mvn install:install-file -Dfile=<path-to-file>
-                    logger.logToFile("file ${file.getAbsolutePath()} has embedded pom, extracting to [${pomContainer}]")
-                    uploadNexusCommand = "mvn deploy:deploy-file -DpomFile=${pomContainer.extractedPom.getAbsolutePath()} \
-                                        -DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
-                                        ${classifierArgument}"
+                    log.info("file ${file.getAbsolutePath()} has embedded pom, extracting to [${pomContainer}]")
+                    uploadNexusCommand = "mvn deploy:deploy-file -DpomFile=${pomContainer.extractedPom.getAbsolutePath()} " +
+                                        "-DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} " +
+                                        "${classifierArgument}"
                 }
             }
         }
         if (uploadNexusCommand == null) {
-            uploadNexusCommand = "mvn deploy:deploy-file -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} \
-                                    -DgeneratePom=true -Dpackaging=${packaging} \
-                                    -DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} \
-                                    ${classifierArgument}"
+            uploadNexusCommand = "mvn deploy:deploy-file -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} " +
+                                    "-DgeneratePom=true -Dpackaging=${packaging} " +
+                                    "-DrepositoryId=${repositoryId} -Durl=${repositoryUrl} -Dfile=${file.getAbsolutePath()} " +
+                                    "${classifierArgument}"
         }
 
         if (uploadNexusCommand != null && !uploadNexusCommand.isEmpty()) {
@@ -94,13 +98,13 @@ class ArtifactUploader {
             def uploadProcessExitValue = shellCommand.exitValue
             //uploadProcess.text.eachLine { println theLine }
             if (!uploadProcessExitValue) {
-                logger.logToFile("Upload of artifact ${jarName} failed")
-                logger.logToFile("*****")
-                logger.logToFile("*************************************************************")
+                log.info("Upload of artifact ${jarName} failed")
+                log.info("*****")
+                log.info("*************************************************************")
             }
             showGradleDependency(groupId, artifactId, version, file, classifier, pomContainer)
         } else {
-            logger.logToFile("No valid upload to nexus command, skipping upload... (file: [${file}])")
+            log.info("No valid upload to nexus command, skipping upload... (file: [${file}])")
         }
     }
 
@@ -111,7 +115,7 @@ class ArtifactUploader {
         Collection<ZipEntry> embeddedPoms = fileAsZip.entries().findAll { ZipEntry entry -> !entry.directory }.findAll { ZipEntry entry ->
             boolean isPom = false
             if (entry.name ==~ /META-INF\/.*?\/pom.xml$/) {
-                logger.logToFile("unzipped entries: [${entry}], name: [${entry.name}], directory: [${entry.directory}]")
+                log.info("unzipped entries: [${entry}], name: [${entry.name}], directory: [${entry.directory}]")
                 embeddedPomExists = true
                 isPom = true
             }
@@ -121,7 +125,7 @@ class ArtifactUploader {
             if (embeddedPoms.size() == 1) {
                 String pomContents = fileAsZip.getInputStream(embeddedPoms.first()).text
                 extractedPom = PomContainer.fromPomContents(pomContents)
-                logger.logToFile("Extracted from pomContents: [${extractedPom}]")
+                log.info("Extracted from pomContents: [${extractedPom}]")
 
                 if (extractedPom.isValid()) {
                     String pomFoldername = "${this.workingDirectory}/extracted-poms"
@@ -132,10 +136,10 @@ class ArtifactUploader {
                     pomFile.write(pomContents)
                     extractedPom.extractedPom = pomFile
                 } else {
-                    logger.logToFile("${embeddedPoms.first()} does not contain a valid pom")
+                    log.info("${embeddedPoms.first()} does not contain a valid pom")
                 }
             } else {
-                logger.logToFile("More embedded poms than expected: [${embeddedPoms.size()}]: [${embeddedPoms}]")
+                log.info("More embedded poms than expected: [${embeddedPoms.size()}]: [${embeddedPoms}]")
             }
         }
         return extractedPom
@@ -148,7 +152,7 @@ class ArtifactUploader {
                 //println "artifact: ${artifactName}, jar: ${jarName}: ${file.getAbsolutePath()}"
                 uploadToNexus(groupId, artifactId, version, file, classifier, usePomIfAvailable)
             } else {
-                logger.logToFile("${jarName} NOT processed")
+                log.info("${jarName} NOT processed")
             }
         } else {
             showGradleDependency(groupId, artifactId, version, file, classifier, usePomIfAvailable)
@@ -174,11 +178,11 @@ class ArtifactUploader {
         def groupId = pathMatcher.find() ? pathMatcher.group(1) : null
         def artifactId = groupId != null ? pathMatcher.group(2) : null
         def version = groupId != null ? pathMatcher.group(3) : null
-        logger.logToFile("filename: [${filename}], groupId: [${groupId}], artifactId: [${artifactId}], version: [${version}]")
+        log.info("filename: [${filename}], groupId: [${groupId}], artifactId: [${artifactId}], version: [${version}]")
         if (groupId != null && artifactId != null && version != null) {
             uploadFile(groupId, version, file, artifactId)
         } else {
-            logger.logToFile("uploadFileWithGroupIdArtifactIdVersionInFilename: Unable to upload artifact: Not enough extractable attributes")
+            log.info("uploadFileWithGroupIdArtifactIdVersionInFilename: Unable to upload artifact: Not enough extractable attributes")
         }
     }
 

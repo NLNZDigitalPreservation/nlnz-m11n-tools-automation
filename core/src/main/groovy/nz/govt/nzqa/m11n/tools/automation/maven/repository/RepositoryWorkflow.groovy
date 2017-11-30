@@ -1,10 +1,12 @@
-package nz.govt.nzqa.eqa.buildtools
+package nz.govt.nzqa.m11n.tools.automation.maven.repository
+
+import groovy.util.logging.Slf4j
 
 /**
  * A conditional workflow for processing a repository.
  */
+@Slf4j
 class RepositoryWorkflow {
-    Logger logger
     RepositoryProcessor repositoryProcessor
 
     Boolean doStartWithCopy = false
@@ -36,11 +38,8 @@ class RepositoryWorkflow {
      * @return
      */
     def setup() {
-        logger = new Logger()
         String logFilePathStart = workParentFolderPath + File.separator + "logs"
-        logger.generateLogFilePath(logFilePathStart, workflowName)
-        logger.logToConsole = true
-        logger.logToFile("Starting workflow ${workflowName}, logging to ${logFilePathStart}-[current-date-time].log")
+        log.info("Starting workflow ${workflowName}, logging to ${logFilePathStart}-[current-date-time].log")
 
         repositoryProcessor = new RepositoryProcessor()
         repositoryProcessor.logger = logger
@@ -55,59 +54,59 @@ class RepositoryWorkflow {
     def nextRepositoryName() {
         previousRepositoryName = currentRepositoryName
         currentRepositoryName = repositoryBaseName + '-' + sequenceIndex
-        logger.logToFile("\n***************\nCurrent repository name is '${currentRepositoryName}'\n")
+        log.info("\n***************\nCurrent repository name is '${currentRepositoryName}'\n")
         sequenceIndex += 1
         return currentRepositoryName
     }
 
     def doWorkflow() {
 
-        logger.logToFile("\n***************\ndoStartWithCopy=${doStartWithCopy}\n")
+        log.info("\n***************\ndoStartWithCopy=${doStartWithCopy}\n")
         if (doStartWithCopy) {
             repositoryProcessor.copyRepository(currentRepositoryName, nextRepositoryName())
         }
 
-        logger.logToFile("\n***************\ndoSubdirectoryFilter=${doSubdirectoryFilter}\n")
+        log.info("\n***************\ndoSubdirectoryFilter=${doSubdirectoryFilter}\n")
         if (doSubdirectoryFilter) {
             repositoryProcessor.subdirectoryFilter(currentRepositoryName, subdirectoryFilterPath)
         }
 
-        logger.logToFile("\n***************\ndoPullIntoNewRepository=${doPullIntoNewRepository}\n")
+        log.info("\n***************\ndoPullIntoNewRepository=${doPullIntoNewRepository}\n")
         if (doPullIntoNewRepository) {
             repositoryProcessor.pullIntoNewRepository(currentRepositoryName, nextRepositoryName())
         }
 
-        logger.logToFile("\n***************\ndoCopyToWorkingRepository=${doCopyToWorkingRepository}\n")
+        log.info("\n***************\ndoCopyToWorkingRepository=${doCopyToWorkingRepository}\n")
         if (doCopyToWorkingRepository) {
             repositoryProcessor.copyRepository(currentRepositoryName, nextRepositoryName())
         }
 
-        logger.logToFile("\n***************\ndoBigToSmallReport=${doBigToSmallReport}\n")
+        log.info("\n***************\ndoBigToSmallReport=${doBigToSmallReport}\n")
         if (doBigToSmallReport) {
             repositoryProcessor.bigToSmallReport(currentRepositoryName, true)
         }
 
-        logger.logToFile("\n***************\ndoRemoveFolders=${doRemoveFolders}\n")
+        log.info("\n***************\ndoRemoveFolders=${doRemoveFolders}\n")
         if (doRemoveFolders) {
             if (removalFolders != null && !removalFolders.isEmpty() && !removalFolders.isAllWhitespace()) {
                 repositoryProcessor.removeFolders(currentRepositoryName, removalFolders)
 
                 // don't pull into a new repository if nothing changes
-                logger.logToFile("\n***************\ndoPostRemovalFoldersPull=${doPostRemovalFoldersPull}\n")
+                log.info("\n***************\ndoPostRemovalFoldersPull=${doPostRemovalFoldersPull}\n")
                 if (doPostRemovalFoldersPull) {
                     repositoryProcessor.pullIntoNewRepository(currentRepositoryName, nextRepositoryName())
                 }
 
-                logger.logToFile("\n***************\ndoPostRemoveFoldersBigToSmallReport=${doPostRemoveFoldersBigToSmallReport}\n")
+                log.info("\n***************\ndoPostRemoveFoldersBigToSmallReport=${doPostRemoveFoldersBigToSmallReport}\n")
                 if (doPostRemoveFoldersBigToSmallReport) {
                     repositoryProcessor.bigToSmallReport(currentRepositoryName, true)
                 }
             } else {
-                logger.logToFile("\ndoRemoveFolders=${doRemoveFolders} but no folders listed, so skipping\n")
+                log.info("\ndoRemoveFolders=${doRemoveFolders} but no folders listed, so skipping\n")
             }
         }
 
-        logger.logToFile("\n***************\ndoCreatePatches=${doCreatePatches}\n")
+        log.info("\n***************\ndoCreatePatches=${doCreatePatches}\n")
         if (doCreatePatches) {
             repositoryProcessor.createPatches(currentRepositoryName)
         }

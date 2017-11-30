@@ -1,4 +1,4 @@
-package nz.govt.nzqa.eqa.buildtools
+package nz.govt.nzqa.m11n.tools.automation.migration
 
 import java.util.regex.Matcher
 

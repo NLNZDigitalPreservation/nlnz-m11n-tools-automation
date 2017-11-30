@@ -1,13 +1,15 @@
-package nz.govt.nzqa.eqa.buildtools
+package nz.govt.nzqa.m11n.tools.automation.git
+
+import groovy.util.logging.Slf4j
+import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
 
 import java.text.SimpleDateFormat
 
 /**
  * Provides access to some common git commands.
  */
+@Slf4j
 class GitCommander {
-    Logger logger
-    private File gitFolder
     private static String GIT_EACH_UPDATE_REF = "git for-each-ref --format=\"%(refname)\" refs/original/ | xargs -n 1 git update-ref -d"
     private static String GIT_REFLOG_EXPIRE = "git reflog expire --expire=now --all"
     private static String GIT_RESET_HARD = "git reset --hard"
@@ -17,7 +19,6 @@ class GitCommander {
 
     def setBranch(String gitFolder, String branchName) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         String command = "git checkout ${branchName}"
         shellCommand.executeOnShellWithWorkingDirectory(command, gitFolder)
     }
@@ -27,7 +28,6 @@ class GitCommander {
      */
     def subdirectoryFilterInFolder(String gitFolder, String targetFolderPath) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         String command = "git filter-branch --tag-name-filter cat --prune-empty " +
             "--subdirectory-filter \"${targetFolderPath}\" -- --all"
         shellCommand.executeOnShellWithWorkingDirectory(command, gitFolder)
@@ -41,7 +41,6 @@ class GitCommander {
      */
     def removeFolders(String gitFolder, String removalFilesOrFolders) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         // Note that wildcards will not work for this shell command.
         // In order to do any shell expansions for the removalFileOrFolders, those values
         // will need to be determined elsewhere
@@ -57,8 +56,7 @@ class GitCommander {
      */
     def cleanUp(String gitFolder) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
-        logger.logToFile("NOTE that the command 'git for-each-ref ...'\n" +
+        log.info("NOTE that the command 'git for-each-ref ...'\n" +
                          "     will cause a usage warning if there are no matching references for the update-ref command.\n" +
                          "     This warning can be safely ignored (no update-ref's took place).")
         shellCommand.executeOnShellWithWorkingDirectory(GIT_EACH_UPDATE_REF, gitFolder)
@@ -76,7 +74,6 @@ class GitCommander {
      */
     def checkFolderSize(String folderPath) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         shellCommand.executeOnShellWithWorkingDirectory('du -sh', folderPath)
     }
 
@@ -93,7 +90,6 @@ class GitCommander {
     def pullIntoNewRepository(String gitFolder, String newRepositoryParentFolderPath, String newRepositoryName,
                               String... recreateBranchNames) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         String newRepositoryFolder = newRepositoryParentFolderPath + File.separator + newRepositoryName
         def branchHashMap = [:]
         recreateBranchNames.each { branchName ->
@@ -111,18 +107,16 @@ class GitCommander {
 
     def getBranchHash(String gitFolder, String branchName) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         String command = "git show ${branchName} --format=\"%H\" --no-patch"
         shellCommand.executeOnShellWithWorkingDirectory(command, gitFolder)
         String branchHash = shellCommand.output.toString().split("\n")[0]
-        logger.logToFile("${gitFolder} branch ${branchName} hash is '${branchHash}'")
+        log.info("${gitFolder} branch ${branchName} hash is '${branchHash}'")
         return branchHash
     }
 
     def createPatches(String gitFolder, String startingBranchName, String endingBranchName, String patchesFolder, String singlePatchFilePath) {
         createFolder(patchesFolder)
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         String commandForDirectory = "git format-patch ${startingBranchName}..${endingBranchName} " +
                 "--output-directory \"${patchesFolder}\""
         shellCommand.executeOnShellWithWorkingDirectory(commandForDirectory, gitFolder)
@@ -137,7 +131,6 @@ class GitCommander {
         String convertedFolderName = gitFolder.replace('/', '-').replace(' ', '_')
 
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
 
         // Because the -All-File-SHAs- and -Big-Objects- files may be too large for the command line,
         // output their sorted contents to separate files
@@ -179,7 +172,6 @@ class GitCommander {
 
     def mergeTwoRepositories(String repoToMerge, String repoToMergeDir, String finalRepositoryDir){
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         shellCommand.executeOnShellWithWorkingDirectory("git remote add ${repoToMerge} ${repoToMergeDir}", finalRepositoryDir)
         shellCommand.executeOnShellWithWorkingDirectory("git fetch ${repoToMerge}", finalRepositoryDir)
         // --allow-unrelated-histories is only available for git >= 2.9
@@ -190,13 +182,11 @@ class GitCommander {
 
     def initGitFolder(String folderPath) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         shellCommand.executeOnShellWithWorkingDirectory("git init", folderPath)
     }
 
     def createGitAttributes (String folderPath) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         shellCommand.executeOnShellWithWorkingDirectory("git config merge.ours.driver true", folderPath)
         shellCommand.executeOnShellWithWorkingDirectory("echo .gitignore merge=ours >> .gitattributes", folderPath)
         shellCommand.executeOnShellWithWorkingDirectory("git add .gitattributes && git commit -m 'Add .gitattributes'", folderPath)
@@ -204,7 +194,6 @@ class GitCommander {
 
     def moveToEqaRoot(String folderPath) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         shellCommand.executeOnShellWithWorkingDirectory("mkdir -p ${folderpath}")
         shellCommand.executeOnShellWithWorkingDirectory("git mv * ${folderpath}/", folderPath)
         shellCommand.executeOnShellWithWorkingDirectory("git add -A && git commit -m 'Initial commit and folder structure setup'", folderPath)
@@ -212,7 +201,6 @@ class GitCommander {
 
     def deleteGitIgnore(String folderPath) {
         ShellCommand shellCommand = new ShellCommand()
-        shellCommand.logger = logger
         shellCommand.executeOnShellWithWorkingDirectory("rm .gitignore", folderPath)
     }
 }

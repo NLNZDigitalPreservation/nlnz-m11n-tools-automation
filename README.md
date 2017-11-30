@@ -4,6 +4,19 @@
 
 This repository contains automation classes and tools that are available for gradle builds in a automation tools plugin.
 
+Some of the classes here correlate with classes in the eqa-build-plugin project, the difference should be in the package
+name, where the eqa-build-classes are of package nz.govt.nzqa.eqa.tools.build.automation.* and the m11n-tools-automation
+classes are of package nz.govt.nzqa.m11n.tools.automation.*.
+
+There should be regular effort to keep the functionality in same-named classes updated across the two projects. Because
+eqa-build-plugin is used to build the m11n-tools-automation artifacts, the use of m11n-tools-automation classes in
+the eqa-build-plugin would introduce circular dependencies between the projects, which we avoid by simply duplicating the
+functionality instead of using a dependency. But we don't want to duplicate work, so we make the classes almost identical
+aside from packaging.
+
+Choose the eqa-build-plugin classes for build-related processing and the m11n-tools-automation for automation-related
+processing.
+
 ## Motivation
 
 Gradle builds provide part of the platform of build and deploy automation. This plugin makes objects available for

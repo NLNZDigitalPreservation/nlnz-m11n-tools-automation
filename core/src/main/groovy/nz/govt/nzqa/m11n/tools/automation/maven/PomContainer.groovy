@@ -1,4 +1,4 @@
-package nz.govt.nzqa.eqa.buildtools
+package nz.govt.nzqa.m11n.tools.automation.maven
 
 import groovy.transform.Canonical
 import groovy.util.slurpersupport.GPathResult
@@ -22,16 +22,16 @@ class PomContainer {
         return pomContainer
     }
 
-    public boolean isValid() {
+    boolean isValid() {
         return groupId != null && !groupId.isEmpty() && artifactId != null && !artifactId.isEmpty() &&
                 version != null && !version.isEmpty()
     }
 
-    public boolean isExtracted() {
+    boolean isExtracted() {
         return isValid() && extractedPom != null && extractedPom.exists()
     }
 
-    public String toString() {
+    String toString() {
         return "groupId: ${groupId}, artifactId: ${artifactId}, version: ${version}, extractedPom: ${extractedPom}"
     }
 }

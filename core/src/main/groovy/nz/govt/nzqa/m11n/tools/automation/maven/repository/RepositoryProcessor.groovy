@@ -1,10 +1,15 @@
-package nz.govt.nzqa.eqa.buildtools
+package nz.govt.nzqa.m11n.tools.automation.maven.repository
+
+import groovy.util.logging.Slf4j
+import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
+import nz.govt.nzqa.m11n.tools.automation.git.GitCommander
 
 import java.text.SimpleDateFormat
 
 /**
  * Processes a repository.
  */
+@Slf4j
 class RepositoryProcessor {
 
     static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss")
@@ -12,13 +17,10 @@ class RepositoryProcessor {
     String[] preserveBranchNames = [ ]
     String workParentFolderPath = "/tmp"
     String tempFolderPath = "/tmp"
-    Logger logger
     GitCommander gitCommander = new GitCommander()
     ShellCommand shellCommand = new ShellCommand()
 
     def setup() {
-        gitCommander.logger = logger
-        shellCommand.logger = logger
     }
 
     /**
