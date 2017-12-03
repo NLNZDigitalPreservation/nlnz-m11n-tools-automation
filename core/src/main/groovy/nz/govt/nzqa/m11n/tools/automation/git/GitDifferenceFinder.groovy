@@ -1,6 +1,8 @@
 package nz.govt.nzqa.m11n.tools.automation.git
 
+import groovy.util.logging.Slf4j
 import nz.govt.nzqa.m11n.tools.automation.AutomationException
+import nz.govt.nzqa.m11n.tools.automation.file.FilePathDifferenceExtractor
 import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
 
 /**
@@ -8,6 +10,7 @@ import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
  *
  * There are two cases: a general change or a change in a specific folder.
  */
+@Slf4j
 class GitDifferenceFinder {
     static final String GIT_DIFF_COMMAND = "git diff"
     static final String NAME_ONLY_OPTION = "--name-only"
@@ -16,25 +19,65 @@ class GitDifferenceFinder {
     static final String CURRENT_FOLDER = "."
     static final String PATHSPEC_MAGIC_EXCLUDE = "':(exclude)"
     static final String SPACE = " "
+    static final String GIT_LS_FILES_COMMAND = "git ls-files"
+    static final String LS_FILES_OPTIONS = "--exclude-standard --others"
+    static final String LS_FILES_EXCLUDE_FOLDER = "--exclude="
 
     /**
-     * Returns the base command. Note that the commit hash can be null.
+     * Returns the git diff base command. Note that the commit hash can be null.
      *
      * @param commitHash
      * @return
      */
-    String getCommonCommand(String commitHash) {
-        StringBuilder commonCommand = new StringBuilder()
-        commonCommand.append(GIT_DIFF_COMMAND)
+    String getGitDiffBaseCommand(String commitHash) {
+        StringBuilder command = new StringBuilder()
+        command.append(GIT_DIFF_COMMAND)
         if (commitHash?.trim()) {
-            commonCommand.append(SPACE)
-            commonCommand.append(commitHash)
+            command.append(SPACE)
+            command.append(commitHash)
         }
-        commonCommand.append(SPACE)
-        commonCommand.append(NAME_ONLY_OPTION)
-        commonCommand.append(SPACE)
+        command.append(SPACE)
+        command.append(NAME_ONLY_OPTION)
+        command.append(SPACE)
 
-        return commonCommand.toString()
+        return command.toString()
+    }
+
+    String getGitListUntrackedFilesBaseCommand(File gitFolder, File includeFolder, List<File> excludeFolders) {
+        StringBuilder command = new StringBuilder()
+        command.append(GIT_LS_FILES_COMMAND)
+        command.append(SPACE)
+        if (includeFolder != null) {
+            String includeSubpath = FilePathDifferenceExtractor.subpathDifference(gitFolder, includeFolder)
+            if (includeSubpath != null) {
+                if (!includeSubpath.isEmpty()) {
+                    command.append(includeSubpath.trim())
+                } else {
+                    command.append(".")
+                }
+            }
+        } else {
+            command.append(".")
+        }
+        command.append(SPACE)
+        command.append(LS_FILES_OPTIONS)
+        command.append(SPACE)
+
+        excludeFolders.each { excludeFolder ->
+            if (excludeFolder != null) {
+                String excludeSubpath = FilePathDifferenceExtractor.subpathDifference(gitFolder, excludeFolder)
+                if (excludeSubpath) {
+                    // non-null && not empty
+                    command.append(LS_FILES_EXCLUDE_FOLDER)
+                    command.append(excludeSubpath.trim())
+                    command.append(SPACE)
+                } else {
+                    log.warn("Unrecognised exclude folder for subpath extraction=${excludeFolder}")
+                }
+            }
+        }
+
+        return command.toString()
     }
 
     ShellCommand executeCommand(String baseCommand, String exceptionMessagePrefix, File gitFolder,
@@ -100,17 +143,28 @@ class GitDifferenceFinder {
         }
         ensureFoldersExist(allFolders)
 
-        String baseCommand = getCommonCommand(commitHash)
+        String baseCommand = getGitDiffBaseCommand(commitHash)
 
         ShellCommand changesWithStaged = executeCommand(baseCommand, "Unable to find changes", gitRootFolder, CACHED_OPTION, includeFolder, excludeFolders)
         if (nonEmptyResult(changesWithStaged.getOutput())) {
+            log.info("Changes with staged on gitFolder=${gitRootFolder}, includeFolder=${includeFolder}, excludeFolders=${excludeFolders}")
             return true
         }
 
         ShellCommand changesWithUnstaged = executeCommand(baseCommand, "Unable to find changes", gitRootFolder, null, includeFolder, excludeFolders)
         if (nonEmptyResult(changesWithUnstaged.getOutput())) {
+            log.info("Changes with unstaged on gitFolder=${gitRootFolder}, includeFolder=${includeFolder}, excludeFolders=${excludeFolders}")
             return true
         }
+
+        String untrackedCommand = getGitListUntrackedFilesBaseCommand(gitRootFolder, includeFolder, excludeFolders)
+        ShellCommand untrackedShellCommand = new ShellCommand(exceptionOnError: true, exceptionMessagePrefix: "Unable to find untracked")
+        untrackedShellCommand.executeOnShellWithWorkingDirectory(untrackedCommand.toString(), gitRootFolder)
+        if (nonEmptyResult(untrackedShellCommand.getOutput())) {
+            log.info("Changes with untracked on gitFolder=${gitRootFolder}, includeFolder=${includeFolder}, excludeFolders=${excludeFolders}")
+            return true
+        }
+
         return false
     }
 
