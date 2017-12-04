@@ -14,11 +14,6 @@ class LineChecker {
         return (line.toLowerCase().startsWith(subString))
     }
 
-
-    String getName (String line) {
-
-    }
-
     // For splitDefaults
     boolean lineStartsWithIf(String line){
         return (line.toLowerCase().startsWith("if"))
@@ -41,15 +36,19 @@ class LineChecker {
     String getEntityNameFromLine(String line) {
 
         def regexFilter = /'(\w+)'/
-        String name = ((line =~ /$regexFilter/)[0][1])
+        String name = ''
+        def result = (line =~ /$regexFilter/)
+
+        if (result) {
+            name = result[0][1]
+        }
         System.out.println("entity name: " + name)
-        return (name.size() >= 1 ? name : '')
+        return name
     }
 
 
-    boolean entityNameHasChanged(String line, String currentEntityName){
-        name = getEntityNameFromLine(line)
-        return (name.equals(currentEntityName))
+    boolean entityNameHasChanged(String newEntityName, String currentEntityName){
+        return ! newEntityName.equalsIgnoreCase(currentEntityName)
     }
 
     // For splitTables

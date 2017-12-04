@@ -5,6 +5,38 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class SybaseOperator {
 
+    String getSqlTypeFromSybaseSqlName(String sybaseSqlName){
+
+        System.out.println("sybaseSqlName: "+sybaseSqlName)
+        String sqlType = ''
+
+        def regexFilter = /(\d+)-eqa_prod_(\w+)_(\d+).sql/
+        // After regex gives [ sybaseSqlName, index, sqlType, date]
+        System.out.println("after regex: " + (sybaseSqlName =~ /$regexFilter/)[0])
+        String baseName = ((sybaseSqlName =~ /$regexFilter/)[0][2])
+        System.out.println("BaseName: " + (sybaseSqlName =~ /$regexFilter/)[0][2])
+
+        String[] baseNameSplit = ((sybaseSqlName =~ /$regexFilter/)[0][2]).split('_')
+        if (baseNameSplit.size() > 1){
+            // Has > 1 word
+            for (String word : baseNameSplit){
+                sqlType += camelCase(word)
+            }
+        }
+
+        else{
+            sqlType = baseName
+        }
+
+        System.out.println("sqlType " + sqlType)
+        return sqlType
+    }
+
+    String camelCase(String word){
+        return word.substring(0, 1).toUpperCase() + word.substring(1)
+    }
+
+
 /**
  * Split defaults.sql - dropping and creating objects/parameters in dbo
  * @param sybaseSqlFile
@@ -108,9 +140,9 @@ class SybaseOperator {
                 // If line not blank
                 if (line.trim()) {
                     if (lineChecker.lineStartsWith(line, "exec") || lineChecker.lineStartsWith(line, "if exists")) {
-                        if (lineChecker.entityNameHasChanged(line, currentEntityName)) {
-                            currentEntityName = lineChecker.getEntityNameFromLine(line)
-                            System.out.println("Current entity name: " + currentEntityName)
+                        String newEntityName = lineChecker.getEntityNameFromLine(line)
+                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                            currentEntityName = newEntityName
 
                             if (fileExist) {
                                 sqlFile << line + '\r\n'
@@ -119,16 +151,18 @@ class SybaseOperator {
 
                             } else {
                                 // Create a new file for new entity
-                                sqlFileName = outputDir + File.separator + "splitUserDatatypes-" + counter + lineChecker.getTypeFromLine(line) + ".sql"
+                                sqlFileName = outputDir + File.separator + "splitUserDatatypes-" + counter + "-" + lineChecker.getTypeFromLine(line) + ".sql"
                                 new File(sqlFileName).createNewFile()
                                 sqlFile = new File(sqlFileName)
                                 log.info("File '${sqlFileName}' created")
                                 sqlFile << line + '\r\n'
                                 counter++
                             }
-                        } else {
-                            sqlFile << line + '\r\n'
                         }
+                    }
+
+                    else {
+                        sqlFile << line + '\r\n'
                     }
 
                     log.info("=============== End of 'splitUserDatatypes' Generated ${counter} files =============== ")
