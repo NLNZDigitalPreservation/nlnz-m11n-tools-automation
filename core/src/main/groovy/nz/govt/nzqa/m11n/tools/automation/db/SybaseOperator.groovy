@@ -23,7 +23,7 @@ class SybaseOperator {
                 sqlType += camelCase(word)
             }
         } else {
-            sqlType = baseName
+            sqlType = camelCase(baseName)
         }
 
         System.out.println("sqlType " + sqlType)

@@ -3,6 +3,8 @@ package nz.govt.nzqa.m11n.tools.automation.db
 import org.junit.Before
 import org.junit.Test
 
+import  static org.junit.Assert.assertEquals
+
 /**
  * Tests the {@link nz.govt.nzqa.m11n.tools.automation.db.SybaseOperator}.
  */
@@ -16,9 +18,10 @@ class SybaseOperatorTest {
     }
 
     @Test
-    void shouldGetCorrectName(){
-        String testSybaseSqlName = '00-eqa_prod_defaults_171106.sql'
-        sybaseOperatorTestObj.getSqlTypeFromSybaseSqlName(testSybaseSqlName)
+    void shouldExtractCorrectSybaseName() {
+        String testName = '00-eqa_prod_defaults_171106.sql'
+
+        assertEquals("Should return camel cased sybase sql name", "Defaults", sybaseOperatorTestObj.getSqlTypeFromSybaseSqlName(testName))
     }
 
     /**
@@ -165,4 +168,7 @@ class SybaseOperatorTest {
         String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/"
         sybaseOperatorTestObj.splitSP(testFile, testDestDir)
     }
+
+
+
 }
