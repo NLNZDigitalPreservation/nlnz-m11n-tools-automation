@@ -11,38 +11,43 @@ class LineChecker {
     }
 
     boolean lineContains(String line, String subString) {
-        return (line.toLowerCase().startsWith(subString))
+        return (line.toLowerCase().contains(subString))
     }
 
-    // For splitDefaults
-    boolean lineStartsWithIf(String line){
-        return (line.toLowerCase().startsWith("if"))
-    }
+    String getTypeFromStatus(boolean isCreateStatement) {
 
-    boolean lineStartsWithCreate(String line) {
-        return (line.toLowerCase().startsWith("create"))
-    }
-
-    // For splitUserDatatypes
-    String getTypeFromLine(String line) {
-
-       if(line.toLowerCase().contains("add")){
-           return "add"
-       }
+        if(isCreateStatement){
+            return "add"
+        }
 
         return "drop"
     }
 
     String getEntityNameFromLine(String line) {
 
-        def regexFilter = /'(\w+)'/
-        String name = ''
-        def result = (line =~ /$regexFilter/)
+        def regexFilterList = [/'(\w+)'/, /'(\w+).(\w+)'/, /(\w+)\.(\w+)/, /CREATE TRIGGER (\w+)/,/(\w+)_(\w+)/, /CREATE PROCEDURE (\w+)/, /create procedure (\w+)/]
 
-        if (result) {
-            name = result[0][1]
+//        System.out.println("Line before:" + line)
+//        line.replace(".", "\\.")
+//        System.out.println("Line after:" + line)
+
+        String name = ''
+
+        mainloop:
+        for (def regexFilter : regexFilterList){
+
+            def result = (line =~ /$regexFilter/)
+
+            if (result){ //&& lineStartsWith(line, "create procedure")) {
+                System.out.println("Result[0]: " + result[0])
+
+                // Return full match and strip away single quote
+                name = result[0][0].replace("'", "")
+                break mainloop
+            }
         }
-        System.out.println("entity name: " + name)
+//        System.out.println("entity name: " + name)
+
         return name
     }
 
