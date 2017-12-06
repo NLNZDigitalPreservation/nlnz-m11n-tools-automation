@@ -63,10 +63,4 @@ class LineCheckerTest {
         assertEquals("Extract line name correctly 4", 'dbo.Default_1', lineCheckerTestObj.getEntityNameFromLine(lineTest))
     }
 
-
-    @Test
-    void removeEntityNameFromLineWhenCheckType() {
-        String lineTest = "IF EXISTS (SELECT * FROM systypes WHERE name='wwwaddr')"
-        assertEquals("Remove entity name correctly", 'drop', lineCheckerTestObj.getTypeFromLine(lineTest))
-    }
 }
