@@ -95,17 +95,16 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
-                            if (firstFileNotCreated) {
-                                lineBufferForFirstFile += line
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
-                                firstFileNotCreated = false
+                            counter++
 
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
                             }
                         }
+
+                        sqlFile << line + '\r\n'
+
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
@@ -168,23 +167,22 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
-                            if (firstFileNotCreated) {
-                                lineBufferForFirstFile += line
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
-                                firstFileNotCreated = false
+                            counter++
 
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
                             }
                         }
+
+                        sqlFile << line + '\r\n'
+
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
                         sqlFile << line + '\r\n'
                     }
-                 }
+                }
         }
         log.info("=============== End of 'splitUserDatatypes' Generated ${counter} files =============== ")
     }
@@ -229,17 +227,16 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
-                            if (firstFileNotCreated) {
-                                lineBufferForFirstFile += line
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
-                                firstFileNotCreated = false
+                            counter++
 
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
                             }
                         }
+
+                        sqlFile << line + '\r\n'
+
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
@@ -290,17 +287,16 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
-                            if (firstFileNotCreated) {
-                                lineBufferForFirstFile += line
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
-                                firstFileNotCreated = false
+                            counter++
 
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
                             }
                         }
+
+                        sqlFile << line + '\r\n'
+
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
@@ -363,17 +359,16 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
-                            if (firstFileNotCreated) {
-                                lineBufferForFirstFile += line
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
-                                firstFileNotCreated = false
+                            counter++
 
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
                             }
                         }
+
+                        sqlFile << line + '\r\n'
+
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
@@ -420,22 +415,19 @@ class SybaseOperator {
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
 
-                        if (firstFileNotCreated) {
-                            lineBufferForFirstFile += line
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                            counter++
-                            firstFileNotCreated = false
+                        counter++
 
-                        } else {
-                            sqlFile << line + '\r\n'
-                            counter++
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
                         }
+                        sqlFile << line + '\r\n'
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
                         sqlFile << line + '\r\n'
                     }
-               }
+                }
         }
         log.info("=============== End of 'splitUserMessages' Generated ${counter} files =============== ")
     }
@@ -481,16 +473,14 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
+                            counter++
+
                             if (firstFileNotCreated) {
                                 writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
                                 firstFileNotCreated = false
-
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
                             }
                         }
+                        sqlFile << line + '\r\n'
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
@@ -558,17 +548,16 @@ class SybaseOperator {
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
 
-                            if (firstFileNotCreated) {
-                                lineBufferForFirstFile += line
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                counter++
-                                firstFileNotCreated = false
+                            counter++
 
-                            } else {
-                                sqlFile << line + '\r\n'
-                                counter++
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
                             }
                         }
+
+                        sqlFile << line + '\r\n'
+
                     } else if (firstFileNotCreated) {
                         lineBufferForFirstFile += line
                     } else {
@@ -614,21 +603,21 @@ class SybaseOperator {
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
 
+                    counter++
+
                     if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
                         writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                        counter++
                         firstFileNotCreated = false
-                    } else {
-                        sqlFile << line + '\r\n'
-                        counter++
                     }
+
+                    sqlFile << line + '\r\n'
+
                 } else if (firstFileNotCreated) {
                     lineBufferForFirstFile += line
                 } else {
                     sqlFile << line + '\r\n'
                 }
-         }
+        }
         log.info("=============== End of 'splitUniqueKeys' Generated ${counter} files =============== ")
     }
 
@@ -667,15 +656,15 @@ class SybaseOperator {
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
 
+                    counter++
+
                     if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
                         writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                        counter++
                         firstFileNotCreated = false
-                    } else {
-                        sqlFile << line + '\r\n'
-                        counter++
                     }
+
+                    sqlFile << line + '\r\n'
+
                 } else if (firstFileNotCreated) {
                     lineBufferForFirstFile += line
                 } else {
@@ -720,22 +709,18 @@ class SybaseOperator {
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
 
+                    counter++
+
                     if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
                         writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                        counter++
                         firstFileNotCreated = false
-                    } else {
-                        sqlFile << line + '\r\n'
-                        counter++
                     }
-                }
 
-                else if (firstFileNotCreated) {
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
                     lineBufferForFirstFile += line
-                }
-
-                else {
+                } else {
                     sqlFile << line + '\r\n'
                 }
         }
