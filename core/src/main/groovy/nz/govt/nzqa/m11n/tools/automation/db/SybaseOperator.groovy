@@ -871,6 +871,6 @@ class SybaseOperator {
                     }
                 }
         }
-        log.info("=============== End of 'splitSP' Generated ${counter} files =============== "
+        log.info("=============== End of 'splitSP' Generated ${counter} files =============== ")
     }
 }
