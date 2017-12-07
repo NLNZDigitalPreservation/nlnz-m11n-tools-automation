@@ -17,7 +17,7 @@ class SybaseOperatorTest {
         SybaseOperatorTestObj = new SybaseOperator()
     }
 
-    @Test
+//    @Test
     void shouldExtractCorrectSybaseName() {
         String testName = '00-eqa_prod_defaults_171106.sql'
 
@@ -159,11 +159,11 @@ class SybaseOperatorTest {
     }
 
     /**
-     * Expect 256 drop and 1811 create procedures
+     * Expect 1924 drop and 1941 create procedures
      */
-//    @Test
+    @Test
     void testSplitSP() {
-        String testFileDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/13-eqa_prod_SP_171106.sql"
+        String testFileDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/13-eqa_prod_SP_171106_2.sql"
         File testFile = new File(testFileDir)
         String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/"
         sybaseOperatorTestObj.splitSP(testFile, testDestDir)

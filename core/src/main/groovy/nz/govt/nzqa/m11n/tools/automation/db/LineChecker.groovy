@@ -23,13 +23,37 @@ class LineChecker {
         return "drop"
     }
 
-    String getEntityNameFromLine(String line) {
+    String getTypeFromLine(String line) {
 
-        def regexFilterList = [/'(\w+)'/, /'(\w+).(\w+)'/, /(\w+)\.(\w+)/, /CREATE TRIGGER (\w+)/,/(\w+)_(\w+)/, /CREATE PROCEDURE (\w+)/, /create procedure (\w+)/]
+        if(lineContains(line, "add") || lineContains(line, "create")){
+            return "add"
+        }
 
-//        System.out.println("Line before:" + line)
-//        line.replace(".", "\\.")
-//        System.out.println("Line after:" + line)
+        return "drop"
+    }
+
+    String getEntityNameFromLine(String line, String lineType) {
+
+        def regexFilterList = []
+        int resultIndex = 0
+
+        switch(lineType){
+            case 'exec':
+                regexFilterList = [/EXEC (\w+) (\w+)/, /EXEC (\w+) '(\w+)'/, /EXEC (\w+) '(\w+\.\w+)'/]
+                resultIndex = 2
+                break
+
+            case 'create':
+                regexFilterList =[/(?i)CREATE (\w+) (\w+\.\w+)/, /(?i)CREATE (\w+) (\w+)/]
+                resultIndex = 2
+                break
+
+            default:
+
+                regexFilterList = [/(\w+)\.(\w+)/, /'(\w+)'/, /'(\w+).(\w+)'/, /(\w+)\.(\w+)/, /(\w+)_(\w+)/]
+                resultIndex = 0
+                break
+        }
 
         String name = ''
 
@@ -42,27 +66,18 @@ class LineChecker {
                 System.out.println("Result[0]: " + result[0])
 
                 // Return full match and strip away single quote
-                name = result[0][0].replace("'", "")
+                name = result[0][resultIndex].replace("'", "")
                 break mainloop
             }
         }
-//        System.out.println("entity name: " + name)
-
         return name
     }
 
-
     boolean entityNameHasChanged(String newEntityName, String currentEntityName){
+        if(!newEntityName.equalsIgnoreCase(currentEntityName)){
+            return ! newEntityName.replace("dbo.", "").equalsIgnoreCase(currentEntityName)
+        }
+
         return ! newEntityName.equalsIgnoreCase(currentEntityName)
     }
-
-    // For splitTables
-    boolean lineIsCreateTable(String line) {
-        return (line.toLowerCase().contains("create table"))
-    }
-
-    String[] getSchemaAndTableNames(String line) {
-        return line.substring(line.lastIndexOf(" ") + 1).split("\\.")
-    }
-
 }
