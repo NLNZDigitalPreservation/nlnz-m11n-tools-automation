@@ -7,7 +7,28 @@ class LineChecker {
 
     // Generic
     boolean lineStartsWith(String line, String prefix) {
-        return (line.toLowerCase().startsWith(prefix))
+
+//        System.out.println("Line before:" + line)
+        // Remove unecessary comments and overhead etc
+        def regex = '.*(?=(?i)' + prefix + ')'
+        def result = (line =~ /$regex/)
+//        System.out.println("regex:" + regex)
+
+
+        if(result){
+//            System.out.println("Line after:" + result[0])
+            return true
+        }
+        else{
+            return false
+        }
+//        if(! line.toLowerCase().startsWith(prefix)){
+
+//            def regex = '.*(?=' + prefix + ')'
+//            line =~ /$regex/
+//        }
+
+//        return (line.toLowerCase().startsWith(prefix))
     }
 
     boolean lineContains(String line, String subString) {

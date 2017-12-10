@@ -36,31 +36,37 @@ class LineCheckerTest {
     @Test
     void extractLineNameCorrectlyWhenLineHasNoName() {
         String lineTest = "GO"
-        assertEquals("Extract line name correctly", '', lineCheckerTestObj.getEntityNameFromLine(lineTest))
+        assertEquals("Extract line name correctly", '', lineCheckerTestObj.getEntityNameFromLine(lineTest, ""))
     }
 
     @Test
     void extractLineNameCorrectlyWhenLineHasName() {
         String lineTest = "IF EXISTS (SELECT * FROM systypes WHERE name='wwwaddr')"
-        assertEquals("Extract line name correctly", 'wwwaddr', lineCheckerTestObj.getEntityNameFromLine(lineTest))
+        assertEquals("Extract line name correctly", 'wwwaddr', lineCheckerTestObj.getEntityNameFromLine(lineTest, ""))
     }
 
     @Test
     void extractLineNameCorrectlyWhenLineHasName2() {
         String lineTest = "IF OBJECT_ID('dbo.default_n') IS NOT NULL"
-        assertEquals("Extract line name correctly 2", 'dbo.default_n', lineCheckerTestObj.getEntityNameFromLine(lineTest))
+        assertEquals("Extract line name correctly 2", 'dbo.default_n', lineCheckerTestObj.getEntityNameFromLine(lineTest, ""))
     }
 
     @Test
     void extractLineNameCorrectlyWhenLineHasName3() {
         String lineTest = "IF OBJECT_ID('default_n') IS NOT NULL"
-        assertEquals("Extract line name correctly 3", 'default_n', lineCheckerTestObj.getEntityNameFromLine(lineTest))
+        assertEquals("Extract line name correctly 3", 'default_n', lineCheckerTestObj.getEntityNameFromLine(lineTest, ""))
     }
 
     @Test
     void extractLineNameCorrectlyWhenLineHasName4() {
         String lineTest = "CREATE DEFAULT dbo.Default_1 AS 0"
-        assertEquals("Extract line name correctly 4", 'dbo.Default_1', lineCheckerTestObj.getEntityNameFromLine(lineTest))
+        assertEquals("Extract line name correctly 4", 'dbo.Default_1', lineCheckerTestObj.getEntityNameFromLine(lineTest, "create"))
+    }
+
+    @Test
+    void shouldIgnoreCommentsInLineWhenCheckStartWith(){
+        String lineTest = "/* Adaptive Server has expanded all '*' elements in the following statement */ create view dbo.mc_vw_sqr_event"
+        assertTrue("shouldIgnoreCommentsInLineWhenCheckStartWith", lineCheckerTestObj.lineStartsWith(lineTest, "create"))
     }
 
 }
