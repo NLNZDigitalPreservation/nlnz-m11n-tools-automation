@@ -1,6 +1,11 @@
 package nz.govt.nzqa.m11n.tools.automation.db
 
 import groovy.util.logging.Slf4j
+import nz.govt.nzqa.m11n.tools.automation.file.FilenameExtractor
+
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
 
 @Slf4j
 class SybaseOperator {
@@ -68,49 +73,47 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create") && isFirstCreateStatement) {
+                    log.info("Dropping completed. Current entity name reset and start creating...")
 
-                    if (lineChecker.lineStartsWith(line, "create") && isFirstCreateStatement) {
-                        log.info("Dropping completed. Current entity name reset and start creating...")
-
-                        doneDropping = true
-                        currentEntityName = ''
-                        isFirstCreateStatement = false
-                        lineType = "create"
-                    }
-
-                    if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create")) {
-
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
-
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitDefaults-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-
-                            counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
-                        }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
-                    }
+                    doneDropping = true
+                    currentEntityName = ''
+                    isFirstCreateStatement = false
+                    lineType = "create"
                 }
+
+                if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create")) {
+
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitDefaults-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
         }
         log.info("=============== End of 'splitDefaults' Generated ${counter} files =============== ")
     }
@@ -143,46 +146,45 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "exec") && lineChecker.lineContains(line, "addtype") && isFirstCreateStatement) {
-                        log.info("Dropping completed. Current entity name reset and start creating...")
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "exec") && lineChecker.lineContains(line, "addtype") && isFirstCreateStatement) {
+                    log.info("Dropping completed. Current entity name reset and start creating...")
 
-                        doneDropping = true
-                        currentEntityName = ''
-                        isFirstCreateStatement = false
-                        lineType = "exec"
-                    }
-
-                    if ((lineChecker.lineStartsWith(line, "if exists") && !doneDropping) || lineChecker.lineStartsWith(line, "exec")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
-
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitUserDatatypes-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-
-                            counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
-                        }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
-                    }
+                    doneDropping = true
+                    currentEntityName = ''
+                    isFirstCreateStatement = false
+                    lineType = "exec"
                 }
+
+                if ((lineChecker.lineStartsWith(line, "if exists") && !doneDropping) || lineChecker.lineStartsWith(line, "exec")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitUserDatatypes-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
         }
         log.info("=============== End of 'splitUserDatatypes' Generated ${counter} files =============== ")
     }
@@ -212,37 +214,36 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "exec")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "exec")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
 
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitGroups-" + counter + "-" + currentEntityName + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitGroups-" + counter + "-" + currentEntityName + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
 
-                            counter++
+                        counter++
 
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
                         }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
                     }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitGroups' Generated ${counter} files =============== ")
     }
@@ -272,37 +273,36 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "exec")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "exec")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
 
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitUsers-" + counter + "-" + currentEntityName + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitUsers-" + counter + "-" + currentEntityName + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
 
-                            counter++
+                        counter++
 
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
                         }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
                     }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitUsers' Generated ${counter} files =============== ")
     }
@@ -335,46 +335,45 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "create rule") && isFirstCreateStatement) {
-                        log.info("Dropping completed. Current entity name reset and start creating...")
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create rule") && isFirstCreateStatement) {
+                    log.info("Dropping completed. Current entity name reset and start creating...")
 
-                        doneDropping = true
-                        currentEntityName = ''
-                        isFirstCreateStatement = false
-                        lineType = "create"
-                    }
-
-                    if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create rule")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
-
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitRules-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-
-                            counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
-                        }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
-                    }
+                    doneDropping = true
+                    currentEntityName = ''
+                    isFirstCreateStatement = false
+                    lineType = "create"
                 }
+
+                if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create rule")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitRules-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
         }
         log.info("=============== End of 'splitRules' Generated ${counter} files =============== ")
     }
@@ -403,31 +402,30 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "exec")) {
-                        String currentEntityName = lineChecker.getEntityNameFromLine(line, "exec")
-                        // Create a new file for new entity
-                        sqlFileName = outputDir + File.separator + "splitUserMessages-" + counter + "-" + currentEntityName + ".sql"
-                        new File(sqlFileName).createNewFile()
-                        sqlFile = new File(sqlFileName)
-                        log.info("File '${sqlFileName}' created")
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "exec")) {
+                    String currentEntityName = lineChecker.getEntityNameFromLine(line, "exec")
+                    // Create a new file for new entity
+                    sqlFileName = outputDir + File.separator + "splitUserMessages-" + counter + "-" + currentEntityName + ".sql"
+                    new File(sqlFileName).createNewFile()
+                    sqlFile = new File(sqlFileName)
+                    log.info("File '${sqlFileName}' created")
 
-                        counter++
+                    counter++
 
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
-                        sqlFile << line + '\r\n'
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
+                    if (firstFileNotCreated) {
+                        writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                        firstFileNotCreated = false
                     }
+                    sqlFile << line + '\r\n'
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitUserMessages' Generated ${counter} files =============== ")
     }
@@ -458,35 +456,34 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "create table")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, "create")
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create table")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, "create")
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
 
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitTables-" + counter + "-" + currentEntityName + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitTables-" + counter + "-" + currentEntityName + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
 
-                            counter++
+                        counter++
 
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
                         }
-                        sqlFile << line + '\r\n'
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
                     }
+                    sqlFile << line + '\r\n'
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitTables' Generated ${counter} files =============== ")
     }
@@ -518,52 +515,49 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "create trigger")){
-                        lineType = "create"
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create trigger")) {
+                    lineType = "create"
 
-                        if (isFirstCreateStatement) {
-                            log.info("Dropping completed. Current entity name reset and start creating...")
-                            currentEntityName = ''
-                            isFirstCreateStatement = false
-                        }
-
+                    if (isFirstCreateStatement) {
+                        log.info("Dropping completed. Current entity name reset and start creating...")
+                        currentEntityName = ''
+                        isFirstCreateStatement = false
                     }
 
-                    else if (lineChecker.lineStartsWith(line, "if object_id")){
-                        lineType = "if object_id"
-                    }
-
-                    if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create trigger")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
-
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitTriggers-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-
-                            counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
-                        }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
-                    }
+                } else if (lineChecker.lineStartsWith(line, "if object_id")) {
+                    lineType = "if object_id"
                 }
+
+                if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create trigger")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitTriggers-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
         }
         log.info("=============== End of 'splitTriggers' Generated ${counter} files =============== ")
     }
@@ -592,9 +586,9 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
+        sybaseSqlFile.eachLine { String line ->
                 // If line not blank
+            if (line.trim()) {
                 if (lineChecker.lineStartsWith(line, "alter table")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "alter table")
                     // Create a new file for new entity
@@ -617,6 +611,7 @@ class SybaseOperator {
                 } else {
                     sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitUniqueKeys' Generated ${counter} files =============== ")
     }
@@ -645,9 +640,9 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
+        sybaseSqlFile.eachLine { String line ->
                 // If line not blank
+            if (line.trim()) {
                 if (lineChecker.lineStartsWith(line, "alter table")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "alter table")
                     // Create a new file for new entity
@@ -670,6 +665,7 @@ class SybaseOperator {
                 } else {
                     sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitCheckConstraints' Generated ${counter} files =============== ")
     }
@@ -698,9 +694,9 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
                 if (lineChecker.lineStartsWith(line, "alter table")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "alter table")
                     // Create a new file for new entity
@@ -723,6 +719,7 @@ class SybaseOperator {
                 } else {
                     sqlFile << line + '\r\n'
                 }
+            }
         }
         log.info("=============== End of 'splitForeignKeys' Generated ${counter} files =============== ")
     }
@@ -755,48 +752,47 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "create view") && isFirstCreateStatement) {
-                        log.info("Dropping completed. Current entity name reset and start creating...")
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create view") && isFirstCreateStatement) {
+                    log.info("Dropping completed. Current entity name reset and start creating...")
 
-                        doneDropping = true
-                        currentEntityName = ''
-                        isFirstCreateStatement = false
-                        lineType = "create view"
-                    }
-
-                    if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create view")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
-
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitViews-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-
-                            counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
-                        }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
-                    }
+                    doneDropping = true
+                    currentEntityName = ''
+                    isFirstCreateStatement = false
+                    lineType = "create view"
                 }
-        }
 
+                if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create view")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitViews-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
+
+        }
         log.info("=============== End of 'splitViews' Generated ${counter} files =============== ")
     }
 
@@ -827,50 +823,100 @@ class SybaseOperator {
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine {
-            String line ->
-                // If line not blank
-                if (line.trim()) {
-                    if (lineChecker.lineStartsWith(line, "create procedure")) {
-                        lineType = "create"
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create procedure")) {
+                    lineType = "create"
 
-                        if (isFirstCreateStatement) {
-                            log.info("Dropping completed. Current entity name reset and start creating...")
-                            currentEntityName = ''
-                            isFirstCreateStatement = false
-                        }
-                    } else if (lineChecker.lineStartsWith(line, "if object_id")) {
-                        lineType = "if object_id"
+                    if (isFirstCreateStatement) {
+                        log.info("Dropping completed. Current entity name reset and start creating...")
+                        currentEntityName = ''
+                        isFirstCreateStatement = false
                     }
-
-                    if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create procedure")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                            currentEntityName = newEntityName
-
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitSP-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-
-                            counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
-                        }
-
-                        sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
-                        sqlFile << line + '\r\n'
-                    }
+                } else if (lineChecker.lineStartsWith(line, "if object_id")) {
+                    lineType = "if object_id"
                 }
+
+                if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create procedure")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitSP-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
         }
         log.info("=============== End of 'splitSP' Generated ${counter} files =============== ")
+    }
+
+
+
+    /**
+     * Reconstruct the original file. Used in unit test only
+     *
+     * @param splitFileDir
+     */
+    def reconstruct (String splitFileDir){
+        String reconstructedFileName = splitFileDir + File.separator + "reconstructed.sql"
+        System.out.println(splitFileDir)
+        System.out.println(reconstructedFileName)
+        new File(reconstructedFileName).createNewFile()
+        File reconstructedFile = new File(reconstructedFileName)
+        log.info("File '${reconstructedFileName}' created")
+
+        String[] splitFileNameList = new FilenameExtractor().getListOfSplitSqlScriptsInDir(splitFileDir)
+        System.out.println(splitFileNameList)
+
+        for (String splitFileName : splitFileNameList){
+            List<String> lines = Files.readAllLines(Paths.get(splitFileDir + File.separator + splitFileName),  StandardCharsets.UTF_8)
+            for(String line : lines){
+                // If line is not blank
+                if (line.trim()) {
+                    reconstructedFile << line + '\r\n'
+                }
+            }
+        }
+    }
+
+    int[] getLinesWhereReconstructedFileDiffersFromOriginal (String originalFilePath, String reconstructedFilepath){
+        List<Integer> lineDifferentFromOriginal = new ArrayList<>()
+        List<String> originalLineList = Files.readAllLines(Paths.get(originalFilePath),  StandardCharsets.UTF_8)
+        List<String> reconstructedLineList = Files.readAllLines(Paths.get(reconstructedFilepath),  StandardCharsets.UTF_8)
+
+        System.out.println("originalLineList size: " + originalLineList.size())
+        System.out.println("reconstructedLineList size: " + reconstructedLineList.size())
+
+        for(int index = 0; index < reconstructedLineList.size(); index ++){
+            if(! originalLineList.get(index).equalsIgnoreCase(reconstructedLineList.get(index))){
+//                System.out.println("Index: " + index)
+//                System.out.println("original.get(index): " + originalLineList.get(index))
+//                System.out.println("reconstructedLineList.get(index): " + reconstructedLineList.get(index))
+                lineDifferentFromOriginal.add(index + 1)
+            }
+        }
+
+        System.out.println("Line no. diff :" + lineDifferentFromOriginal)
+        return lineDifferentFromOriginal
+
     }
 }

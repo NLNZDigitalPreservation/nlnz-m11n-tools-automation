@@ -10,7 +10,7 @@ class LineChecker {
 
 //        System.out.println("Line before:" + line)
         // Remove unecessary comments and overhead etc
-        def regex = '.*(?=(?i)' + prefix + ')'
+        def regex = '.*(?=(?i)' + prefix + ' )'
         def result = (line =~ /$regex/)
 //        System.out.println("regex:" + regex)
 
@@ -84,7 +84,7 @@ class LineChecker {
             def result = (line =~ /$regexFilter/)
 
             if (result){ //&& lineStartsWith(line, "create procedure")) {
-                System.out.println("Result[0]: " + result[0])
+//                System.out.println("Result[0]: " + result[0])
 
                 // Return full match and strip away single quote
                 name = result[0][resultIndex].replace("'", "")
