@@ -6,6 +6,7 @@ import nz.govt.nzqa.m11n.tools.automation.file.FilenameExtractor
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.stream.Collectors
 
 @Slf4j
 class SybaseOperator {
@@ -818,54 +819,54 @@ class SybaseOperator {
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
         String[] lineBufferForFirstFile = []
-        String lineType = "if object_id"
+        String lineType = "if"
 
         String sqlFileName = ''
         def sqlFile
 
         sybaseSqlFile.eachLine { String line ->
-            // If line not blank
-            if (line.trim()) {
-                if (lineChecker.lineStartsWith(line, "create procedure")) {
-                    lineType = "create"
+                // If line not blank
+                if (line.trim()) {
+                    if (lineChecker.lineStartsWith(line, "create procedure")) {
+                        lineType = "create"
 
-                    if (isFirstCreateStatement) {
-                        log.info("Dropping completed. Current entity name reset and start creating...")
-                        currentEntityName = ''
-                        isFirstCreateStatement = false
-                    }
-                } else if (lineChecker.lineStartsWith(line, "if object_id")) {
-                    lineType = "if object_id"
-                }
-
-                if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create procedure")) {
-                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                        currentEntityName = newEntityName
-
-                        // Create a new file for new entity
-                        sqlFileName = outputDir + File.separator + "splitSP-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
-                        new File(sqlFileName).createNewFile()
-                        sqlFile = new File(sqlFileName)
-                        log.info("File '${sqlFileName}' created")
-
-                        counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
+                        if (isFirstCreateStatement) {
+                            log.info("Dropping completed. Current entity name reset and start creating...")
+                            currentEntityName = ''
+                            isFirstCreateStatement = false
                         }
+                    } else if (lineChecker.lineStartsWith(line, "if")) {
+                        lineType = "if"
                     }
 
-                    sqlFile << line + '\r\n'
+                    if (lineChecker.lineStartsWith(line, "if") || lineChecker.lineStartsWith(line, "create procedure")) {
+                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                            currentEntityName = newEntityName
 
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
-                    sqlFile << line + '\r\n'
+                            // Create a new file for new entity
+                            sqlFileName = outputDir + File.separator + "splitSP-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
+                            new File(sqlFileName).createNewFile()
+                            sqlFile = new File(sqlFileName)
+                            log.info("File '${sqlFileName}' created")
+
+                            counter++
+
+                            if (firstFileNotCreated) {
+                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                firstFileNotCreated = false
+                            }
+                        }
+
+                        sqlFile << line + '\r\n'
+
+                    } else if (firstFileNotCreated) {
+                        lineBufferForFirstFile += line
+                    } else {
+                        sqlFile << line + '\r\n'
+                    }
                 }
             }
-        }
         log.info("=============== End of 'splitSP' Generated ${counter} files =============== ")
     }
 
@@ -878,40 +879,44 @@ class SybaseOperator {
      */
     def reconstruct (String splitFileDir){
         String reconstructedFileName = splitFileDir + File.separator + "reconstructed.sql"
-        System.out.println(splitFileDir)
-        System.out.println(reconstructedFileName)
+//        System.out.println(splitFileDir)
+//        System.out.println(reconstructedFileName)
         new File(reconstructedFileName).createNewFile()
         File reconstructedFile = new File(reconstructedFileName)
         log.info("File '${reconstructedFileName}' created")
 
         String[] splitFileNameList = new FilenameExtractor().getListOfSplitSqlScriptsInDir(splitFileDir)
-        System.out.println(splitFileNameList)
+//        System.out.println(splitFileNameList)
 
         for (String splitFileName : splitFileNameList){
             List<String> lines = Files.readAllLines(Paths.get(splitFileDir + File.separator + splitFileName),  StandardCharsets.UTF_8)
             for(String line : lines){
-                // If line is not blank
-                if (line.trim()) {
-                    reconstructedFile << line + '\r\n'
-                }
+                reconstructedFile << line + '\r\n'
             }
         }
     }
 
     int[] getLinesWhereReconstructedFileDiffersFromOriginal (String originalFilePath, String reconstructedFilepath){
         List<Integer> lineDifferentFromOriginal = new ArrayList<>()
-        List<String> originalLineList = Files.readAllLines(Paths.get(originalFilePath),  StandardCharsets.UTF_8)
-        List<String> reconstructedLineList = Files.readAllLines(Paths.get(reconstructedFilepath),  StandardCharsets.UTF_8)
+        List<String> originalLineList = Files.readAllLines(Paths.get(originalFilePath), StandardCharsets.UTF_8)
+                .stream().filter({str -> !str.trim().isEmpty()}).collect(Collectors.toList())
+
+//        System.out.println("originalLineList size (before cut): " + originalLineList.size())
+        // Remove blank lines
+//        originalLineList.removeAll(Arrays.asList("", null, "\r\n", "\n", " "))
+        List<String> reconstructedLineList = Files.readAllLines(Paths.get(reconstructedFilepath), StandardCharsets.UTF_8)
 
         System.out.println("originalLineList size: " + originalLineList.size())
         System.out.println("reconstructedLineList size: " + reconstructedLineList.size())
+//        boolean firstError = true
 
         for(int index = 0; index < reconstructedLineList.size(); index ++){
             if(! originalLineList.get(index).equalsIgnoreCase(reconstructedLineList.get(index))){
-//                System.out.println("Index: " + index)
-//                System.out.println("original.get(index): " + originalLineList.get(index))
-//                System.out.println("reconstructedLineList.get(index): " + reconstructedLineList.get(index))
+                System.out.println("Index: " + index)
+                System.out.println("original.get(index): " + originalLineList.get(index))
+                System.out.println("reconstructedLineList.get(index): " + reconstructedLineList.get(index))
                 lineDifferentFromOriginal.add(index + 1)
+//                firstError = false
             }
         }
 

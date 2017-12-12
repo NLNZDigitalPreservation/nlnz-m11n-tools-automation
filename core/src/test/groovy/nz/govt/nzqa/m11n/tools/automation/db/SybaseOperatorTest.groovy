@@ -281,12 +281,12 @@ class SybaseOperatorTest {
     }
 
 
-    @Test
+//    @Test
     void testSplitTriggersCanReconstructToTheOriginal() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
         String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
+//        sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
 
         String reconstructedFilePath =  testDestDir +  File.separator + "splitTriggers"
         String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
@@ -362,8 +362,14 @@ class SybaseOperatorTest {
     void testSplitSPCanReconstructToTheOriginal() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
         String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-//        sybaseOperatorTestObj.splitSP(testFile, testDestDir)
+
+// The code below encodes the original file (ISO-8859-1) in UTF 8
+//        def testFile = new File(testFileName).getText('ISO-8859-1')
+//        String encodedTestFileName = testDestDir + File.separator + '/13-eqa_prod_SP_171106.sql'
+//        new File(encodedTestFileName).write(testFile,'utf-8')
+
+        File encodedTestFile = new File(testFileName)
+        sybaseOperatorTestObj.splitSP(testFileName, testDestDir)
 
         String reconstructedFilePath =  testDestDir +  File.separator + "splitSP"
         String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
