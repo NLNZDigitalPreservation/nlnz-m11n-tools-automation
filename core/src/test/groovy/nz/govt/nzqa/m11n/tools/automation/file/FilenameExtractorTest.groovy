@@ -9,7 +9,8 @@ public class FilenameExtractorTest {
 
     FilenameExtractor filenameExtractorTestObj = new FilenameExtractor()
 
-    @Test
+    // This test should only be run after sybase sql scripts have been split
+//    @Test
     void testSort(){
         String testDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitSP"
         String [] testFileList = filenameExtractorTestObj.getListOfSplitSqlScriptsInDir(testDir)
