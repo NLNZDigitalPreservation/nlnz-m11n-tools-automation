@@ -18,7 +18,7 @@ class SybaseOperatorTest {
         SybaseOperatorTestObj = new SybaseOperator()
     }
 
-//    @Test
+    @Test
     void shouldExtractCorrectSybaseName() {
         String testName = '00-eqa_prod_defaults_171106.sql'
 

@@ -886,7 +886,6 @@ class SybaseOperator {
         log.info("File '${reconstructedFileName}' created")
 
         String[] splitFileNameList = new FilenameExtractor().getListOfSplitSqlScriptsInDir(splitFileDir)
-//        System.out.println(splitFileNameList)
 
         for (String splitFileName : splitFileNameList){
             List<String> lines = Files.readAllLines(Paths.get(splitFileDir + File.separator + splitFileName),  StandardCharsets.UTF_8)
@@ -901,14 +900,10 @@ class SybaseOperator {
         List<String> originalLineList = Files.readAllLines(Paths.get(originalFilePath), StandardCharsets.UTF_8)
                 .stream().filter({str -> !str.trim().isEmpty()}).collect(Collectors.toList())
 
-//        System.out.println("originalLineList size (before cut): " + originalLineList.size())
-        // Remove blank lines
-//        originalLineList.removeAll(Arrays.asList("", null, "\r\n", "\n", " "))
         List<String> reconstructedLineList = Files.readAllLines(Paths.get(reconstructedFilepath), StandardCharsets.UTF_8)
 
         System.out.println("originalLineList size: " + originalLineList.size())
         System.out.println("reconstructedLineList size: " + reconstructedLineList.size())
-//        boolean firstError = true
 
         for(int index = 0; index < reconstructedLineList.size(); index ++){
             if(! originalLineList.get(index).equalsIgnoreCase(reconstructedLineList.get(index))){
@@ -916,7 +911,6 @@ class SybaseOperator {
                 System.out.println("original.get(index): " + originalLineList.get(index))
                 System.out.println("reconstructedLineList.get(index): " + reconstructedLineList.get(index))
                 lineDifferentFromOriginal.add(index + 1)
-//                firstError = false
             }
         }
 
