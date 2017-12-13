@@ -13,14 +13,14 @@ class SybaseOperator {
 
     String getSqlTypeFromSybaseSqlName(String sybaseSqlName) {
 
-        System.out.println("sybaseSqlName: " + sybaseSqlName)
+        log.debug("sybaseSqlName: " + sybaseSqlName)
         String sqlType = ''
 
         def regexFilter = /(\d+)-eqa_prod_(\w+)_(\d+).sql/
         // After regex gives [ sybaseSqlName, index, sqlType, date]
-        System.out.println("after regex: " + (sybaseSqlName =~ /$regexFilter/)[0])
+        log.debug("after regex: " + (sybaseSqlName =~ /$regexFilter/)[0])
         String baseName = ((sybaseSqlName =~ /$regexFilter/)[0][2])
-        System.out.println("BaseName: " + (sybaseSqlName =~ /$regexFilter/)[0][2])
+        log.debug("BaseName: " + (sybaseSqlName =~ /$regexFilter/)[0][2])
 
         String[] baseNameSplit = ((sybaseSqlName =~ /$regexFilter/)[0][2]).split('_')
         if (baseNameSplit.size() > 1) {
@@ -32,7 +32,7 @@ class SybaseOperator {
             sqlType = camelCase(baseName)
         }
 
-        System.out.println("sqlType " + sqlType)
+        log.debug("sqlType " + sqlType)
         return sqlType
     }
 
@@ -871,6 +871,65 @@ class SybaseOperator {
     }
 
 
+    /**
+     * Split sybase_eqa_prod.sql into 11 <00>-eqa_prod_<smaller file type>_<6 digit timestamp>.sql files for splitSybaseScripts task
+     *
+     * Type: check for comments, '-- create <entity>' and '-- <entity>'
+     *
+     * @param sybaseSqlFile
+     * @param destinationDir
+     */
+    def splitSybase(File sybaseSqlFile, String destinationDir) {
+
+        log.info("=============== Starting splitSybase() =============== ")
+
+        String outputDir = destinationDir + File.separator + "splitSybase"
+        new File(outputDir).mkdir()
+        log.info("New directory '${outputDir}' created")
+
+        LineChecker lineChecker = new LineChecker()
+
+        int counter = 0
+        String currentEntityName = ''
+        boolean firstFileNotCreated = true
+        String[] lineBufferForFirstFile = []
+        String lineType = "create"
+
+        Map<String, String> typeAndFilenameLookup = new HashMap<String, String>()
+
+        String sqlFileName = ''
+        def sqlFile
+
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "exec")) {
+                    String type = (line =~ /(?i)exec (\w+)/)[0][1]
+                    String newEntityName =
+                            System.out.println(type)
+
+                    if (!newEntityName.equalsIgnoreCase(currentEntityName)) {
+                        // Write to new file
+                    }
+
+                } else if (lineChecker.lineStartsWith(line, "if object_id")) {
+                    String newEntityName = (line =~ /'(\w+.*)'/)[0][1]
+                    System.out.println(newEntityName)
+                    if (!newEntityName.equalsIgnoreCase(currentEntityName)) {
+                        // Write to new file
+                    }
+                } else if (lineChecker.lineStartsWith(line, "create")) {
+                    String type = (line =~ /(?i)create (\w+)/)[0][1]
+
+                } else if (lineChecker.lineStartsWith(line, "alter table")) {
+                    String type = (line =~ /(?i)create (\w+)/)[0][1]
+
+                }
+
+            }
+        }
+        log.info("=============== End of 'splitBigSybaseSql' Generated ${counter} files =============== ")
+    }
 
     /**
      * Reconstruct the original file. Used in unit test only
@@ -918,4 +977,6 @@ class SybaseOperator {
         return lineDifferentFromOriginal
 
     }
+
+
 }

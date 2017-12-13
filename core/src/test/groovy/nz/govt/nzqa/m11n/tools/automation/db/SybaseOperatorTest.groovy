@@ -171,6 +171,17 @@ class SybaseOperatorTest {
     }
 
     /**
+     * Split big Sybase script into 11 smaller sqls
+     */
+//    @Test
+    void testSplitSybase() {
+        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/sybase_eqa_prod_161205_test.sql"
+        File testFile = new File(testFileName)
+        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        sybaseOperatorTestObj.splitSybase(testFile, testDestDir)
+    }
+
+    /**
      * Testing files generated are the same as the original
      */
 

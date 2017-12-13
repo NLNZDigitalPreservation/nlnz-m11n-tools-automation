@@ -4,13 +4,12 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 class LineChecker {
-
     // Generic
     boolean lineStartsWith(String line, String prefix) {
 
 //        System.out.println("Line before:" + line)
         // Remove unecessary comments and overhead etc
-        def regex = '.*(?=(?i)' + prefix + ' )'
+        def regex = '.*(?i)' + prefix
         def result = (line =~ /$regex/)
 //        System.out.println("regex:" + regex)
 
@@ -101,4 +100,6 @@ class LineChecker {
 
         return ! newEntityName.equalsIgnoreCase(currentEntityName)
     }
+
+
 }
