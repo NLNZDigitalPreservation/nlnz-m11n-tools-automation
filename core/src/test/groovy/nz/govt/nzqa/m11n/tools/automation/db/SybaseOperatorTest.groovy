@@ -103,6 +103,19 @@ class SybaseOperatorTest {
     }
 
     /**
+     * Expect 598 indices
+     * */
+//    @Test
+    void testSplitIndices() {
+        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07a-eqa_prod_indices_171214.sql"
+        File testFile = new File(testFileName)
+        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        sybaseOperatorTestObj.splitIndices(testFile, testDestDir)
+    }
+
+
+
+    /**
      * Expect 311 drop and create triggers
      */
 //    @Test
@@ -139,7 +152,7 @@ class SybaseOperatorTest {
     /**
      * Expect 1088 alter table add foreign key contraint statements
      */
-//    @Test
+    @Test
     void testSplitForeignKeys() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
         File testFile = new File(testFileName)
@@ -389,7 +402,4 @@ class SybaseOperatorTest {
         int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
         assertTrue("Reconstructed file from splitSP() is identical to the original", linesDifferent.size()==0)
     }
-
-
-
 }

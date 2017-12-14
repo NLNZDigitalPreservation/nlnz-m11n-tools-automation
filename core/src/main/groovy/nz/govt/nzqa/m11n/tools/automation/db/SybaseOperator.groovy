@@ -490,6 +490,78 @@ class SybaseOperator {
     }
 
     /**
+     * Split indices.sql
+     *
+     * Type: if not null drop all then create
+     *
+     * @param sybaseSqlFile
+     * @param destinationDir
+     */
+    def splitIndices(File sybaseSqlFile, String destinationDir) {
+        log.info("=============== Starting splitIndices() =============== ")
+
+        String outputDir = destinationDir + File.separator + "splitIncices"
+        new File(outputDir).mkdir()
+        log.info("New directory '${outputDir}' created")
+
+        LineChecker lineChecker = new LineChecker()
+
+        int counter = 0
+        String currentEntityName = ''
+        boolean firstFileNotCreated = true
+//        boolean doneDropping = false
+        String[] lineBufferForFirstFile = []
+        String lineType = "if index"
+
+        String sqlFileName = ''
+        def sqlFile
+
+        sybaseSqlFile.eachLine { String line ->
+            // If line not blank
+            if (line.trim()) {
+                if (lineChecker.lineStartsWith(line, "create")) {
+                    log.info("Dropping completed. Current entity name reset and start creating...")
+
+//                    doneDropping = true
+                    currentEntityName = ''
+                    lineType = "create index"
+                } else if (lineChecker.lineStartsWith(line, "if")) {
+                    lineType = "if index"
+                }
+
+                if (lineChecker.lineStartsWith(line, "if") || lineChecker.lineStartsWith(line, "create")) {
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+
+                        // Create a new file for new entity
+                        sqlFileName = outputDir + File.separator + "splitIndices-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+
+                        counter++
+
+                        if (firstFileNotCreated) {
+                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            firstFileNotCreated = false
+                        }
+                    }
+
+                    sqlFile << line + '\r\n'
+
+                } else if (firstFileNotCreated) {
+                    lineBufferForFirstFile += line
+                } else {
+                    sqlFile << line + '\r\n'
+                }
+            }
+
+        }
+        log.info("=============== End of 'splitIndices' Generated ${counter} files =============== ")
+    }
+
+    /**
      * Split triggers.sql - dropping and recreating all trigger objects
      *
      * Type: if not null drop all then create
@@ -819,7 +891,7 @@ class SybaseOperator {
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
         String[] lineBufferForFirstFile = []
-        String lineType = "if"
+        String lineType = "if object_id"
 
         String sqlFileName = ''
         def sqlFile
@@ -835,13 +907,15 @@ class SybaseOperator {
                             currentEntityName = ''
                             isFirstCreateStatement = false
                         }
-                    } else if (lineChecker.lineStartsWith(line, "if")) {
-                        lineType = "if"
                     }
 
-                    if (lineChecker.lineStartsWith(line, "if") || lineChecker.lineStartsWith(line, "create procedure")) {
+                    else if (lineChecker.lineStartsWith(line, "if object_id")) {
+                        lineType = "if object_id"
+                    }
+
+                    if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create procedure") || lineChecker.lineStartsWith(line, "create proc")) {
                         String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName) && !line.contains("--")) {
                             currentEntityName = newEntityName
 
                             // Create a new file for new entity
@@ -944,7 +1018,7 @@ class SybaseOperator {
         File reconstructedFile = new File(reconstructedFileName)
         log.info("File '${reconstructedFileName}' created")
 
-        String[] splitFileNameList = new FilenameExtractor().getListOfSplitSqlScriptsInDir(splitFileDir)
+        String[] splitFileNameList = new FilenameExtractor().getListOfSplitSqlScriptsInDir(splitFileDir, "default")
 
         for (String splitFileName : splitFileNameList){
             List<String> lines = Files.readAllLines(Paths.get(splitFileDir + File.separator + splitFileName),  StandardCharsets.UTF_8)

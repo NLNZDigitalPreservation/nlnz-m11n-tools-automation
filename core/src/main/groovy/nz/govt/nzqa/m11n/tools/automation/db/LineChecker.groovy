@@ -9,7 +9,7 @@ class LineChecker {
 
 //        System.out.println("Line before:" + line)
         // Remove unecessary comments and overhead etc
-        def regex = '.*(?i)' + prefix
+        def regex = '.*(?i)' + prefix + " "
         def result = (line =~ /$regex/)
 //        System.out.println("regex:" + regex)
 
@@ -68,8 +68,17 @@ class LineChecker {
                 resultIndex = 2
                 break
 
-            default:
+            case 'create index':
+                regexFilterList =[/.*(?i)index (\w+)/]
+                resultIndex = 1
+                break
 
+            case 'if index':
+                regexFilterList =[/.*(?i)id=OBJECT_ID\('(\w+.*)'\) and name='(\w+)'/]
+                resultIndex = 2
+                break
+
+            default:
                 regexFilterList = [/(\w+)\.(\w+)/, /'(\w+)'/, /'(\w+).(\w+)'/, /(\w+)\.(\w+)/, /(\w+)_(\w+)/]
                 resultIndex = 0
                 break

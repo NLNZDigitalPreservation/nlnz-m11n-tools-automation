@@ -13,11 +13,21 @@ class FilenameExtractor {
         return names.sort() as String[]
     }
 
-    String[] getListOfSplitSqlScriptsInDir(String dir) {
+    String[] getListOfSplitSqlScriptsInDir(String dir, String type) {
 
         List<String> names = new ArrayList<>()
 
-        new File(dir).eachFileMatch(~/split.*/) {
+        def regexFilterAdd = /split(\w+)-(\d+)-(\w+.*)-add.sql/
+        def regexFilterDrop = /split(\w+)-(\d+)-(\w+.*)-drop.sql/
+        def regexFilter = /split(\w+)-(\d+)-(\w+.*).sql/
+
+        if (type.equalsIgnoreCase("add")){
+            regexFilter = regexFilterAdd
+        }
+        else if (type.equalsIgnoreCase("drop")){
+            regexFilter = regexFilterDrop
+        }
+        new File(dir).eachFileMatch(~/$regexFilter/) {
             file -> names.add(file.getName())
         }
 
@@ -38,5 +48,63 @@ class FilenameExtractor {
 
 //        System.out.println(names)
         return names as String[]
+    }
+
+      String[] getAssemblyFilesInDir(String dir) {
+        def names = []
+
+        new File(dir).eachFileMatch(~/(\d+).*.sql/) {
+            file -> names.add(file.getName())
+        }
+
+        return names.sort()
+    }
+
+    String getEntityNameFromSybaseSplitSqlName(String sybaseSplitSqlName, String type){
+
+//        System.out.println("sybaseSplitSqlName: " + sybaseSplitSqlName)
+        String name = ''
+
+        def regexFilterAdd = /split(\w+)-(\d+)-(\w+.*)-add.sql/
+        def regexFilterDrop = /split(\w+)-(\d+)-(\w+.*)-drop.sql/
+        def regexFilter = /split(\w+)-(\d+)-(\w+.*).sql/
+
+
+        if (type.equalsIgnoreCase("add")){
+            System.out.println("after regex: " + (sybaseSplitSqlName =~ /$regexFilterAdd/)[0])
+            name = ((sybaseSplitSqlName =~ /$regexFilterAdd/)[0][3])
+        }
+
+        else if (type.equalsIgnoreCase("drop")){
+            System.out.println("after regex: " + (sybaseSplitSqlName =~ /$regexFilterDrop/)[0])
+            name = ((sybaseSplitSqlName =~ /$regexFilterDrop/)[0][3])
+
+        }
+
+        else{
+            name = ((sybaseSplitSqlName =~ /$regexFilter/)[0][3])
+        }
+
+
+
+//        System.out.println("name: " + (sybaseSplitSqlName =~ /$regexFilter/)[0][3])
+
+        return name
+    }
+
+    String getSqlTypeFromSybaseFolderName(String sybaseFolderName){
+
+//        System.out.println("sybaseFolderName: " + sybaseFolderName)
+        String sqlType = ''
+
+        def regexFilter = /split(\w+)/
+//        System.out.println("after regex: " + (sybaseFolderName =~ /$regexFilter/)[0])
+        String baseName = ((sybaseFolderName =~ /$regexFilter/)[0][1])
+//        System.out.println("folder Name: " + (sybaseFolderName =~ /$regexFilter/)[0][1])
+
+        sqlType = camelCase(baseName)
+
+//        System.out.println("sqlType " + sqlType)
+        return sqlType
     }
 }
