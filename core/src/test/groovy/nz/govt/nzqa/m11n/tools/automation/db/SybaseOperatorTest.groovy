@@ -28,18 +28,18 @@ class SybaseOperatorTest {
     /**
      * Expect 5 drop statements and 5 create statements
      */
-//    @Test
+    @Test
     void testSplitDefaults() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScriptssybaseScripts/"
+        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitDefaults(testFile, testDestDir)
     }
 
     /**
      * Expect 44 drop statements and 44 add statements
      */
-//    @Test
+    @Test
     void testSplitUserDatatypes() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
         File testFile = new File(testFileName)
@@ -61,7 +61,7 @@ class SybaseOperatorTest {
     /**
      * Expect 23 add users
      */
-//    @Test
+    @Test
     void testSplitUsers() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
         File testFile = new File(testFileName)
@@ -72,7 +72,7 @@ class SybaseOperatorTest {
     /**
      * Expect 1 drop rule and 1 add rule
      */
-//    @Test
+    @Test
     void testSplitRules() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
         File testFile = new File(testFileName)

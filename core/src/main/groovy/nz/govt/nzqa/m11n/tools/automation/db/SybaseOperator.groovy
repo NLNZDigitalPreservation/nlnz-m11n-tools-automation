@@ -500,7 +500,7 @@ class SybaseOperator {
     def splitIndices(File sybaseSqlFile, String destinationDir) {
         log.info("=============== Starting splitIndices() =============== ")
 
-        String outputDir = destinationDir + File.separator + "splitIncices"
+        String outputDir = destinationDir + File.separator + "splitIndices"
         new File(outputDir).mkdir()
         log.info("New directory '${outputDir}' created")
 

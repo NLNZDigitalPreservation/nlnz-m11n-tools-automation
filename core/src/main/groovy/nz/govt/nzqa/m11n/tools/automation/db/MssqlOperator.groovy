@@ -109,7 +109,7 @@ class MssqlOperator {
      */
 
     /**
-     * Drop triggers
+     * 1. Drop triggers
      *
      * Function type: get list of filenames in split folder
      *
@@ -119,151 +119,100 @@ class MssqlOperator {
      * @param destinationDir
      * @return
      */
-    def generateDropTriggers(String splitTriggersFolderDir, String destinationDir){
-
-        log.info("=============== Starting generateDropTriggers =============== ")
-
-        String sqlFileName = destinationDir + File.separator + "01-dropTriggers.sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
-
-        String[] sqlList = filenameExtractor.getListOfSplitSqlScriptsInDir(splitTriggersFolderDir)
-        System.out.println("Before:" + sqlList.size())
-        sqlList = new HashSet<String>(Arrays.asList(sqlList)).toArray(new String[0])
-        System.out.println("After:" + sqlList.size())
-
-        List<String> mssqlLineList = new ArrayList<String>()
-
-        for (String sqlName : sqlList){
-            String entityName = filenameExtractor.getEntityNameFromSybaseSplitSqlName(sqlName, "drop")
-
-            // Check if entity name is of <dbo>.<name>
-            def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
-            String filteredEntityName = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[" + entityName + "]")
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
-            mssqlLineList.add("/****** Object:  Trigger " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
-            mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.triggers WHERE object_id = OBJECT_ID(N'" + filteredEntityName + "\')")
-            mssqlLineList.add("DROP TRIGGER " + filteredEntityName)
-            mssqlLineList.add("GO")
-        }
-
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
-        }
-        log.info("=============== End of 'generateDropTriggers'. Generated ${sqlList.size()} statments =============== ")
-    }
-
-    /**
-     * Drop SPs
-     *
-     * Function type: get list of filenames in split folder
-     *
-     * SQL type: If exists select * from <sys.type> with match object id, drop type
-     *
-     * @param splitTriggersFolderDir
-     * @param destinationDir
-     * @return
-     */
-    def generateDropSP(String splitSPFolderDir, String destinationDir){
-
-        log.info("=============== Starting generateDropSP =============== ")
-
-        String sqlFileName = destinationDir + File.separator + "02-dropSP.sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
-
-        String[] sqlList = filenameExtractor.getListOfSplitSqlScriptsInDir(splitSPFolderDir, "drop")
-        System.out.println("Before:" + sqlList.size())
-        sqlList = new HashSet<String>(Arrays.asList(sqlList)).toArray(new String[0])
-        System.out.println("After:" + sqlList.size())
-
-        List<String> mssqlLineList = new ArrayList<String>()
-
-        for (String sqlName : sqlList){
-            String entityName = filenameExtractor.getEntityNameFromSybaseSplitSqlName(sqlName, "drop")
-
-            // Check if entity name is of <dbo>.<name>
-            def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
-            String filteredEntityName = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[" + entityName + "]")
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
-            mssqlLineList.add("/****** Object:  StoredProcedure " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
-            mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredEntityName + "\') AND type in (N'P', N'PC'))")
-            mssqlLineList.add("DROP PROCEDURE " + filteredEntityName)
-            mssqlLineList.add("GO")
-        }
-
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
-        }
-        log.info("=============== End of 'generateDropSP'. Generated ${sqlList.size()} statments =============== ")
-    }
-
-    /**
-     * Drop Constraints
-     *
-     * Function type: get list of files in split folder, parse and assign entity and parent names
-     *
-     * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
-     *
-     * @param splitTriggersFolderDir
-     * @param destinationDir
-     * @return
-     */
-    def generateDropCheckConstraints(String splitCheckConstraintsFolderDir, String destinationDir){
+    def generateDropTriggers(String sqlInputFileName, String destinationDir){
 
         log.info("=============== Starting generateDropCheckConstraints =============== ")
 
-        String sqlFileName = destinationDir + File.separator + "03-dropCheckConstraints.sql"
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "drop trigger")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "drop trigger")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+
+                String filteredName = "["+ filterEntityName[0][2] + "]"
+                String filteredObjectId = "["+ filterEntityName[0][1] + "].["+ filterEntityName[0][2] + "]"
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Trigger " + filteredName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.triggers WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\')")
+                mssqlLineList.add("DROP TRIGGER " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+        String sqlFileName = destinationDir + File.separator + "01-dropTriggers-"+ dirIndex + "-" + entityName + ".sql"
         new File(sqlFileName).createNewFile()
         def sqlFile = new File(sqlFileName)
         log.info("File '${sqlFileName}' created")
 
-        String[] sqlList = filenameExtractor.getListOfSplitSqlScriptsInDir(splitCheckConstraintsFolderDir, "default")
-        List<String> mssqlLineList = new ArrayList<String>()
-
-        for (String sqlName : sqlList){
-            String entityName = ''
-            String filteredEntityName = ''
-            String parentName = ''
-            String filteredParentName = ''
-            def filterParentName = ''
-
-
-            new File(splitForeignKeysFolderDir + File.separator + sqlName).eachLine { String line ->
-                if (lineChecker.lineStartsWith(line, "alter table")) {
-
-                    parentName = lineChecker.getEntityNameFromLine(line, "alter table")
-                    filterParentName = (parentName =~ /(\w+)\.(\w+)/)
-                    filteredParentName = (filterParentName ? "[" + filterParentName[0][1] + "].[" + filterParentName[0][2] + "]" : "[" + parentName + "]")
-                } else if (lineChecker.lineStartsWith(line, "add constraint")) {
-                    entityName = lineChecker.getEntityNameFromLine(line, "add constraint")
-                    filteredEntityName = "[dbo].[" + entityName + "]"
-                }
-            }
-
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
-//            mssqlLineList.add("/****** Object:  StoredProcedure " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
-            mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.check_constraints WHERE object_id = OBJECT_ID(N'" + filteredEntityName + "\') AND " +
-                    "parent_object_id = OBJECT_ID(N'" + filteredParentName + "'))")
-            mssqlLineList.add("ALTER TABLE " + filteredParentName + " DROP CONSTRAINT [" + entityName + "]")
-            mssqlLineList.add("GO")
-        }
 
         for (String line : mssqlLineList){
             sqlFile << line + '\r\n'
         }
-
-        log.info("=============== End of 'generateDropSP'. Generated ${sqlList.size()} statments =============== ")
+        System.out.println("=============== End of 'generateDropTriggers'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropTriggers'. Generated ${counter} statments =============== ")
     }
 
     /**
-     * Drop Foreign keys
+     * 2. Drop SPs
      *
-     * Function type: get list of files in split folder, parse and assign entity and parent names
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropSP(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting generateDropCheckConstraints =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "drop procedure") && !lineChecker.lineStartsWith(line, "--")) {
+                entityName = lineChecker.getEntityNameFromLine(line, "drop procedure")
+
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+
+                String filteredName = "["+ filterEntityName[0][2] + "]"
+                String filteredObjectId = "["+ filterEntityName[0][1] + "].["+ filterEntityName[0][2] + "]"
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  StoredProcedure " + filteredName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\') AND type in (N'P', N'PC'))")
+                mssqlLineList.add("DROP PROCEDURE " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+        String sqlFileName = destinationDir + File.separator + "02-dropSP-"+ dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropSP'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropSP'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 3. Drop Constraints
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
      *
      * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
      *
@@ -271,71 +220,504 @@ class MssqlOperator {
      * @param destinationDir
      * @return
      */
-    def generateDropForeignKeys(String splitForeignKeysFolderDir, String destinationDir){
+    def generateDropCheckConstraints(String sqlInputFileName, String destinationDir){
 
-        log.info("=============== Starting generateDropForeignKeys =============== ")
+        log.info("=============== Starting generateDropCheckConstraints =============== ")
 
-        String sqlFileName = destinationDir + File.separator + "04-dropCForeignKeys.sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
-
-        String[] sqlList = filenameExtractor.getListOfSplitSqlScriptsInDir(splitForeignKeysFolderDir, "default")
         List<String> mssqlLineList = new ArrayList<String>()
 
-        for (String sqlName : sqlList){
-            String entityName = ''
-            String filteredEntityName = ''
-            String parentName = ''
-            String filteredParentName = ''
-            def filterParentName = ''
+        String parentName = ''
+        String filteredParentName = ''
+        String entityName = ''
 
+        int counter = 0
 
-            new File(splitForeignKeysFolderDir + File.separator + sqlName).eachLine { String line ->
-                if (lineChecker.lineStartsWith(line, "alter table")) {
-
-                    parentName = lineChecker.getEntityNameFromLine(line, "alter table")
-                    filterParentName = (parentName =~ /(\w+)\.(\w+)/)
-                    filteredParentName = (filterParentName ? "[" + filterParentName[0][1] + "].[" + filterParentName[0][2] + "]" : "[" + parentName + "]")
-                } else if (lineChecker.lineStartsWith(line, "add constraint")) {
-                    entityName = lineChecker.getEntityNameFromLine(line, "add constraint")
-                    filteredEntityName = "[dbo].[" + entityName + "]"
-                }
-            }
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "alter table")) {
+                parentName = lineChecker.getEntityNameFromLine(line, "alter table")
+                def filterParentName = (parentName =~ /(\w+)\.(\w+)/)
+                filteredParentName = (filterParentName ? "[" + filterParentName[0][1] + "].[" + filterParentName[0][2] + "]" : "[" + parentName + "]")
+            } else if (lineChecker.lineStartsWith(line, "add constraint")) {
+                entityName = lineChecker.getEntityNameFromLine(line, "add constraint")
+                String filteredEntityName = "[dbo].[" + entityName + "]"
 
 //            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
 //            mssqlLineList.add("/****** Object:  StoredProcedure " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
-            mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'" + filteredEntityName + "\') AND " +
-                    "parent_object_id = OBJECT_ID(N'" + filteredParentName + "'))")
-            mssqlLineList.add("ALTER TABLE " + filteredParentName + " DROP CONSTRAINT [" + entityName + "]")
-            mssqlLineList.add("GO")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.check_constraints WHERE object_id = OBJECT_ID(N'" + filteredEntityName + "\') AND " +
+                        "parent_object_id = OBJECT_ID(N'" + filteredParentName + "'))")
+                mssqlLineList.add("ALTER TABLE " + filteredParentName + " DROP CONSTRAINT [" + entityName + "]")
+                mssqlLineList.add("GO")
+                counter ++
+            }
         }
+
+        int dirIndex = new File(destinationDir).list().length
+        String sqlFileName = destinationDir + File.separator + "03-dropCheckConstraints-"+ dirIndex + "-" + parentName + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
 
         for (String line : mssqlLineList){
             sqlFile << line + '\r\n'
         }
 
-        log.info("=============== End of 'generateDropSP'. Generated ${sqlList.size()} statments =============== ")
+        System.out.println("=============== End of 'generateDropCheckConstraints'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropCheckConstraints'. Generated ${counter} statments =============== ")
     }
 
-    List<String>  generateDropViews(){
+    /**
+     * 4. Drop Foreign keys
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropForeignKeys(String sqlInputFileName, String destinationDir){
 
+        log.info("=============== Starting generateDropForeignKeys =============== ")
+
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        String parentName = ''
+        String filteredParentName = ''
+        String entityName =''
+        int counter = 0
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "alter table")) {
+                parentName = lineChecker.getEntityNameFromLine(line, "alter table")
+                def filterParentName = (parentName =~ /(\w+)\.(\w+)/)
+                filteredParentName = (filterParentName ? "[" + filterParentName[0][1] + "].[" + filterParentName[0][2] + "]" : "[" + parentName + "]")
+            } else if (lineChecker.lineStartsWith(line, "add constraint")) {
+                entityName = lineChecker.getEntityNameFromLine(line, "add constraint")
+                String filteredEntityName = "[dbo].[" + entityName + "]"
+
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+//            mssqlLineList.add("/****** Object:  StoredProcedure " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'" + filteredEntityName + "\') AND " +
+                        "parent_object_id = OBJECT_ID(N'" + filteredParentName + "'))")
+                mssqlLineList.add("ALTER TABLE " + filteredParentName + " DROP CONSTRAINT [" + entityName + "]")
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+        String sqlFileName = destinationDir + File.separator + "04-dropForeignKeys-"+ dirIndex + "-" + parentName + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+
+        System.out.println("=============== End of 'generateDropForeignKeys'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropForeignKeys'. Generated ${counter} statments =============== ")
     }
 
-    List<String>  generateDropTables(){
+    /**
+     * 5. Drop Indices
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropIndices(String sqlInputFileName, String destinationDir){
 
+        log.info("=============== Starting generateDropIndices =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "drop index")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "drop index")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+
+                String filteredName = filterEntityName[0][2]
+                String filteredObjectId = "[dbo].["+ filterEntityName[0][1] + "]"
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Index " + filteredName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\') AND " +
+                        "name = N'" + filteredName + "')")
+                mssqlLineList.add("DROP INDEX " + filteredName + " ON " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+        String sqlFileName = destinationDir + File.separator + "05-dropIndices-"+ dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropIndices'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropIndices'. Generated ${counter} statments =============== ")
     }
 
-    List<String>  generateDropUserDatatypes(){
+    /**
+     * 6. Drop Views
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropViews(String sqlInputFileName, String destinationDir){
 
+        log.info("=============== Starting generateDropViews =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "drop view")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "drop view")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+
+                String filteredName = "["+ filterEntityName[0][2] + "]"
+                String filteredObjectId = "["+ filterEntityName[0][1] + "].["+ filterEntityName[0][2] + "]"
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  View " + filteredName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\')")
+                mssqlLineList.add("DROP VIEW " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "06-dropViews-"+ dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropViews'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropViews'. Generated ${counter} statments =============== ")
     }
 
-    List<String>  generateDropRules(){
+    /**
+     * 7. Drop Tables
+     *
+     * Function type: Get a list of tables and assign entity and parent names (no drop table scripts provided)
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropTables(String sqlInputFilesDir, String destinationDir){
 
+
+        log.info("=============== Starting generateDropTables =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        String[] sqlList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFilesDir, "default")
+        sqlList = new HashSet<String>(Arrays.asList(sqlList)).toArray(new String[0])
+
+        for (String sqlName : sqlList){
+            entityName = filenameExtractor.getEntityNameFromSybaseSplitSqlName(sqlName, "create")
+            // Check if entity name is of <dbo>.<name>
+            def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+            String filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[dbo].[" + entityName + "]")
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+            mssqlLineList.add("/****** Object:  Table " +  filteredObjectId + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+            mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\') AND type in (N'U'))")
+            mssqlLineList.add("DROP TABLE " + filteredObjectId)
+            mssqlLineList.add("GO")
+            counter ++
+        }
+
+        entityName = 'all'
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "07-dropTables-" + dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropTables'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropTables'. Generated ${counter} statments =============== ")
     }
 
-    List<String>  generateDropDefaults(){
+    /**
+     * 8. Drop User Datatypes
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropUserDatatypes(String sqlInputFileName, String destinationDir){
 
+        log.info("=============== Starting generateDropUserDatatypes =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "EXEC sp_droptype")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "exec")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].["+ filterEntityName[0][2] + "]" : "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  UserDefinedDataType " + filteredObjectId + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.types at JOIN sys.schemas ss ON st.schema_id = ss.schema_id WHERE st.name = N'" + entityName + "' AND ss.name = N'dbo')")
+                mssqlLineList.add("DROP TYPE " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "08-dropUserDatatypes-"+ dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropUserDatatypes'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropUserDatatypes'. Generated ${counter} statments =============== ")
+    }
+
+
+    /**
+     * 9. Drop Rules
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropRules(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting generateDropRules =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "drop rule")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "drop rule")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+
+                String filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].["+ filterEntityName[0][2] + "]" : "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Rule " + filteredObjectId + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "' AND OBJECTPROPERTY(object_id, N'IsRule') = 1)")
+                mssqlLineList.add("DROP RULE " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "09-dropRules-"+ dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropRules'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropRules'. Generated ${counter} statments =============== ")
+    }
+
+
+    /**
+     * 10. Drop Defaults
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropDefaults(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting generateDropDefaults =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "drop default")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "drop default")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String filteredName = (filterEntityName ? "["+ filterEntityName[0][2] + "]" : "["+ entityName + "]")
+                String filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].["+ filterEntityName[0][2] + "]" : "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Default " + filteredName  + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "' AND OBJECTPROPERTY(object_id, N'IsDefault') = 1)")
+                mssqlLineList.add("DROP RULE " + filteredObjectId)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "10-dropDefaults-"+ dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropDefautls'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropDefaults'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 11. Drop Users
+     *
+     * Function type: get a list of create user files (no drop user statements provided)
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropUsers(String sqlInputFilesDir, String destinationDir){
+
+        log.info("=============== Starting generateDropUsers =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        String[] sqlList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFilesDir, "default")
+        sqlList = new HashSet<String>(Arrays.asList(sqlList)).toArray(new String[0])
+
+        for (String sqlName : sqlList){
+            entityName = filenameExtractor.getEntityNameFromSybaseSplitSqlName(sqlName, "create")
+            // Check if entity name is of <dbo>.<name>
+            def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+            String filteredName = (filterEntityName ? "[" + filterEntityName[0][2] + "]" : "[" + entityName + "]")
+            String filteredEntityName = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[" + entityName + "]")
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+            mssqlLineList.add("/****** Object:  User " +  filteredName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+            mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.database_principals WHERE name = N'" + entityName + "\')")
+            mssqlLineList.add("DROP USER " + filteredEntityName)
+            mssqlLineList.add("GO")
+            counter ++
+        }
+
+        entityName = 'all'
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "11-dropUsers-" + dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropUsers'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropUsers'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 12. Drop Database
+     *
+     * Function type: No drop statement provided, hard coded
+     *
+     * SQL type: If exists select * from <sys.type> with match object id, drop type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateDropDatabase(String databaseName, String destinationDir){
+
+        log.info("=============== Starting generateDropUsers =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+
+        String entityName = "[" + databaseName + "]"
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+        mssqlLineList.add("/****** Object:  Database " +  entityName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+        mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.database_principals WHERE name = N'" + databasename + "\')")
+        mssqlLineList.add("DROP DATABASE " + entityName)
+        mssqlLineList.add("GO")
+        counter ++
+
+        entityName = 'all'
+        int dirIndex = new File(destinationDir).list().length
+
+        String sqlFileName = destinationDir + File.separator + "12-dropDatabase-" + dirIndex + "-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
+
+        for (String line : mssqlLineList){
+            sqlFile << line + '\r\n'
+        }
+        System.out.println("=============== End of 'generateDropDatabase'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateDropDatabase'. Generated ${counter} statments =============== ")
     }
 
     /**
