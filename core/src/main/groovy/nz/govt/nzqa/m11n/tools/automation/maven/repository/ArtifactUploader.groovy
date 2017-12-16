@@ -94,7 +94,8 @@ class ArtifactUploader {
         }
 
         if (uploadNexusCommand != null && !uploadNexusCommand.isEmpty()) {
-            shellCommand.executeOnShellWithWorkingDirectory(uploadNexusCommand, workingDirectory)
+            File workingDirectoryFile = new File(workingDirectory)
+            shellCommand.executeOnShellWithWorkingDirectory(uploadNexusCommand, workingDirectoryFile)
             def uploadProcessExitValue = shellCommand.exitValue
             //uploadProcess.text.eachLine { println theLine }
             if (!uploadProcessExitValue) {
