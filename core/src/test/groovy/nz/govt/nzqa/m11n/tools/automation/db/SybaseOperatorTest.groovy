@@ -1,6 +1,7 @@
 package nz.govt.nzqa.m11n.tools.automation.db
 
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 import  static org.junit.Assert.assertEquals
@@ -9,6 +10,7 @@ import  static org.junit.Assert.assertTrue
 /**
  * Tests the {@link nz.govt.nzqa.m11n.tools.automation.db.SybaseOperator}.
  */
+@Ignore
 class SybaseOperatorTest {
 
     SybaseOperator SybaseOperatorTestObj

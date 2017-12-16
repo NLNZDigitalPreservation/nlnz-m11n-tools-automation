@@ -1,6 +1,7 @@
 package nz.govt.nzqa.m11n.tools.automation.db
 
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import nz.govt.nzqa.m11n.tools.automation.file.FilenameExtractor
 
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertEquals
 /**
  * Tests the {@link MssqlOperator}.
  */
+@Ignore
 class MssqlOperatorTest {
 
     MssqlOperator mssqlMapperTestObj
