@@ -39,42 +39,11 @@ class MssqlOperator {
     String getBracketedColumnType(String columnName, String sybaseSplitUserDatatypesDir){
         // Doesn't matter if use drop or add 
         String[] userDefinedDatatypeList = filenameExtractor.getAllEntityNameFromSybaseSplitSqlName(sybaseSplitUserDatatypesDir, "add")
-        return (userDefinedDatatypeList.contains(columnName) ? "[dbo].[" + columnName + "]" : "[" + columnName + "]")
+        return (userDefinedDatatypeList.contains(columnName) ? "[dbo].[" + columnName + "]" : (columnName.contains("(") ? "[" + columnName.replaceAll("\\(", "]\\(") : "[" + columnName + "]"))
     }
 
     String camelCase(String word) {
         return word.substring(0, 1).toUpperCase() + word.substring(1)
-    }
-
-    def generateTables(String[] sqlList, String originalFilePath, String destinationDir){
-
-        log.info("=============== Starting generateTables() =============== ")
-
-        String outputDir = destinationDir + File.separator + "generateTables"
-        new File(outputDir).mkdir()
-        log.info("New directory '${outputDir}' created")
-
-        int counter = 0
-
-        for (String sqlName : sqlList){
-            String entityName = filenameExtractor.getEntityNameFromSybaseSplitSqlName(sqlName, "tables")
-            String tableFileName = outputDir + File.separator + "mssqlTable-" + counter + "-" + entityName + ".sql"
-            System.out.println("Table file name: " + tableFileName)
-            new File(tableFileName).createNewFile()
-            def mssqlFile = new File(tableFileName)
-
-            List<String> sybaseLineList = Files.readAllLines(Paths.get(originalFilePath), StandardCharsets.UTF_8)
-                    .stream().filter({str -> !str.trim().isEmpty()}).collect(Collectors.toList())
-
-            // Generate scripts
-            List<String> mssqlLineList = getLineList(entityName, sybaseLineList)
-
-            for (String line : mssqlLineList){
-                mssqlFile << line + '\r\n'
-            }
-
-            counter ++
-        }
     }
 
     /**
@@ -163,8 +132,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropTriggers'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropTriggers'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropTriggers'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropTriggers'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -216,8 +185,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropSP'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropSP'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropSP'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropSP'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -275,8 +244,8 @@ class MssqlOperator {
             }
         }
 
-        System.out.println("=============== End of 'generateDropCheckConstraints'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropCheckConstraints'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropCheckConstraints'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropCheckConstraints'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -333,8 +302,8 @@ class MssqlOperator {
             }
         }
 
-        System.out.println("=============== End of 'generateDropForeignKeys'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropForeignKeys'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropForeignKeys'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropForeignKeys'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -388,8 +357,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropIndices'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropIndices'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropIndices'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropIndices'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -441,8 +410,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropViews'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropViews'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropViews'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropViews'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -495,8 +464,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropTables'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropTables'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropTables'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropTables'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -546,8 +515,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropUserDatatypes'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropUserDatatypes'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropUserDatatypes'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropUserDatatypes'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
 
@@ -599,8 +568,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropRules'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropRules'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropRules'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropRules'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
 
@@ -652,8 +621,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropDefautls'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropDefaults'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropDefautls'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropDefaults'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -706,8 +675,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateDropUsers'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropUsers'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropUsers'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateDropUsers'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -836,8 +805,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateCreateUsers'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateCreateUsers'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateCreateUsers'. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateCreateUsers'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -887,8 +856,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of ' generateCreateDatabaseRoles. Generated ${counter} statments =============== ")
-        log.info("=============== End of ' generateCreateDatabaseRoles'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of ' generateCreateDatabaseRoles. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of ' generateCreateDatabaseRoles'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -1048,8 +1017,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of ' generateCreateDefaults. Generated ${counter} statments =============== ")
-        log.info("=============== End of ' generateCreateDefaults'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of ' generateCreateDefaults. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of ' generateCreateDefaults'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -1105,8 +1074,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateCreateRules. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateCreateRules'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateCreateRules. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateCreateRules'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
     /**
@@ -1168,8 +1137,8 @@ class MssqlOperator {
             }
         }
 
-        System.out.println("=============== End of ' generateCreateUserDatatypes. Generated ${counter} statments =============== ")
-        log.info("=============== End of ' generateCreateUserDatatypes'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of ' generateCreateUserDatatypes. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of ' generateCreateUserDatatypes'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
 
@@ -1190,11 +1159,11 @@ class MssqlOperator {
 
         List<String> mssqlLineList = new ArrayList<String>()
 
-        int counter = 0
         String entityName = ''
         String filteredObjectId = ''
         String constraintName = ''
         boolean startedCreateTable = false
+        boolean constraintStatementIsTerminated = false
 
         new File(sqlInputFileName).eachLine { String line ->
 
@@ -1216,7 +1185,7 @@ class MssqlOperator {
                 mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\' AND type in (N'U'))")
                 mssqlLineList.add("BEGIN")
 
-                mssqlLineList.add("CREATE TABLE " + filteredObjectId)
+                mssqlLineList.add("CREATE TABLE " + filteredObjectId + "(")
             }
 
             else if (line.equalsIgnoreCase("(")){
@@ -1227,21 +1196,22 @@ class MssqlOperator {
                 constraintName = lineChecker.getEntityNameFromLine(line.trim(), "constraint")
             }
 
-            else if (lineChecker.lineStartsWith(line.trim(), "PRIMARY KEY")){
+            else if (lineChecker.lineStartsWith(line.trim(), "PRIMARY KEY") || lineChecker.lineStartsWith(line.trim(), "UNIQUE")){
                 def filteredLine = (line.trim() =~ /(?i)(\w+.*) \((\w+.*)\)/)
                 String pkStatement = filteredLine[0][1]
-                String bracketedPkColumnName = "[" + filteredLine[0][2] + "]"
+                String[] pkColumnNameList = filteredLine[0][2].split (",")
                 String bracketedConstraintName = "[" + constraintName + "]"
 
                 mssqlLineList.add("CONSTRAINT " + bracketedConstraintName + " " + pkStatement)
                 mssqlLineList.add("(")
-                mssqlLineList.add("\t" + bracketedPkColumnName + " ASC")
-                mssqlLineList.add(")WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]")
-                mssqlLineList.add(") ON [PRIMARY]")
-                mssqlLineList.add("END")
-                mssqlLineList.add("GO")
-                mssqlLineList.add("SET ANSI_PADDING OFF")
-                mssqlLineList.add("GO")
+
+                for (String pkColumnName : pkColumnNameList){
+                    String bracketedPkColumnName = "[" + pkColumnName + "]"
+                    mssqlLineList.add("\t" + bracketedPkColumnName + " ASC")
+                }
+
+                // If there's > 1 constraint, add ',' at the end
+                mssqlLineList.add(")WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]" + (line.endsWith(",")? "," : ""))
             }
 
             else if (startedCreateTable){
@@ -1250,17 +1220,28 @@ class MssqlOperator {
                     startedCreateTable = false
                 }
 
-                else {
-                    String[] nameTypeValue = (line.trim() =~ /(\w+)\s+(\w+.\S+)\s+(\w+.*)/)[0]
+                else if (lineChecker.lineStartsWith(line, "    ")) {
+                    String[] nameTypeValue = (line.trim().replaceAll("\\[|\\]", "") =~ /(\w+)\s+(\w+\S+)\s+(\w+.*)/)[0]
                     String bracketedColumnName = "[" + nameTypeValue[1] + "]"
                     String bracketedColumnType = getBracketedColumnType(nameTypeValue[2], sybaseSplitUserDatatypesDir).replaceAll("uni", "n")
-                    String value = nameTypeValue[3]
+
+                    // If the type needs to be not null. TODO add more types if needed
+                    String value = (nameTypeValue[3].contains("IDENTITY") && ! nameTypeValue[3].contains("NOT NULL")? nameTypeValue[3].replaceAll("IDENTITY", "IDENTITY NOT NULL") : nameTypeValue[3])
                     mssqlLineList.add("\t" + bracketedColumnName + " " + bracketedColumnType+ " " + value)
                 }
 
             }
 
             else if (lineChecker.lineStartsWith(line, "GRANT")){
+                if(!constraintStatementIsTerminated){
+                    mssqlLineList.add(") ON [PRIMARY]")
+                    mssqlLineList.add("END")
+                    mssqlLineList.add("GO")
+                    mssqlLineList.add("SET ANSI_PADDING OFF")
+                    mssqlLineList.add("GO")
+                    constraintStatementIsTerminated = true
+                }
+
                 String[] operationNameUser = lineChecker.getOperationNameAndUserFromGrantLine(line)
                 if (operationNameUser.length > 0){
                      String operation = operationNameUser[1]
@@ -1283,8 +1264,8 @@ class MssqlOperator {
                 sqlFile << line + '\r\n'
             }
         }
-        System.out.println("=============== End of 'generateCreateTables. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateCreateTables'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateCreateTables. Generated ${mssqlLineList.size()} lines =============== ")
+        log.info("=============== End of 'generateCreateTables'. Generated ${mssqlLineList.size()} lines =============== ")
     }
 
 //    List<String> getLineList(String entityName, List<String> sybaseLineList){

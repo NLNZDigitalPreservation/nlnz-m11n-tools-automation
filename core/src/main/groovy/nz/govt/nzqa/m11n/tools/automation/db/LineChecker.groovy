@@ -77,7 +77,7 @@ class LineChecker {
                 break
 
             case 'constraint':
-                regexFilterList =[/(?i)CONSTRAINT (\W+.*)/]
+                regexFilterList =[/(?i)CONSTRAINT (\w+.*)/]
                 resultIndex = 1
                 break
 
