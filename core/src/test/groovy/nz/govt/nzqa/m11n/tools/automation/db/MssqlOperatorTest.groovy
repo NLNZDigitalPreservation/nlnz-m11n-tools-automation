@@ -132,7 +132,7 @@ class MssqlOperatorTest {
     }
 
     @Test
-    void shouldGenerate15DropDefaultsStatements(){
+    void shouldGenerate5DropDefaultsStatements(){
         String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropDefaults'
         new File(destinationDir).mkdir()
 
@@ -152,6 +152,104 @@ class MssqlOperatorTest {
 
         String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
         mssqlMapperTestObj.generateDropUsers(sqlInputFileDir, destinationDir)
+    }
+
+    /**
+     * Tests for create statements
+     */
+
+    @Test
+    void shouldGenerate1CreateDBStatement(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createDatabase'
+        new File(destinationDir).mkdir()
+        String createDBFilePath = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/mssql_eqa_prod_create_database_171205.sql'
+
+        mssqlMapperTestObj.generateCreateDatabase("eqa_prod", createDBFilePath, destinationDir)
+    }
+
+    @Test
+    void shouldGenerate23CreateUsersStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createUsersRolesSchemas'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
+        String[] sqlUserFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
+
+//         Generate users
+        for (String sqlFilename : sqlUserFilenameList){
+            mssqlMapperTestObj.generateCreateUsers(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+        // Generate roles
+        String sqlGroupInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitGroups'
+        String[] sqlGroupFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlGroupInputFileDir, "default")
+
+        for (String sqlFilename : sqlGroupFilenameList) {
+            mssqlMapperTestObj.generateCreateDatabaseRoles(sqlGroupInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+        // Add member to role, grant connect to users as dbo, and create schema
+        for (String sqlFilename : sqlUserFilenameList) {
+            mssqlMapperTestObj.generateAlterRoleAddMemberGrantConnectSchema(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+    }
+
+    @Test
+    void shouldGenerate5CreateDefaultsStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createDefaults'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateDefaults(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
+    @Test
+    void shouldGenerate1CreateRulesStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createRules'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateRules(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
+    @Test
+    void shouldGenerate44CreateUserDatatypesStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createUserDatatypes'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateUserDatatypes(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
+    @Test
+    void shouldGenerate676CreateTablesStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createTables'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables'
+        String sybaseSplitUserDatatypesDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
+
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateTables(sqlInputFileDir + File.separator + sqlFilename, destinationDir, sybaseSplitUserDatatypesDir)
+        }
+
     }
 
 //    @Test

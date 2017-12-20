@@ -150,7 +150,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                if (lineChecker.lineStartsWith(line, "exec") && lineChecker.lineContains(line, "addtype") && isFirstCreateStatement) {
+                if (lineChecker.lineStartsWith(line, "exec sp_addtype") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
 
                     doneDropping = true
@@ -159,7 +159,7 @@ class SybaseOperator {
                     lineType = "exec"
                 }
 
-                if ((lineChecker.lineStartsWith(line, "if exists") && !doneDropping) || lineChecker.lineStartsWith(line, "exec")) {
+                if ((lineChecker.lineStartsWith(line, "if exists") && !doneDropping) || lineChecker.lineStartsWith(line, "exec sp_addtype")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName

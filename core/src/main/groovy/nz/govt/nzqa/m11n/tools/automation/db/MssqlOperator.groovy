@@ -12,30 +12,35 @@ import java.util.stream.Collectors
 
 @Slf4j
 class MssqlOperator {
-    // Commands
-    String USE= "USE []"
-    String GO = "GO "
-    String CREATE = "CREATE "
-    String DROP = "DROP "
-    String EXEC = "EXEC "
-    String IF = "IF "
-    String IF_OBJECT_ID = "IF OBJECT_ID"
-    String ALTER = "ALTER "
-
-    // Entity types
-    String TABLE = "TABLE "
-    String PROCEDURE = "PROCEDURE "
-    String TRIGGER = "TRIGGER "
-
-    // Settings
-    String SET_ANSI_NULL_ON = "SET ANSI_NULLS ON"
-    String SET_QUOTED_IDENTIFIER_ON = "SET QUOTED_IDENTIFIER ON"
-    String SET_ANSI_PADDING_ON = "SET ANSI_PADDING ON"
+//    // Commands
+//    String USE= "USE []"
+//    String GO = "GO "
+//    String CREATE = "CREATE "
+//    String DROP = "DROP "
+//    String EXEC = "EXEC "
+//    String IF = "IF "
+//    String IF_OBJECT_ID = "IF OBJECT_ID"
+//    String ALTER = "ALTER "
+//
+//    // Entity types
+//    String TABLE = "TABLE "
+//    String PROCEDURE = "PROCEDURE "
+//    String TRIGGER = "TRIGGER "
+//
+//    // Settings
+//    String SET_ANSI_NULL_ON = "SET ANSI_NULLS ON"
+//    String SET_QUOTED_IDENTIFIER_ON = "SET QUOTED_IDENTIFIER ON"
+//    String SET_ANSI_PADDING_ON = "SET ANSI_PADDING ON"
 
 
     LineChecker lineChecker = new LineChecker()
     FilenameExtractor filenameExtractor = new FilenameExtractor()
 
+    String getBracketedColumnType(String columnName, String sybaseSplitUserDatatypesDir){
+        // Doesn't matter if use drop or add 
+        String[] userDefinedDatatypeList = filenameExtractor.getAllEntityNameFromSybaseSplitSqlName(sybaseSplitUserDatatypesDir, "add")
+        return (userDefinedDatatypeList.contains(columnName) ? "[dbo].[" + columnName + "]" : "[" + columnName + "]")
+    }
 
     String camelCase(String word) {
         return word.substring(0, 1).toUpperCase() + word.substring(1)
@@ -145,15 +150,18 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
-        String sqlFileName = destinationDir + File.separator + "01-dropTriggers-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "01-dropTriggers-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropTriggers'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropTriggers'. Generated ${counter} statments =============== ")
@@ -196,14 +204,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
-        String sqlFileName = destinationDir + File.separator + "02-dropSP-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            String sqlFileName = destinationDir + File.separator + "02-dropSP-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropSP'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropSP'. Generated ${counter} statments =============== ")
@@ -251,14 +262,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
-        String sqlFileName = destinationDir + File.separator + "03-dropCheckConstraints-"+ dirIndex + "-" + parentName + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            String sqlFileName = destinationDir + File.separator + "03-dropCheckConstraints-" + dirIndex + "-" + parentName + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
 
         System.out.println("=============== End of 'generateDropCheckConstraints'. Generated ${counter} statments =============== ")
@@ -306,14 +320,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
-        String sqlFileName = destinationDir + File.separator + "04-dropForeignKeys-"+ dirIndex + "-" + parentName + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            String sqlFileName = destinationDir + File.separator + "04-dropForeignKeys-" + dirIndex + "-" + parentName + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
 
         System.out.println("=============== End of 'generateDropForeignKeys'. Generated ${counter} statments =============== ")
@@ -359,14 +376,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
-        String sqlFileName = destinationDir + File.separator + "05-dropIndices-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            String sqlFileName = destinationDir + File.separator + "05-dropIndices-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropIndices'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropIndices'. Generated ${counter} statments =============== ")
@@ -409,15 +429,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        String sqlFileName = destinationDir + File.separator + "06-dropViews-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+            String sqlFileName = destinationDir + File.separator + "06-dropViews-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropViews'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropViews'. Generated ${counter} statments =============== ")
@@ -460,16 +482,18 @@ class MssqlOperator {
             counter ++
         }
 
-        entityName = 'all'
-        int dirIndex = new File(destinationDir).list().length
+        if (mssqlLineList.size() > 0) {
+            entityName = 'all'
+            int dirIndex = new File(destinationDir).list().length
 
-        String sqlFileName = destinationDir + File.separator + "07-dropTables-" + dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+            String sqlFileName = destinationDir + File.separator + "07-dropTables-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropTables'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropTables'. Generated ${counter} statments =============== ")
@@ -510,15 +534,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        String sqlFileName = destinationDir + File.separator + "08-dropUserDatatypes-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+            String sqlFileName = destinationDir + File.separator + "08-dropUserDatatypes-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropUserDatatypes'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropUserDatatypes'. Generated ${counter} statments =============== ")
@@ -561,15 +587,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        String sqlFileName = destinationDir + File.separator + "09-dropRules-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+            String sqlFileName = destinationDir + File.separator + "09-dropRules-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropRules'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropRules'. Generated ${counter} statments =============== ")
@@ -612,15 +640,17 @@ class MssqlOperator {
             }
         }
 
-        int dirIndex = new File(destinationDir).list().length
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
 
-        String sqlFileName = destinationDir + File.separator + "10-dropDefaults-"+ dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+            String sqlFileName = destinationDir + File.separator + "10-dropDefaults-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropDefautls'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropDefaults'. Generated ${counter} statments =============== ")
@@ -663,16 +693,18 @@ class MssqlOperator {
             counter ++
         }
 
-        entityName = 'all'
-        int dirIndex = new File(destinationDir).list().length
+        if (mssqlLineList.size() > 0) {
+            entityName = 'all'
+            int dirIndex = new File(destinationDir).list().length
 
-        String sqlFileName = destinationDir + File.separator + "11-dropUsers-" + dirIndex + "-" + entityName + ".sql"
-        new File(sqlFileName).createNewFile()
-        def sqlFile = new File(sqlFileName)
-        log.info("File '${sqlFileName}' created")
+            String sqlFileName = destinationDir + File.separator + "11-dropUsers-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
 
-        for (String line : mssqlLineList){
-            sqlFile << line + '\r\n'
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
         }
         System.out.println("=============== End of 'generateDropUsers'. Generated ${counter} statments =============== ")
         log.info("=============== End of 'generateDropUsers'. Generated ${counter} statments =============== ")
@@ -691,19 +723,16 @@ class MssqlOperator {
      */
     def generateDropDatabase(String databaseName, String destinationDir){
 
-        log.info("=============== Starting generateDropUsers =============== ")
+        log.info("=============== Starting generateDropDatabase =============== ")
 
         List<String> mssqlLineList = new ArrayList<String>()
-        int counter = 0
-
         String entityName = "[" + databaseName + "]"
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
         mssqlLineList.add("/****** Object:  Database " +  entityName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
-        mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.database_principals WHERE name = N'" + databasename + "\')")
+        mssqlLineList.add("IF  EXISTS (SELECT * FROM sys.database_principals WHERE name = N'" + databaseName + "\')")
         mssqlLineList.add("DROP DATABASE " + entityName)
         mssqlLineList.add("GO")
-        counter ++
 
         entityName = 'all'
         int dirIndex = new File(destinationDir).list().length
@@ -716,85 +745,580 @@ class MssqlOperator {
         for (String line : mssqlLineList){
             sqlFile << line + '\r\n'
         }
-        System.out.println("=============== End of 'generateDropDatabase'. Generated ${counter} statments =============== ")
-        log.info("=============== End of 'generateDropDatabase'. Generated ${counter} statments =============== ")
+        System.out.println("=============== End of 'generateDropDatabase'. Generated 1 statments =============== ")
+        log.info("=============== End of 'generateDropDatabase'. Generated 1 statments =============== ")
     }
 
     /**
      * Functions for generating create statements
      */
 
-    List<String> generateCreateTriggers(){
+    /**
+     * 1. Create Database
+     *
+     * Function type: Read from create DB script
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
 
-    }
+    def generateCreateDatabase(String databaseName, String mssqlCreateDatabaseScriptPath, String destinationDir){
 
-    List<String> generateCreateSPs(){
+        log.info("=============== Starting generateCreateDatabase =============== ")
 
-    }
+        String entityName = 'all'
 
-    List<String>  generateCreateConstriants(){
+        String sqlFileName = destinationDir + File.separator + "1-createDatabase-0-" + entityName + ".sql"
+        new File(sqlFileName).createNewFile()
+        def sqlFile = new File(sqlFileName)
+        log.info("File '${sqlFileName}' created")
 
-    }
+        entityName = "[" + databaseName + "]"
 
-    List<String>  generateCreateForeignKeys(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+        sqlFile << "/****** Object:  Database " +  entityName + "    Script Date: " + dateFormat.format(new Date()) + " ******/" + '\r\n'
 
-    }
+        List<String> lines = Files.readAllLines(Paths.get(mssqlCreateDatabaseScriptPath),  StandardCharsets.UTF_8)
 
-    List<String>  generateCreateViews(){
-
-    }
-
-    List<String>  generateCreateTables(){
-
-    }
-
-    List<String>  generateCreateUserDatatypes(){
-
-    }
-
-    List<String>  generateCreateRules(){
-
-    }
-
-    List<String>  generateCreateDefaults(){
-
-    }
-
-
-
-
-    List<String> getLineList(String entityName, List<String> sybaseLineList){
-        List<String> lineList = []
-
-        // Check if entity name is of <dbo>.<name>
-        def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
-        String tableName = (filterEntityName ? "["+ filterEntityName[0][1] + "][" + filterEntityName[0][2] + "]" : "[" + entityName + "]")
-
-        // Append headers
-        lineList.add(USE.replace("[]", "[eqa_prod]"))
-        lineList.add(GO)
-        lineList.add(DROP + TABLE + tableName)
-        lineList.add(GO)
-        lineList.add(SET_ANSI_NULL_ON)
-        lineList.add(GO)
-        lineList.add(SET_QUOTED_IDENTIFIER_ON)
-        lineList.add(GO)
-        lineList.add(SET_ANSI_PADDING_ON)
-        lineList.add(GO)
-
-        boolean inCreateStatment = false
-
-        for (String line : sybaseLineList){
-            if (lineChecker.lineStartsWith(line, "create")) {
-                lineList.add(CREATE + TABLE + entityName)
-                inCreateStatment = true
-            }
-
-//            if (inCreateStatment){
-//
-//            }
+        for(String line : lines){
+            sqlFile << line + '\r\n'
         }
 
-        return lineList
+        System.out.println("=============== End of 'generateCreateDatabase'. Generated 1 statments =============== ")
+        log.info("=============== End of 'generateCreateDatabase'. Generated 1 statments =============== ")
     }
+
+    /**
+     * 2-1. Create Users
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, exec
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateUsers(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting generateCreateUsers =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "EXEC sp_adduser")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "exec")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String filteredName = (filterEntityName ? "["+ filterEntityName[0][2] + "]" : "["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  User " +  filteredName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'" + entityName + "\')")
+                mssqlLineList.add("CREATE USER " + filteredName + " FOR LOGIN " + filteredName + " WITH DEFAULT_SCHEMA=" + filteredName)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "2.1-createUsers-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+        System.out.println("=============== End of 'generateCreateUsers'. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateCreateUsers'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 2-2. Create DatabaseRole
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, exec
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateDatabaseRoles(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting  generateCreateDatabaseRoles =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "EXEC sp_addgroup")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "exec")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String filteredName = (filterEntityName ? "["+ filterEntityName[0][2] + "]" : "["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  DatabseRole " +  filteredName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF  NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'" + entityName + "\' AND type = 'R')")
+                mssqlLineList.add("CREATE ROLE " + filteredName)
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "2.2-createDatabaseRoles-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+        System.out.println("=============== End of ' generateCreateDatabaseRoles. Generated ${counter} statments =============== ")
+        log.info("=============== End of ' generateCreateDatabaseRoles'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 2-3. Add member
+     *
+     * Function type: Parse sybase sql scripts (groups and users) and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, create type
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+
+    def generateAlterRoleAddMemberGrantConnectSchema(String sqlInputFileName, String destinationDir){
+        log.info("=============== Starting AlterRoleAddMemberGrantConnectSchema =============== ")
+        log.info("************ Part 1. Generating 'alter role add user' statements ************ ")
+        System.out.println("************ Part 1. Generating 'alter role add user' statements ************ ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+
+        String userName = ''
+        String schemaName = ''
+
+        int NUMBER_OF_GROUPS = 3
+        int NUMBER_OF_USERS = 22
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "EXEC sp_adduser")) {
+
+                String [] entityList = lineChecker.getEntityNameFromLine(line, "exec type and name").replaceAll("'", "").split(",")
+                userName = entityList[0]
+                String bracketedEntityName = "[" + userName + "]"
+
+                schemaName = entityList[1]
+
+                String roleName = entityList[2]
+                String bracketedRoleName = "[" + roleName + "]"
+
+                mssqlLineList.add("ALTER ROLE " + bracketedRoleName + " ADD MEMBER " + bracketedEntityName)
+                mssqlLineList.add("GO")
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = (new File(destinationDir).list().length - NUMBER_OF_USERS - NUMBER_OF_GROUPS) / 3
+
+            String sqlFileName = destinationDir + File.separator + "2.3-createAlterRole-" + dirIndex + "-" + userName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+
+        log.info("************ End of part 1. Generated 1 'alter role add user' statments ************")
+        System.out.println("************ End of part 1. Generated 1 'alter role add user' statments ************")
+
+        // Generate Grant statements
+        log.info("************ Part 2. Generating 'grant connect to user' statements ************")
+        System.out.println("************ Part 2. Generating 'grant connect to user' statements ************")
+
+        int dirIndex = (new File(destinationDir).list().length - NUMBER_OF_USERS - NUMBER_OF_GROUPS) / 3
+        String sqlFileNameGrantConnect = destinationDir + File.separator + "2.4-createGrantConnect-" + dirIndex + "-" + userName + ".sql"
+        new File(sqlFileNameGrantConnect).createNewFile()
+        def sqlFileGrantConnect = new File(sqlFileNameGrantConnect)
+        log.info("File '${sqlFileNameGrantConnect}' created")
+
+        sqlFileGrantConnect << "GRANT CONNECT TO [" + userName + "] AS [dbo]" + '\r\n'
+        sqlFileGrantConnect << "GO" + '\r\n'
+
+        log.info("************ End of part 2. Generated 1 'grant connect to user' statments ************")
+        System.out.println("************ End of part 2. Generated 1 'grant connect to user' statments ************")
+
+        // Generate create schema statements
+        log.info("************ Part 3.Generating create schema statements ************")
+        System.out.println("************ Part 3.Generating create schema statements ************")
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+        List<String> mssqlLineListSchema = new ArrayList<String>()
+
+        mssqlLineListSchema.add("/****** Object:  Schema [" +  schemaName + "]    Script Date: " + dateFormat.format(new Date()) + " ******/")
+        mssqlLineListSchema.add("IF  NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'" + schemaName + "\' )")
+        mssqlLineListSchema.add("EXEC sys.sp_executesql N'CREATE SCHEMA [" + schemaName + "]'")
+        mssqlLineListSchema.add("GO")
+
+
+        int dirIndexSchema = (new File(destinationDir).list().length - NUMBER_OF_USERS - NUMBER_OF_GROUPS - 1)/3
+
+        String sqlFileNameSchema = destinationDir + File.separator + "2.5-createSchemas-" + dirIndexSchema + "-" + schemaName + ".sql"
+        new File(sqlFileNameSchema).createNewFile()
+        def sqlFileSchema = new File(sqlFileNameSchema)
+        log.info("File '${sqlFileNameSchema}' created")
+
+        for (String line : mssqlLineListSchema){
+            sqlFileSchema << line + '\r\n'
+        }
+
+        System.out.println("************ End of part 3. Generated 1 'create schema' statments ************")
+        log.info("************ End of part 3. Generated 1 'create schema' statments ************")
+
+        System.out.println("=============== End of 'AlterRoleAddMemberGrantConnectSchema' =============== ")
+        log.info("=============== End of 'AlterRoleAddMemberGrantConnectSchema' =============== ")
+    }
+
+    /**
+     * 3. Create Defaults
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, exec
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateDefaults(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting  generateCreateDefaults =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "CREATE DEFAULT")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "create")
+                String value = lineChecker.getValueFromLine(line)
+
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String filteredName = (filterEntityName ? "["+ filterEntityName[0][2] + "]" : "["+ entityName + "]")
+                String filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]": "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Default " +  filteredName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\' AND OBJECTPROPERTY(object_id, N'IsDefault') = 1)")
+                mssqlLineList.add("EXEC dbo.sp_executesql N'CREATE DEFAULT " + filteredObjectId)
+                mssqlLineList.add("AS")
+                mssqlLineList.add(value)
+                mssqlLineList.add("'")
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "3-createDefaults-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+        System.out.println("=============== End of ' generateCreateDefaults. Generated ${counter} statments =============== ")
+        log.info("=============== End of ' generateCreateDefaults'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 4. Create Rules
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, exec
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateRules(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting  generateCreateRules =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "CREATE RULE")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "create")
+                String value = lineChecker.getValueFromLine(line)
+
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String filteredName = (filterEntityName ? "["+ filterEntityName[0][2] + "]" : "["+ entityName + "]")
+                String filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]": "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Rule " +  filteredName + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\' AND OBJECTPROPERTY(object_id, N'IsRule') = 1)")
+                mssqlLineList.add("EXEC dbo.sp_executesql N'CREATE RULE " + filteredObjectId)
+                mssqlLineList.add("AS")
+                mssqlLineList.add(value)
+                mssqlLineList.add("'")
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "4-createRules-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+        System.out.println("=============== End of 'generateCreateRules. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateCreateRules'. Generated ${counter} statments =============== ")
+    }
+
+    /**
+     * 5. Create User Datatypes
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, create then grant references
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateUserDatatypes(String sqlInputFileName, String destinationDir){
+
+        log.info("=============== Starting generateCreateUserDatatypes =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        int counter = 0
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "EXEC sp_addtype")) {
+
+                String[] nameTypeValue = lineChecker.getEntityNameFromLine(line, "exec type and name").replaceAll("'", "").split(",")
+
+//                System.out.println("Name type & value: "+ nameTypeValue)
+                entityName = nameTypeValue[0]
+//                System.out.println("Entity name: "+ entityName)
+                String type = nameTypeValue[1].replaceAll("uni", "n")
+                String bracketedType = (type.contains("(") ? "[" + type.replaceAll("\\(", "]\\(") : "[" + type + "]")
+                String value = nameTypeValue[2]
+
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String bracketedObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]": "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  UserDefinedDataType " +  bracketedObjectId + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id WHERE st.name = N'" + entityName + "\' AND ss.name = N'dbo')")
+                mssqlLineList.add("CREATE TYPE " + bracketedObjectId + " FROM " + bracketedType + " " + value)
+                mssqlLineList.add("GO")
+                mssqlLineList.add("GRANT REFERENCES ON TYPE::" + bracketedObjectId + " TO [public] AS [dbo]")
+                mssqlLineList.add("GO")
+                counter ++
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "5-createUserDatatypes-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+
+        System.out.println("=============== End of ' generateCreateUserDatatypes. Generated ${counter} statments =============== ")
+        log.info("=============== End of ' generateCreateUserDatatypes'. Generated ${counter} statments =============== ")
+    }
+
+
+    /**
+     * 6. Create Tables
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, create
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateTables(String sqlInputFileName, String destinationDir, String sybaseSplitUserDatatypesDir){
+
+        log.info("=============== Starting  generateCreateTables =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+
+        int counter = 0
+        String entityName = ''
+        String filteredObjectId = ''
+        String constraintName = ''
+        boolean startedCreateTable = false
+
+        new File(sqlInputFileName).eachLine { String line ->
+
+            if (lineChecker.lineStartsWith(line, "CREATE TABLE")) {
+
+                entityName = lineChecker.getEntityNameFromLine(line, "create")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                filteredObjectId = (filterEntityName ? "["+ filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]": "[dbo].["+ entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  Table " +  filteredObjectId + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("SET ANSI_NULLS ON")
+                mssqlLineList.add("GO")
+                mssqlLineList.add("SET QUOTED_IDENTIFIER ON")
+                mssqlLineList.add("GO")
+                mssqlLineList.add("SET ANSI_PADDING ON")
+                mssqlLineList.add("GO")
+
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\' AND type in (N'U'))")
+                mssqlLineList.add("BEGIN")
+
+                mssqlLineList.add("CREATE TABLE " + filteredObjectId)
+            }
+
+            else if (line.equalsIgnoreCase("(")){
+                startedCreateTable = true
+            }
+
+            else if (lineChecker.lineStartsWith(line.trim(), "CONSTRAINT")){
+                constraintName = lineChecker.getEntityNameFromLine(line.trim(), "constraint")
+            }
+
+            else if (lineChecker.lineStartsWith(line.trim(), "PRIMARY KEY")){
+                def filteredLine = (line.trim() =~ /(?i)(\w+.*) \((\w+.*)\)/)
+                String pkStatement = filteredLine[0][1]
+                String bracketedPkColumnName = "[" + filteredLine[0][2] + "]"
+                String bracketedConstraintName = "[" + constraintName + "]"
+
+                mssqlLineList.add("CONSTRAINT " + bracketedConstraintName + " " + pkStatement)
+                mssqlLineList.add("(")
+                mssqlLineList.add("\t" + bracketedPkColumnName + " ASC")
+                mssqlLineList.add(")WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]")
+                mssqlLineList.add(") ON [PRIMARY]")
+                mssqlLineList.add("END")
+                mssqlLineList.add("GO")
+                mssqlLineList.add("SET ANSI_PADDING OFF")
+                mssqlLineList.add("GO")
+            }
+
+            else if (startedCreateTable){
+
+                if (line.equalsIgnoreCase(")")) {
+                    startedCreateTable = false
+                }
+
+                else {
+                    String[] nameTypeValue = (line.trim() =~ /(\w+)\s+(\w+.\S+)\s+(\w+.*)/)[0]
+                    String bracketedColumnName = "[" + nameTypeValue[1] + "]"
+                    String bracketedColumnType = getBracketedColumnType(nameTypeValue[2], sybaseSplitUserDatatypesDir).replaceAll("uni", "n")
+                    String value = nameTypeValue[3]
+                    mssqlLineList.add("\t" + bracketedColumnName + " " + bracketedColumnType+ " " + value)
+                }
+
+            }
+
+            else if (lineChecker.lineStartsWith(line, "GRANT")){
+                String[] operationNameUser = lineChecker.getOperationNameAndUserFromGrantLine(line)
+                if (operationNameUser.length > 0){
+                     String operation = operationNameUser[1]
+                    String bracketedUser = "[" + operationNameUser[3] + "]"
+                    mssqlLineList.add("GRANT " + operation + " ON " + filteredObjectId + " TO " + bracketedUser + " AS [dbo]")
+                    mssqlLineList.add("GO")
+                }
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "6-createTables-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+        System.out.println("=============== End of 'generateCreateTables. Generated ${counter} statments =============== ")
+        log.info("=============== End of 'generateCreateTables'. Generated ${counter} statments =============== ")
+    }
+
+//    List<String> getLineList(String entityName, List<String> sybaseLineList){
+//        List<String> lineList = []
+//
+//        // Check if entity name is of <dbo>.<name>
+//        def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+//        String tableName = (filterEntityName ? "["+ filterEntityName[0][1] + "][" + filterEntityName[0][2] + "]" : "[" + entityName + "]")
+//
+//        // Append headers
+//        lineList.add(USE.replace("[]", "[eqa_prod]"))
+//        lineList.add(GO)
+//        lineList.add(DROP + TABLE + tableName)
+//        lineList.add(GO)
+//        lineList.add(SET_ANSI_NULL_ON)
+//        lineList.add(GO)
+//        lineList.add(SET_QUOTED_IDENTIFIER_ON)
+//        lineList.add(GO)
+//        lineList.add(SET_ANSI_PADDING_ON)
+//        lineList.add(GO)
+//
+//        boolean inCreateStatment = false
+//
+//        for (String line : sybaseLineList){
+//            if (lineChecker.lineStartsWith(line, "create")) {
+//                lineList.add(CREATE + TABLE + entityName)
+//                inCreateStatment = true
+//            }
+//
+////            if (inCreateStatment){
+////
+////            }
+//        }
+//
+//        return lineList
+//    }
 }

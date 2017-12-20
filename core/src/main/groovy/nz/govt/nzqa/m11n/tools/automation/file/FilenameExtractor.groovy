@@ -71,12 +71,12 @@ class FilenameExtractor {
 
 
         if (type.equalsIgnoreCase("add")){
-            System.out.println("after regex: " + (sybaseSplitSqlName =~ /$regexFilterAdd/)[0])
+//            System.out.println("after regex: " + (sybaseSplitSqlName =~ /$regexFilterAdd/)[0])
             name = ((sybaseSplitSqlName =~ /$regexFilterAdd/)[0][3])
         }
 
         else if (type.equalsIgnoreCase("drop")){
-            System.out.println("after regex: " + (sybaseSplitSqlName =~ /$regexFilterDrop/)[0])
+//            System.out.println("after regex: " + (sybaseSplitSqlName =~ /$regexFilterDrop/)[0])
             name = ((sybaseSplitSqlName =~ /$regexFilterDrop/)[0][3])
 
         }
@@ -85,11 +85,22 @@ class FilenameExtractor {
             name = ((sybaseSplitSqlName =~ /$regexFilter/)[0][3])
         }
 
-
-
 //        System.out.println("name: " + (sybaseSplitSqlName =~ /$regexFilter/)[0][3])
 
         return name
+    }
+
+    String[] getAllEntityNameFromSybaseSplitSqlName(String sybaseSplitDir, String type){
+
+        String[] sqlFilenameList = getListOfSplitSqlScriptsInDir(sybaseSplitDir, type)
+        List<String> result = new ArrayList<>()
+
+        for (String sqlFilename : sqlFilenameList) {
+            String name = getEntityNameFromSybaseSplitSqlName(sqlFilename, type)
+            result.add(name)
+        }
+
+        return result as String[]
     }
 
     String getSqlTypeFromSybaseFolderName(String sybaseFolderName){

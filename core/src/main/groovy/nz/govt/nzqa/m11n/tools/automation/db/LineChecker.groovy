@@ -21,13 +21,6 @@ class LineChecker {
         else{
             return false
         }
-//        if(! line.toLowerCase().startsWith(prefix)){
-
-//            def regex = '.*(?=' + prefix + ')'
-//            line =~ /$regex/
-//        }
-
-//        return (line.toLowerCase().startsWith(prefix))
     }
 
     boolean lineContains(String line, String subString) {
@@ -63,6 +56,11 @@ class LineChecker {
                 resultIndex = 2
                 break
 
+            case 'exec type and name':
+                regexFilterList = [/EXEC (\w+) (.*)/]
+                resultIndex = 2
+                break
+
             case 'create':
                 regexFilterList =[/(?i)CREATE (\w+) (\w+\.\w+)/, /(?i)CREATE (\w+) (\w+)/]
                 resultIndex = 2
@@ -76,6 +74,11 @@ class LineChecker {
             case 'if index':
                 regexFilterList =[/.*(?i)id=OBJECT_ID\('(\w+.*)'\) and name='(\w+)'/]
                 resultIndex = 2
+                break
+
+            case 'constraint':
+                regexFilterList =[/(?i)CONSTRAINT (\W+.*)/]
+                resultIndex = 1
                 break
 
             default:
@@ -100,6 +103,30 @@ class LineChecker {
             }
         }
         return name
+    }
+
+    String getValueFromLine (String line){
+        def regexFilter = /(?i)create (\w+) (\w+\.\w+) as (.*)/
+        def result = (line =~ /$regexFilter/)
+
+        String name = ''
+
+        if (result){
+            name = result[0][3]
+        }
+
+        return name
+    }
+
+    String[] getOperationNameAndUserFromGrantLine (String line){
+        def regexFilter = /(?i)grant (\w+) on (\w+.*) to (\w+.*)/
+        def result = (line =~ /$regexFilter/)
+
+        if (result){
+            return result[0]
+        }
+
+        return []
     }
 
     boolean entityNameHasChanged(String newEntityName, String currentEntityName){

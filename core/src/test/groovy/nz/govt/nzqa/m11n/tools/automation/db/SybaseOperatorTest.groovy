@@ -52,7 +52,7 @@ class SybaseOperatorTest {
     /**
      * Expect 3 add groups
      */
-//    @Test
+    @Test
     void testSplitGroups() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
         File testFile = new File(testFileName)
@@ -96,7 +96,7 @@ class SybaseOperatorTest {
     /**
      * Expect 676 tables
      */
-//    @Test
+    @Test
     void testSplitTables() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
         File testFile = new File(testFileName)
