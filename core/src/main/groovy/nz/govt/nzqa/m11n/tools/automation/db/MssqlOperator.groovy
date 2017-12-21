@@ -1408,5 +1408,91 @@ class MssqlOperator {
             System.out.println("=============== End of 'generateCreateIndices. Generated ${mssqlLineList.size()} lines for '" + indexName + "' =============== ")
             log.info("=============== End of 'generateCreateUserIndices'. Generated ${mssqlLineList.size()} lines for '" + indexName + "' =============== ")
         }
+
+    /**
+     * 9. is a whole bunch of DF constraints, alter table <table name> add default <value> for <solumn>
+     */
+
+    /**
+     * 10. Create Foreign keys
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateForeignKeys(String sqlInputFileName, String destinationDir) {
+
+        log.info("=============== Starting generateDropForeignKeys =============== ")
+
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        String fkName = ''
+        String fkColumnName = ''
+        String refTableName = ''
+        String refColumnName = ''
+        String entityName = ''
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "alter table")) {
+                entityName = lineChecker.getEntityNameFromLine(line, "alter table")
+
+            } else if (lineChecker.lineStartsWith(line, "add constraint")) {
+                fkName = lineChecker.getEntityNameFromLine(line, "add constraint")
+            }
+            else if (lineChecker.lineStartsWith(line, "FOREIGN KEY")) {
+                fkColumnName = lineChecker.getFkColumnNameFromFkLine(line)
+            }
+
+            else if (lineChecker.lineStartsWith(line, "REFERENCES")) {
+                String[] refTableColumn= lineChecker.getFkRefTableColumnFromReferencesLine(line)
+                refTableName = refTableColumn[1]
+                refColumnName = refTableColumn[2]
+
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                String bracketedObjectId = (filterEntityName ? "[" + filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[dbo].[" + entityName + "]")
+                String bracketedFkName = "[" + fkName + "]"
+                String bracketedFkColumnName = "[" + fkColumnName + "]"
+
+                def filterRefTableName = (refTableName =~ /(\w+)\.(\w+)/)
+                String bracketedRefTableName = (filterRefTableName ? "[" + filterRefTableName[0][1] + "].[" + filterRefTableName[0][2] + "]" : "[dbo].[" + refTableName + "]")
+                String bracketedRefColumnName = "([" + refColumnName + "])"
+
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+//            mssqlLineList.add("/****** Object:  StoredProcedure " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo]." + bracketedFkName + "\') AND " +
+                        "parent_object_id = OBJECT_ID(N'" + bracketedObjectId + "'))")
+                mssqlLineList.add("ALTER TABLE " + bracketedObjectId + " WITH CHECK ADD CONSTRAINT " + bracketedFkName + " FOREIGN KEY(" + bracketedFkColumnName + ")")
+                mssqlLineList.add("REFERENCES " + bracketedRefTableName + " " + bracketedRefColumnName)
+                mssqlLineList.add("GO")
+
+                // Add check statement
+                mssqlLineList.add("IF EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo]." + bracketedFkName + "\') AND " +
+                        "parent_object_id = OBJECT_ID(N'" + bracketedObjectId + "'))")
+                mssqlLineList.add("ALTER TABLE " + bracketedObjectId + " CHECK CONSTRAINT " + bracketedFkName)
+                mssqlLineList.add("GO")
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "04-dropForeignKeys-" + dirIndex + "-" + fkName + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+
+        System.out.println("=============== End of 'generateDropForeignKeys'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+        log.info("=============== End of 'generateDropForeignKeys'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+    }
+
 }
 

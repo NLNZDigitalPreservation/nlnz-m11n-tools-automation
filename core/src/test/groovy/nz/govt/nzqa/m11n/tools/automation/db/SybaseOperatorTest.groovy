@@ -131,7 +131,7 @@ class SybaseOperatorTest {
     /**
      * Expect 31 alter table add unique key contraint statements
      */
-//    @Test
+    @Test
     void testSplitUniqueKeys() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
         File testFile = new File(testFileName)
@@ -143,7 +143,7 @@ class SybaseOperatorTest {
     /**
      * Expect 11 alter table add unique key contraint and check their values
      */
-//    @Test
+    @Test
     void testSplitCheckConstraints() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
         File testFile = new File(testFileName)

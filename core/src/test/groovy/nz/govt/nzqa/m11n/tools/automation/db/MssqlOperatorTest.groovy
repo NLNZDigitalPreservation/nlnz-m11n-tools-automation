@@ -280,6 +280,20 @@ class MssqlOperatorTest {
 
     }
 
+    @Test
+    void shouldGenerate1088CreateFkStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createForeignKeys'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitForeignKeys'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateForeignKeys(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
 //    @Test
     void shouldGenerateOneMssqlScript(){
         String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'

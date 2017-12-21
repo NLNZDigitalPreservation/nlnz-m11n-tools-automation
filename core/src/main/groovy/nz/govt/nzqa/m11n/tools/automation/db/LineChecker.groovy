@@ -151,6 +151,28 @@ class LineChecker {
         return []
     }
 
+    String getFkColumnNameFromFkLine(String line){
+        def regexFilter = /(?i)foreign key \((.*)\)/
+        def result = (line =~ /$regexFilter/)
+
+        if (result){
+            return result[0][1]
+        }
+
+        return []
+    }
+
+    String[] getFkRefTableColumnFromReferencesLine(String line){
+        def regexFilter = /(?i)references (.*) \((.*)\)/
+        def result = (line =~ /$regexFilter/)
+
+        if (result){
+            return result[0]
+        }
+
+        return []
+    }
+
     boolean entityNameHasChanged(String newEntityName, String currentEntityName){
         if(!newEntityName.equalsIgnoreCase(currentEntityName)){
             return ! newEntityName.replace("dbo.", "").equalsIgnoreCase(currentEntityName)
