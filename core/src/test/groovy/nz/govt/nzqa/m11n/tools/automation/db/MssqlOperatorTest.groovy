@@ -252,6 +252,34 @@ class MssqlOperatorTest {
 
     }
 
+    @Test
+    void shouldGenerate85CreateViewsStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createViews'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitViews'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateViews(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
+    @Test
+    void shouldGenerate598CreateIndicesStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createIndices'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitIndices'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateIndices(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
 //    @Test
     void shouldGenerateOneMssqlScript(){
         String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'

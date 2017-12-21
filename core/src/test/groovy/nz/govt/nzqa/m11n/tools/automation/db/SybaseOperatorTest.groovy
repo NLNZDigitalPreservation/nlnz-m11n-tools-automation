@@ -107,7 +107,7 @@ class SybaseOperatorTest {
     /**
      * Expect 598 indices
      * */
-//    @Test
+    @Test
     void testSplitIndices() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07a-eqa_prod_indices_171214.sql"
         File testFile = new File(testFileName)
@@ -166,7 +166,7 @@ class SybaseOperatorTest {
     /**
      * Expect 85 drop and create views
      */
-//    @Test
+    @Test
     void testSplitViews() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
         File testFile = new File(testFileName)

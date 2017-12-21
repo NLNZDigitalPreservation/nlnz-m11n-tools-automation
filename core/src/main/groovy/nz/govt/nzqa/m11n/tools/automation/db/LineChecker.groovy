@@ -38,7 +38,7 @@ class LineChecker {
 
     String getTypeFromLine(String line) {
 
-        if(lineContains(line, "add") || lineContains(line, "create")){
+        if(lineContains(line, "addtype") || lineContains(line, "create ")){
             return "add"
         }
 
@@ -120,6 +120,28 @@ class LineChecker {
 
     String[] getOperationNameAndUserFromGrantLine (String line){
         def regexFilter = /(?i)grant (\w+) on (\w+.*) to (\w+.*)/
+        def result = (line =~ /$regexFilter/)
+
+        if (result){
+            return result[0]
+        }
+
+        return []
+    }
+
+    String getIndexTypeFromCreateLine (String line){
+        def regexFilter = /(?i)create (\w+.*) index \w+.*/
+        def result = (line =~ /$regexFilter/)
+
+        if (result){
+            return result[0][1]
+        }
+
+        return []
+    }
+
+    String[] getNameIndicesFromOnLine(String line){
+        def regexFilter = /(?i)on (.*)\((.*)\)/
         def result = (line =~ /$regexFilter/)
 
         if (result){
