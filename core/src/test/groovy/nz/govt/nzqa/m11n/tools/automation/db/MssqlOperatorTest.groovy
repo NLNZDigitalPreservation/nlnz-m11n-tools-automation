@@ -294,6 +294,20 @@ class MssqlOperatorTest {
 
     }
 
+    @Test
+    void shouldGenerate10CreateCheckConstraintStatements(){
+        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createCheckConstraints'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitCheckConstraints'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateCheckConstraints(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
 //    @Test
     void shouldGenerateOneMssqlScript(){
         String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'

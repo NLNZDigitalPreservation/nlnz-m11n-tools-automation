@@ -2,6 +2,9 @@ package nz.govt.nzqa.m11n.tools.automation.db
 
 import groovy.util.logging.Slf4j
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 @Slf4j
 class LineChecker {
     // Generic
@@ -25,6 +28,10 @@ class LineChecker {
 
     boolean lineContains(String line, String subString) {
         return (line.toLowerCase().contains(subString))
+    }
+
+    boolean lineEndsWith(String line, String subString) {
+        return (line.toLowerCase().endsWith(subString))
     }
 
     String getTypeFromStatus(boolean isCreateStatement) {
@@ -164,6 +171,92 @@ class LineChecker {
 
     String[] getFkRefTableColumnFromReferencesLine(String line){
         def regexFilter = /(?i)references (.*) \((.*)\)/
+        def result = (line =~ /$regexFilter/)
+
+        if (result){
+            return result[0]
+        }
+
+        return []
+    }
+
+    String getChecksFromCheckLine(String line) {
+
+        // check name in ints, check name between val1 and val2, check multiple conditions separated by brackets
+        def regexFilterList = [/(?i)check (.*)/]
+
+
+        for (def regexFilter : regexFilterList) {
+            def result = (line =~ /$regexFilter/)
+
+            if (result) {
+                return result[0][1]
+            }
+        }
+
+        return ''
+    }
+
+    String formatCheckStatement(List<String> completeCheckStatement){
+
+        List<String> result = new ArrayList<>()
+
+        for (String checkStatement : completeCheckStatement){
+            if(checkStatement.contains(" between ") && checkStatement.contains(" and ")){
+                def filteredStatement = (checkStatement =~ /(?i)\(((\w+) between (\d+) and (\d+))\)/)
+                String bracketedEntityName = "[" + filteredStatement[0][2] + "]"
+                String min = (Long.valueOf((String)filteredStatement[0][3]) < Long.valueOf((String)filteredStatement[0][4])? filteredStatement[0][3] : filteredStatement[0][4])
+                String max = (Long.valueOf((String)filteredStatement[0][3]) > Long.valueOf((String)filteredStatement[0][4])? filteredStatement[0][3] : filteredStatement[0][4])
+
+                String formattedStatement = "(" + bracketedEntityName + ">=(" + min + ") AND " + bracketedEntityName + "<=(" + max+ "))"
+                result.add(formattedStatement)
+            }
+
+            else if (checkStatement.contains(" in ")){
+                def filteredStatement = (checkStatement =~ /(?i)\((\w+) in \((.*)\)\)/)
+                String bracketedEntityName = "[" + filteredStatement[0][1] + "]"
+                List<String> valueList = filteredStatement[0][2].replaceAll('"', "'").split(",")
+                String formattedStatement = '('
+
+                for (String value : valueList) {
+                    formattedStatement += bracketedEntityName + "=" + value + (value.equalsIgnoreCase(valueList[-1])? "" : " OR ")
+                }
+
+                formattedStatement += ")"
+                result.add(formattedStatement)
+            }
+
+            else if (checkStatement.contains("=")) {
+                Pattern intPattern = Pattern.compile(/\= (\d+)/)
+                Matcher intMatcher = intPattern.matcher(checkStatement)
+                String modifiedCheckStatement = checkStatement
+
+                while(intMatcher.find()){
+                    modifiedCheckStatement = modifiedCheckStatement.replaceAll(intMatcher.group(), "= (" + intMatcher.group(1) + ")")
+                }
+
+                Pattern stringPattern = Pattern.compile(/\= "(\d+)"/)
+                Matcher stringMatcher = stringPattern.matcher(checkStatement)
+
+                while(stringMatcher.find()){
+                    modifiedCheckStatement = modifiedCheckStatement.replaceAll(stringMatcher.group(), "= '" + stringMatcher.group(1) + "'")
+                }
+
+                result.add(modifiedCheckStatement)
+            }
+
+            else {
+                result.add(checkStatement)
+            }
+        }
+
+        String resultString = String.join(" ", result)
+
+        return resultString
+    }
+
+    String [] getCheckEntityNameValuesFromCheckLine(String line){
+        def regexFilter = /(?i)check \((.*) in \((.*)\)\)/
         def result = (line =~ /$regexFilter/)
 
         if (result){

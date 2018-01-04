@@ -1418,7 +1418,7 @@ class MssqlOperator {
      *
      * Function type: Parse sybase sql script and assign entity and parent names
      *
-     * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
+     * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table add constraint
      *
      * @param splitTriggersFolderDir
      * @param destinationDir
@@ -1426,7 +1426,7 @@ class MssqlOperator {
      */
     def generateCreateForeignKeys(String sqlInputFileName, String destinationDir) {
 
-        log.info("=============== Starting generateDropForeignKeys =============== ")
+        log.info("=============== Starting generateCreateForeignKeys =============== ")
 
 
         List<String> mssqlLineList = new ArrayList<String>()
@@ -1480,7 +1480,7 @@ class MssqlOperator {
         if (mssqlLineList.size() > 0) {
             int dirIndex = new File(destinationDir).list().length
 
-            String sqlFileName = destinationDir + File.separator + "04-dropForeignKeys-" + dirIndex + "-" + fkName + "-" + entityName + ".sql"
+            String sqlFileName = destinationDir + File.separator + "10-createForeignKeys-" + dirIndex + "-" + fkName + "-" + entityName + ".sql"
             new File(sqlFileName).createNewFile()
             def sqlFile = new File(sqlFileName)
             log.info("File '${sqlFileName}' created")
@@ -1490,9 +1490,93 @@ class MssqlOperator {
             }
         }
 
-        System.out.println("=============== End of 'generateDropForeignKeys'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
-        log.info("=============== End of 'generateDropForeignKeys'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+        System.out.println("=============== End of 'generateCreateForeignKeys'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+        log.info("=============== End of 'generateCreateForeignKeys'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+    }
+
+    /**
+     * 11. Create Check Constraints
+     *
+     * Function type: Parse sybase sql script and assign entity and parent names
+     *
+     * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table add constraint
+     *
+     * @param splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateCheckConstraints(String sqlInputFileName, String destinationDir) {
+
+        log.info("=============== Starting generateCreateCheckConstraints =============== ")
+
+
+        List<String> mssqlLineList = new ArrayList<String>()
+        String entityName = ''
+        String constraintName = ''
+        String bracketedObjectId = ''
+        String bracketedConstraintName = ''
+        List<String> checkStatementList = new ArrayList<String>()
+        boolean isCheckStatement = false
+
+        new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "alter table")) {
+                entityName = lineChecker.getEntityNameFromLine(line, "alter table")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                bracketedObjectId = (filterEntityName ? "[" + filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[dbo].[" + entityName + "]")
+
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+//            mssqlLineList.add("/****** Object:  StoredProcedure " + filteredEntityName + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
+
+            } else if (lineChecker.lineStartsWith(line, "add constraint")) {
+                constraintName = lineChecker.getEntityNameFromLine(line, "add constraint")
+                bracketedConstraintName = "[" + constraintName + "]"
+
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.check_constraints WHERE object_id = OBJECT_ID(N'[dbo]." + bracketedConstraintName + "\') AND " +
+                        "parent_object_id = OBJECT_ID(N'" + bracketedObjectId + "'))")
+
+            } else if (lineChecker.lineStartsWith(line, "CHECK")) {
+
+                isCheckStatement = true
+                checkStatementList.add(lineChecker.getChecksFromCheckLine(line))
+            } else if (isCheckStatement) {
+                if (line.startsWith("go")) {
+                    isCheckStatement = false
+                    String formattedCheckStatement = lineChecker.formatCheckStatement(checkStatementList)
+
+                    mssqlLineList.add("ALTER TABLE " + bracketedObjectId + " WITH CHECK ADD CONSTRAINT " + bracketedConstraintName +
+                            " CHECK " + formattedCheckStatement)
+                    mssqlLineList.add("GO")
+
+                    // Add check statement
+                    mssqlLineList.add("IF EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo]." + bracketedConstraintName + "\') AND " +
+                            "parent_object_id = OBJECT_ID(N'" + bracketedObjectId + "'))")
+                    mssqlLineList.add("ALTER TABLE " + bracketedObjectId + " CHECK CONSTRAINT " + bracketedConstraintName)
+                    mssqlLineList.add("GO")
+
+                } else {
+                    checkStatementList.add(line.trim())
+                }
+            }
+            else{
+                //TODO: Have to put this empty else statement here, otherwise it'll execute the else statement inside the else if (isCheckStatement) above...
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "11-createCheckConstraints-" + dirIndex + "-" + constraintName + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+
+        System.out.println("=============== End of 'generatecreateCheckConstraints'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+        log.info("=============== End of 'generatecreateCheckConstraints'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
     }
 
 }
-
