@@ -89,7 +89,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitTriggersFolderDir
      * @param destinationDir
      * @return
      */
@@ -143,7 +143,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitSPsFolderDir
      * @param destinationDir
      * @return
      */
@@ -196,7 +196,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitCheckConstraintsFolderDir
      * @param destinationDir
      * @return
      */
@@ -255,7 +255,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table drop constraint
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitoreignKeysFolderDir
      * @param destinationDir
      * @return
      */
@@ -313,7 +313,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitIndicesFolderDir
      * @param destinationDir
      * @return
      */
@@ -368,7 +368,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitViewsFolderDir
      * @param destinationDir
      * @return
      */
@@ -421,7 +421,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitTablesFolderDir
      * @param destinationDir
      * @return
      */
@@ -475,7 +475,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitUserDatatypesFolderDir
      * @param destinationDir
      * @return
      */
@@ -526,7 +526,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitRolesFolderDir
      * @param destinationDir
      * @return
      */
@@ -578,7 +578,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitDefaultsFolderDir
      * @param destinationDir
      * @return
      */
@@ -630,7 +630,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitUsersFolderDir
      * @param destinationDir
      * @return
      */
@@ -684,7 +684,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id, drop type
      *
-     * @param splitTriggersFolderDir
+     * @param databaseName
      * @param destinationDir
      * @return
      */
@@ -725,7 +725,8 @@ class MssqlOperator {
      *
      * Function type: Read from create DB script
      *
-     * @param splitTriggersFolderDir
+     * @param databaseName
+     * @oaram mssqlCreateDatabaseScriptPath
      * @param destinationDir
      * @return
      */
@@ -763,7 +764,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, exec
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitUsersFolderDir
      * @param destinationDir
      * @return
      */
@@ -814,7 +815,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, exec
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitGroupsFolderDir
      * @param destinationDir
      * @return
      */
@@ -865,7 +866,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, create type
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitUsersFolderDir
      * @param destinationDir
      * @return
      */
@@ -970,7 +971,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, exec
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitDefaultsFolderDir
      * @param destinationDir
      * @return
      */
@@ -1026,7 +1027,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, exec
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitRulesFolderDir
      * @param destinationDir
      * @return
      */
@@ -1083,7 +1084,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, create then grant references
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitUserDatatypesFolderDir
      * @param destinationDir
      * @return
      */
@@ -1146,7 +1147,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, create
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitTablesFolderDir
      * @param destinationDir
      * @return
      */
@@ -1261,7 +1262,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, exec
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitViewsFolderDir
      * @param destinationDir
      * @return
      */
@@ -1342,7 +1343,7 @@ class MssqlOperator {
      *
      * SQL type: If not exists select * from <sys.type> with match name, create
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitIndicesFolderDir
      * @param destinationDir
      * @return
      */
@@ -1420,7 +1421,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table add constraint
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitForeignKeysFolderDir
      * @param destinationDir
      * @return
      */
@@ -1501,7 +1502,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table add constraint
      *
-     * @param splitTriggersFolderDir
+     * @param files in splitFCheckConstraintsFolderDir
      * @param destinationDir
      * @return
      */
@@ -1577,6 +1578,87 @@ class MssqlOperator {
 
         System.out.println("=============== End of 'generatecreateCheckConstraints'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
         log.info("=============== End of 'generatecreateCheckConstraints'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+    }
+
+    /**
+     * 12. Create SP
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, exec
+     *
+     * @param files in splitSPFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateSPs(String sqlInputFileName, String destinationDir) {
+
+        log.info("=============== Starting generateCreateViews =============== ")
+
+        List<String> mssqlLineList = new ArrayList<String>()
+
+        String entityName = ''
+        String filteredObjectId = ''
+        boolean isInCreateStatement = false
+
+        new File(sqlInputFileName).eachLine { String line ->
+
+            // Create view might have some comments before the actual create view statement, so use lineContains function rather than lineStartswith
+            if (lineChecker.lineContains(line, "create view")) {
+                isInCreateStatement = true
+
+                entityName = lineChecker.getEntityNameFromLine(line, "create")
+                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
+                filteredObjectId = (filterEntityName ? "[" + filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[dbo].[" + entityName + "]")
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
+                mssqlLineList.add("/****** Object:  View " + filteredObjectId + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("SET ANSI_NULLS ON")
+                mssqlLineList.add("GO")
+                mssqlLineList.add("SET QUOTED_IDENTIFIER ON")
+                mssqlLineList.add("GO")
+
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\'))")
+                mssqlLineList.add("EXEC dbo.sp_executesql @statement = N'" + line)
+            }
+
+            else if (lineChecker.lineStartsWith(line, "GO") && isInCreateStatement){
+                isInCreateStatement = false
+                mssqlLineList.add("'")
+                mssqlLineList.add("GO")
+
+            }
+
+            else if(isInCreateStatement){
+                mssqlLineList.add(line)
+            }
+
+            else if (lineChecker.lineStartsWith(line, "GRANT")) {
+                String[] operationNameUser = lineChecker.getOperationNameAndUserFromGrantLine(line)
+                if (operationNameUser.length > 0) {
+                    String operation = operationNameUser[1]
+                    String bracketedUser = "[" + operationNameUser[3] + "]"
+                    mssqlLineList.add("GRANT " + operation + " ON " + filteredObjectId + " TO " + bracketedUser + " AS [dbo]")
+                    mssqlLineList.add("GO")
+                }
+            }
+        }
+
+        if (mssqlLineList.size() > 0) {
+            int dirIndex = new File(destinationDir).list().length
+
+            String sqlFileName = destinationDir + File.separator + "7-createViews-" + dirIndex + "-" + entityName + ".sql"
+            new File(sqlFileName).createNewFile()
+            def sqlFile = new File(sqlFileName)
+            log.info("File '${sqlFileName}' created")
+
+            for (String line : mssqlLineList) {
+                sqlFile << line + '\r\n'
+            }
+        }
+
+        System.out.println("=============== End of 'generateViews. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+        log.info("=============== End of 'generateViews'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
     }
 
 }
