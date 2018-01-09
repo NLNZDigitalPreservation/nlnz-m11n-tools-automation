@@ -31,7 +31,7 @@ class MssqlOperatorTest {
 
 //    @Test
     void shouldReturnListOfSqlsInAGivenDir(){
-        String testDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables/'
+        String testDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables/'
         assertEquals("Should return list of sqls in a given directory", 676, mssqlMapperTestObj.getSqlScriptsInDir(testDir).size())
     }
 
@@ -39,7 +39,7 @@ class MssqlOperatorTest {
     void shouldGenerateTwoTables(){
         String[] sybaseSqlFolderList = ['splitTables'] //getSybaseSplitFolders
 
-        String destinationDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts"
+        String destinationDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts"
 
         new File(destinationDir).mkdirs()
 
@@ -54,61 +54,61 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate311DropTriggerStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String sqlFilename = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String sqlFilename = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql'
         mssqlMapperTestObj.generateDropTriggers( sqlFilename, destinationDir)
     }
 
     @Test
     void shouldGenerate19241DropSPStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String sqlFilename = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String sqlFilename = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql'
         mssqlMapperTestObj.generateDropSP(sqlFilename, destinationDir)
     }
 
     @Test
     void shouldGenerate11DropCheckConstraintsStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String sqlFilename = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String sqlFilename = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql'
         mssqlMapperTestObj.generateDropCheckConstraints(sqlFilename, destinationDir)
     }
 
     @Test
     void shouldGenerate1088DropForeignKeysStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String sqlFilename = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String sqlFilename = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql'
         mssqlMapperTestObj.generateDropForeignKeys(sqlFilename, destinationDir)
     }
 
     @Test
     void shouldGenerate598DropIndicesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String sqlFilename = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07a-eqa_prod_indices_171214.sql'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String sqlFilename = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07a-eqa_prod_indices_171214.sql'
         mssqlMapperTestObj.generateDropIndices(sqlFilename, destinationDir)
     }
 
     @Test
     void shouldGenerate85DropViewsStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String sqlFilename = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String sqlFilename = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql'
         mssqlMapperTestObj.generateDropViews(sqlFilename, destinationDir)
     }
 
     @Test
     void shouldGenerate676DropTablesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropTables'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropTables'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables'
         mssqlMapperTestObj.generateDropTables(sqlInputFileDir, destinationDir)
     }
 
     @Test
     void shouldGenerate44DropUserDatatypesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropUserDatatypes'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropUserDatatypes'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "drop")
 
         for (String sqlFilename : sqlFilenameList){
@@ -119,10 +119,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate1DropRuleStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropRules'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropRules'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "drop")
 
         for (String sqlFilename : sqlFilenameList){
@@ -133,10 +133,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate5DropDefaultsStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropDefaults'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropDefaults'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "drop")
 
         for (String sqlFilename : sqlFilenameList){
@@ -147,10 +147,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate23DropUsersStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropUsers'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/dropUsers'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
         mssqlMapperTestObj.generateDropUsers(sqlInputFileDir, destinationDir)
     }
 
@@ -160,19 +160,19 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate1CreateDBStatement(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createDatabase'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createDatabase'
         new File(destinationDir).mkdir()
-        String createDBFilePath = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/mssql_eqa_prod_create_database_171205.sql'
+        String createDBFilePath = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/mssql_eqa_prod_create_database_171205.sql'
 
         mssqlMapperTestObj.generateCreateDatabase("eqa_prod", createDBFilePath, destinationDir)
     }
 
     @Test
     void shouldGenerate23CreateUsersStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createUsersRolesSchemas'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createUsersRolesSchemas'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
         String[] sqlUserFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
 
 //         Generate users
@@ -181,7 +181,7 @@ class MssqlOperatorTest {
         }
 
         // Generate roles
-        String sqlGroupInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitGroups'
+        String sqlGroupInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitGroups'
         String[] sqlGroupFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlGroupInputFileDir, "default")
 
         for (String sqlFilename : sqlGroupFilenameList) {
@@ -196,10 +196,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate5CreateDefaultsStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createDefaults'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createDefaults'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
         for (String sqlFilename : sqlFilenameList){
@@ -210,10 +210,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate1CreateRulesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createRules'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createRules'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
         for (String sqlFilename : sqlFilenameList){
@@ -224,10 +224,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate44CreateUserDatatypesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createUserDatatypes'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createUserDatatypes'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
         for (String sqlFilename : sqlFilenameList){
@@ -238,11 +238,11 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate676CreateTablesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createTables'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createTables'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables'
-        String sybaseSplitUserDatatypesDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTables'
+        String sybaseSplitUserDatatypesDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
 
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
 
@@ -254,10 +254,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate85CreateViewsStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createViews'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createViews'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitViews'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitViews'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
         for (String sqlFilename : sqlFilenameList){
@@ -268,10 +268,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate598CreateIndicesStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createIndices'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createIndices'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitIndices'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitIndices'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
         for (String sqlFilename : sqlFilenameList){
@@ -282,10 +282,10 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate1088CreateFkStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createForeignKeys'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createForeignKeys'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitForeignKeys'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitForeignKeys'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
 
         for (String sqlFilename : sqlFilenameList){
@@ -296,11 +296,25 @@ class MssqlOperatorTest {
 
     @Test
     void shouldGenerate10CreateCheckConstraintStatements(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createCheckConstraints'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createCheckConstraints'
         new File(destinationDir).mkdir()
 
-        String sqlInputFileDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitCheckConstraints'
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitCheckConstraints'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
+
+        for (String sqlFilename : sqlFilenameList){
+            mssqlMapperTestObj.generateCreateCheckConstraints(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+        }
+
+    }
+
+    @Test
+    void shouldGenerate311CreateTriggerStatements(){
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts/createTriggers'
+        new File(destinationDir).mkdir()
+
+        String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTriggers'
+        String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateCheckConstraints(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -310,8 +324,8 @@ class MssqlOperatorTest {
 
 //    @Test
     void shouldGenerateOneMssqlScript(){
-        String destinationDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
-        String splitFolderDir = '/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts'
+        String destinationDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/mssqlScripts'
+        String splitFolderDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts'
         mssqlMapperTestObj.generateMssqlScript(splitFolderDir, destinationDir)
     }
 }

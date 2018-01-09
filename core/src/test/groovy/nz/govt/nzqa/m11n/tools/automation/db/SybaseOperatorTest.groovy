@@ -32,9 +32,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitDefaults() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitDefaults(testFile, testDestDir)
     }
 
@@ -43,9 +43,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitUserDatatypes() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitUserDatatypes(testFile, testDestDir)
     }
 
@@ -54,9 +54,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitGroups() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitGroups(testFile, testDestDir)
     }
 
@@ -65,9 +65,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitUsers() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitUsers(testFile, testDestDir)
     }
 
@@ -76,9 +76,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitRules() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitRules(testFile, testDestDir)
     }
 
@@ -87,9 +87,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitUserMessages() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitUserMessages(testFile, testDestDir)
     }
 
@@ -98,9 +98,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitTables() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitTables(testFile, testDestDir)
     }
 
@@ -109,9 +109,9 @@ class SybaseOperatorTest {
      * */
     @Test
     void testSplitIndices() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07a-eqa_prod_indices_171214.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07a-eqa_prod_indices_171214.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitIndices(testFile, testDestDir)
     }
 
@@ -122,9 +122,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitTriggers() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split-backup/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split-backup/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
     }
 
@@ -133,9 +133,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitUniqueKeys() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitUniqueKeys(testFile, testDestDir)
     }
 
@@ -145,9 +145,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitCheckConstraints() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitCheckConstraints(testFile, testDestDir)
     }
 
@@ -156,9 +156,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitForeignKeys() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitForeignKeys(testFile, testDestDir)
     }
 
@@ -168,9 +168,9 @@ class SybaseOperatorTest {
      */
     @Test
     void testSplitViews() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitViews(testFile, testDestDir)
     }
 
@@ -179,9 +179,9 @@ class SybaseOperatorTest {
      */
 //    @Test
     void testSplitSP() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitSP(testFile, testDestDir)
     }
 
@@ -190,9 +190,9 @@ class SybaseOperatorTest {
      */
 //    @Test
     void testSplitSybase() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/sybase_eqa_prod_161205_test.sql"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/sybase_eqa_prod_161205_test.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitSybase(testFile, testDestDir)
     }
 
@@ -202,8 +202,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitDefaultsCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitDefaults(testFile, testDestDir)
 
@@ -217,8 +217,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitUserDatatypesCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitUserDatatypes(testFile, testDestDir)
 
@@ -232,8 +232,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitGroupsCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitGroups(testFile, testDestDir)
 
@@ -247,8 +247,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitUsersCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitUsers(testFile, testDestDir)
 
@@ -262,8 +262,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitRulesCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitRules(testFile, testDestDir)
 
@@ -277,8 +277,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitUserMessagesCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitUserMessages(testFile, testDestDir)
 
@@ -293,8 +293,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitTablesCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitTables(testFile, testDestDir)
 
@@ -309,8 +309,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitTriggersCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
 //        sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
 
@@ -324,8 +324,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitUniqueKeysCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitUniqueKeys(testFile, testDestDir)
 
@@ -340,8 +340,8 @@ class SybaseOperatorTest {
 
 //     @Test
     void testSplitCheckConstraintsCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
-         String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
+         String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
          File testFile = new File(testFileName)
          sybaseOperatorTestObj.splitCheckConstraints(testFile, testDestDir)
 
@@ -355,8 +355,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitForeignKeysCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitForeignKeys(testFile, testDestDir)
 
@@ -371,8 +371,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitViewsCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         File testFile = new File(testFileName)
         sybaseOperatorTestObj.splitViews(testFile, testDestDir)
 
@@ -386,8 +386,8 @@ class SybaseOperatorTest {
 
 //    @Test
     void testSplitSPCanReconstructToTheOriginal() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
+        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
 
 // The code below encodes the original file (ISO-8859-1) in UTF 8
 //        def testFile = new File(testFileName).getText('ISO-8859-1')
