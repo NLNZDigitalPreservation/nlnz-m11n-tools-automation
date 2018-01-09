@@ -591,8 +591,8 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                if (lineChecker.lineStartsWith(line, "create trigger")) {
-                    lineType = "create"
+                if (line.toLowerCase().startsWith("create trigger")) {
+                    lineType = "create trigger"
 
                     if (isFirstCreateStatement) {
                         log.info("Dropping completed. Current entity name reset and start creating...")
@@ -600,11 +600,11 @@ class SybaseOperator {
                         isFirstCreateStatement = false
                     }
 
-                } else if (lineChecker.lineStartsWith(line, "if object_id")) {
+                } else if (line.toLowerCase().startsWith( "if object_id")) {
                     lineType = "if object_id"
                 }
 
-                if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create trigger")) {
+                if (line.toLowerCase().startsWith("if object_id") || line.toLowerCase().startsWith("create trigger")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName

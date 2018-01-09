@@ -85,7 +85,7 @@ class SybaseOperatorTest {
     /**
      * Expect 2 create messages
      */
-//    @Test
+    @Test
     void testSplitUserMessages() {
         String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
         File testFile = new File(testFileName)
@@ -120,11 +120,11 @@ class SybaseOperatorTest {
     /**
      * Expect 311 drop and create triggers
      */
-//    @Test
+    @Test
     void testSplitTriggers() {
-        String testFileName = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
+        String testFileName = "/home/amyl/git/modernisation/eqa-split-backup/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
         File testFile = new File(testFileName)
-        String testDestDir = "/home/amyl/git/modernisation/eqa-split/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+        String testDestDir = "/home/amyl/git/modernisation/eqa-split-backup/m11n-tools-automation/core/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
     }
 
