@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.db
 
+import groovy.util.logging.Slf4j
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -12,6 +13,7 @@ import static org.junit.Assert.assertEquals
  * Tests the {@link MssqlOperator}.
  */
 @Ignore
+@Slf4j
 class MssqlOperatorTest {
 
     MssqlOperator mssqlMapperTestObj
@@ -111,6 +113,9 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "drop")
 
+        log.info("Expected number of user datatypes: 44")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateDropUserDatatypes(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
@@ -125,6 +130,10 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "drop")
 
+
+        log.info("Expected number of rules: 1")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateDropRules(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
@@ -138,6 +147,9 @@ class MssqlOperatorTest {
 
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "drop")
+
+        log.info("Expected number of defaults: 50")
+        log.info("Total number of files: " + sqlFilenameList.size())
 
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateDropDefaults(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -175,6 +187,9 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUsers'
         String[] sqlUserFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
 
+        log.info("Expected number of users: 23")
+        log.info("Total number of files: " + sqlUserFilenameList.size())
+
 //         Generate users
         for (String sqlFilename : sqlUserFilenameList){
             mssqlMapperTestObj.generateCreateUsers(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -183,6 +198,9 @@ class MssqlOperatorTest {
         // Generate roles
         String sqlGroupInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitGroups'
         String[] sqlGroupFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlGroupInputFileDir, "default")
+
+        log.info("Expected number of groups: 3")
+        log.info("Total number of files: " + sqlGroupFilenameList.size())
 
         for (String sqlFilename : sqlGroupFilenameList) {
             mssqlMapperTestObj.generateCreateDatabaseRoles(sqlGroupInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -202,6 +220,9 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitDefaults'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
+        log.info("Expected number of defaults: 5")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateDefaults(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
@@ -216,6 +237,9 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitRules'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
+        log.info("Expected number of rules: 1")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateRules(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
@@ -229,6 +253,9 @@ class MssqlOperatorTest {
 
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitUserDatatypes'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        log.info("Expected number of user datatypes: 44")
+        log.info("Total number of files: " + sqlFilenameList.size())
 
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateUserDatatypes(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -246,6 +273,9 @@ class MssqlOperatorTest {
 
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
 
+        log.info("Expected number of tables: 676")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateTables(sqlInputFileDir + File.separator + sqlFilename, destinationDir, sybaseSplitUserDatatypesDir)
         }
@@ -259,6 +289,9 @@ class MssqlOperatorTest {
 
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitViews'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
+
+        log.info("Expected number of views: 85")
+        log.info("Total number of files: " + sqlFilenameList.size())
 
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateViews(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -274,6 +307,9 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitIndices'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
+        log.info("Expected number of indices: 598")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateIndices(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
@@ -287,6 +323,9 @@ class MssqlOperatorTest {
 
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitForeignKeys'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
+
+        log.info("Expected number of foreign keys: 1088")
+        log.info("Total number of files: " + sqlFilenameList.size())
 
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateForeignKeys(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
@@ -302,6 +341,9 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitCheckConstraints'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "default")
 
+        log.info("Expected number of check constraints: 10")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
             mssqlMapperTestObj.generateCreateCheckConstraints(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
@@ -316,8 +358,11 @@ class MssqlOperatorTest {
         String sqlInputFileDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/splitTriggers'
         String[] sqlFilenameList = filenameExtractor.getListOfSplitSqlScriptsInDir(sqlInputFileDir, "add")
 
+        log.info("Expected number of triggers: 311")
+        log.info("Total number of files: " + sqlFilenameList.size())
+
         for (String sqlFilename : sqlFilenameList){
-            mssqlMapperTestObj.generateCreateCheckConstraints(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
+            mssqlMapperTestObj.generateCreateTriggers(sqlInputFileDir + File.separator + sqlFilename, destinationDir)
         }
 
     }

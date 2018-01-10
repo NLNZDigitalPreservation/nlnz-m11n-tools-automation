@@ -1502,7 +1502,7 @@ class MssqlOperator {
      *
      * SQL type: If exists select * from <sys.type> with match object id and parent_object_id, alter table add constraint
      *
-     * @param files in splitFCheckConstraintsFolderDir
+     * @param files in splitCheckConstraintsFolderDir
      * @param destinationDir
      * @return
      */
@@ -1581,73 +1581,82 @@ class MssqlOperator {
     }
 
     /**
-     * 12. Create SP
+     * 12. Create SPs
      *
      * Function type: Parse sybase sql script and assign entity names
      *
      * SQL type: If not exists select * from <sys.type> with match name, exec
      *
-     * @param files in splitSPFolderDir
+     * @param files in splitSPsFolderDir
      * @param destinationDir
      * @return
      */
     def generateCreateSPs(String sqlInputFileName, String destinationDir) {
+        //TODO Finish this after Ted's converted it for MSSQL
+    }
 
-        log.info("=============== Starting generateCreateViews =============== ")
+
+    /**
+     * 13. Create Triggers
+     *
+     * Function type: Parse sybase sql script and assign entity names
+     *
+     * SQL type: If not exists select * from <sys.type> with match name, exec
+     *
+     * @param files in splitTriggersFolderDir
+     * @param destinationDir
+     * @return
+     */
+    def generateCreateTriggers(String sqlInputFileName, String destinationDir) {
+        log.info("=============== Starting generateCreateTriggers =============== ")
+
 
         List<String> mssqlLineList = new ArrayList<String>()
-
-        String entityName = ''
-        String filteredObjectId = ''
-        boolean isInCreateStatement = false
+        String triggerName = ''
+        String triggerTable = ''
+        boolean isPartOfTrigger = false
 
         new File(sqlInputFileName).eachLine { String line ->
+            if (lineChecker.lineStartsWith(line, "create trigger")) {
+                def filterEntityName = (line =~ /(?i)create trigger (\S+) on (\S+)/)
+                triggerName = filterEntityName[0][1]
+                triggerTable = filterEntityName[0][2]
 
-            // Create view might have some comments before the actual create view statement, so use lineContains function rather than lineStartswith
-            if (lineChecker.lineContains(line, "create view")) {
-                isInCreateStatement = true
+                String bracketedObjectId = "[" +  triggerName + "]"
+                String bracketedTableName = "[" +  triggerTable + "]"
 
-                entityName = lineChecker.getEntityNameFromLine(line, "create")
-                def filterEntityName = (entityName =~ /(\w+)\.(\w+)/)
-                filteredObjectId = (filterEntityName ? "[" + filterEntityName[0][1] + "].[" + filterEntityName[0][2] + "]" : "[dbo].[" + entityName + "]")
+                String dboObjectId = "[dbo]." + bracketedObjectId
+                String dboTableName = "[dbo]." + bracketedTableName
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy h:mm:ss a")
-                mssqlLineList.add("/****** Object:  View " + filteredObjectId + "    Script Date: " + dateFormat.format(new Date()) + " ******/")
+                mssqlLineList.add("/****** Object:  Trigger " + dboObjectId + "     Script Date: " + dateFormat.format(new Date()) + " ******/")
                 mssqlLineList.add("SET ANSI_NULLS ON")
                 mssqlLineList.add("GO")
                 mssqlLineList.add("SET QUOTED_IDENTIFIER ON")
                 mssqlLineList.add("GO")
-
-                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'" + filteredObjectId + "\'))")
-                mssqlLineList.add("EXEC dbo.sp_executesql @statement = N'" + line)
+                mssqlLineList.add("IF NOT EXISTS (SELECT * FROM sys.triggers WHERE object_id = OBJECT_ID(N'" + dboObjectId + "'))")
+                mssqlLineList.add("EXEC dbo.sp_executesql @statement = N'CREATE TRIGGER " + dboObjectId + " ON " + dboTableName)
+            }
+            else if (lineChecker.lineStartsWith(line, "for")){
+                mssqlLineList.add(line)
+                isPartOfTrigger = true
             }
 
-            else if (lineChecker.lineStartsWith(line, "GO") && isInCreateStatement){
-                isInCreateStatement = false
+            else if (lineChecker.lineStartsWith(line, "alter table")){
+                isPartOfTrigger = false
                 mssqlLineList.add("'")
                 mssqlLineList.add("GO")
-
             }
 
-            else if(isInCreateStatement){
+            else if (isPartOfTrigger){
                 mssqlLineList.add(line)
-            }
-
-            else if (lineChecker.lineStartsWith(line, "GRANT")) {
-                String[] operationNameUser = lineChecker.getOperationNameAndUserFromGrantLine(line)
-                if (operationNameUser.length > 0) {
-                    String operation = operationNameUser[1]
-                    String bracketedUser = "[" + operationNameUser[3] + "]"
-                    mssqlLineList.add("GRANT " + operation + " ON " + filteredObjectId + " TO " + bracketedUser + " AS [dbo]")
-                    mssqlLineList.add("GO")
-                }
             }
         }
 
         if (mssqlLineList.size() > 0) {
             int dirIndex = new File(destinationDir).list().length
 
-            String sqlFileName = destinationDir + File.separator + "7-createViews-" + dirIndex + "-" + entityName + ".sql"
+            String sqlFileName = destinationDir + File.separator + "13-createTriggers-" + dirIndex + "-" + triggerName + "-" + triggerTable + ".sql"
             new File(sqlFileName).createNewFile()
             def sqlFile = new File(sqlFileName)
             log.info("File '${sqlFileName}' created")
@@ -1657,8 +1666,8 @@ class MssqlOperator {
             }
         }
 
-        System.out.println("=============== End of 'generateViews. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
-        log.info("=============== End of 'generateViews'. Generated ${mssqlLineList.size()} lines for '" + entityName + "' =============== ")
+        System.out.println("=============== End of 'generateCreateTriggers'. Generated ${mssqlLineList.size()} lines for '" + triggerName + "' =============== ")
+        log.info("=============== End of 'generateCreateTriggers'. Generated ${mssqlLineList.size()} lines for '" + triggerName + "' =============== ")
     }
 
 }
