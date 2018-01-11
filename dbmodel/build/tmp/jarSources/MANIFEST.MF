@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Implementation-Title: NZQA Modernisation (m11n) automation tools DBMod
+ el Sources Jar
+Gradle-Version: 4.4
+Implementation-Version: 1.0.0-SNAPSHOT
+Java-Version: 1.8.0_151
+Built-By: amyl
+Specification-Vendor: New Zealand Qualifications Authority
+Specification-Title: NZQA Modernisation (m11n) automation tools
+Build-Time: 2018-01-11T17:42:34+1300
+Specification-Version: 1.0.0-SNAPSHOT
+Implementation-Vendor: New Zealand Qualifications Authority
+
