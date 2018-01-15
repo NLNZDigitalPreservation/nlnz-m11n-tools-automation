@@ -2,7 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.parser
 
 import nz.govt.nzqa.dbmigrate.model.Relation
 
-class RelationParser {
+class RelationParser implements Parser{
 
     String getType(String sql){
         String type = ''
@@ -46,26 +46,14 @@ class RelationParser {
         return grantSubObjects
     }
 
+    @Override
     Relation parse(File file){
         Relation relation = new Relation()
-
-        file.eachLine { String line ->
-            if(line.trim()){
-
-                String[] sqlElements = line.split(" ")
-            }
-
-        }
-
-        for (String sqlElement : sqlElements){
-            switch(sqlElement){
-                case('create'):
-                    // Do something
-                break
-
-            }
-
-        }
         return relation
+    }
+
+    @Override
+    Relation parse(String sqlStatement) {
+        return null
     }
 }

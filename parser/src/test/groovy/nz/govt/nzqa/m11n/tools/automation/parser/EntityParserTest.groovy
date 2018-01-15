@@ -1,7 +1,8 @@
 package nz.govt.nzqa.m11n.tools.automation.parser
 
-import org.gradle.internal.impldep.org.junit.Before
-import org.gradle.internal.impldep.org.junit.Test
+import nz.govt.nzqa.m11n.tools.automation.parser.EntityParser
+import org.junit.Before
+import org.junit.Test
 
 /**
  * Tests the {@link nz.govt.nzqa.m11n.tools.automation.parser.EntityParser}.

@@ -2,7 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.parser
 
 import nz.govt.nzqa.dbmigrate.model.Attribute
 
-class AttributeParser {
+class AttributeParser implements Parser{
 
     String getType(String sql){
         String type = ''
@@ -58,26 +58,14 @@ class AttributeParser {
         return isNull
     }
 
+    @Override
     Attribute parse(File file){
         Attribute attribute = new Attribute()
-
-        file.eachLine { String line ->
-            if(line.trim()){
-
-                String[] sqlElements = line.split(" ")
-            }
-
-        }
-
-        for (String sqlElement : sqlElements){
-            switch(sqlElement){
-                case('create'):
-                    // Do something
-                break
-
-            }
-
-        }
         return attribute
+    }
+
+    @Override
+    Attribute parse(String sqlStatement) {
+        return null
     }
 }

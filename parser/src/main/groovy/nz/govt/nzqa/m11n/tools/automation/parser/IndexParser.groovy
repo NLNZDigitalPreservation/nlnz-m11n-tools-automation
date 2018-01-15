@@ -2,7 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.parser
 
 import nz.govt.nzqa.dbmigrate.model.Index
 
-class IndexParser {
+class IndexParser implements Parser{
 
     String getDatabaseName(String sql){
         String database = ''
@@ -47,26 +47,14 @@ class IndexParser {
     }
 
 
+    @Override
     Index parse(File file){
         Index index = new Index()
-
-        file.eachLine { String line ->
-            if(line.trim()){
-
-                String[] sqlElements = line.split(" ")
-            }
-
-        }
-
-        for (String sqlElement : sqlElements){
-            switch(sqlElement){
-                case('create'):
-                    // Do something
-                break
-
-            }
-
-        }
         return index
+    }
+
+    @Override
+    Index parse(String sqlStatement) {
+        return null
     }
 }

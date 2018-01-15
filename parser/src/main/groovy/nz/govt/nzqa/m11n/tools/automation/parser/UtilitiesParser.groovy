@@ -4,7 +4,7 @@ import nz.govt.nzqa.dbmigrate.model.Param
 import nz.govt.nzqa.dbmigrate.model.Relation
 import nz.govt.nzqa.dbmigrate.model.Utilities
 
-class UtilitiesParser {
+class UtilitiesParser implements Parser {
 
     String getDatabaseName(String sql){
         String databaseName = ''
@@ -48,32 +48,20 @@ class UtilitiesParser {
         return sql
     }
 
-    Map<Relation> getGrants(String sql){
-        Map<Relation> grantsMap = new HashMap<Relation>()
+    Map<String, Relation> getGrants(String sql){
+        Map<String, Relation> grantsMap = new HashMap<>()
 
         return grantsMap
     }
 
+    @Override
     Utilities parse(File file){
         Utilities utilities = new Utilities()
-
-        file.eachLine { String line ->
-            if(line.trim()){
-
-                String[] sqlElements = line.split(" ")
-            }
-
-        }
-
-        for (String sqlElement : sqlElements){
-            switch(sqlElement){
-                case('create'):
-                    // Do something
-                break
-
-            }
-
-        }
         return utilities
+    }
+
+    @Override
+    Utilities parse(String sqlStatement) {
+        return null
     }
 }

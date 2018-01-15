@@ -1,0 +1,14 @@
+USE eqa_prod
+CREATE TABLE dbo.ACADEMIC_YEAR (academic_year            char(4)    NOT NULL, academic_year_desc       descr      NOT NULL, academic_year_start      datetime   NOT NULL, academic_year_end        datetime   NOT NULL, academic_year_type       varchar(4) NOT NULL,    academic_year_sort_order sortkey    NOT NULL, CONSTRAINT PK_ACADEMIC_YEAR PRIMARY KEY CLUSTERED (academic_year)) LOCK DATAROWS
+IF OBJECT_ID('dbo.ACADEMIC_YEAR') IS NOT NULL PRINT '<<< CREATED TABLE dbo.ACADEMIC_YEAR >>>' ELSE PRINT '<<< FAILED CREATING TABLE dbo.ACADEMIC_YEAR >>>'
+GRANT REFERENCES ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT SELECT ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT SELECT ON dbo.ACADEMIC_YEAR TO read_only
+GRANT SELECT ON dbo.ACADEMIC_YEAR TO rma_users
+GRANT INSERT ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT DELETE ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT UPDATE ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT DELETE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT TRUNCATE TABLE ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT UPDATE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user
+GRANT TRANSFER TABLE ON dbo.ACADEMIC_YEAR TO eqa_user

@@ -2,7 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.parser
 
 import nz.govt.nzqa.dbmigrate.model.Param
 
-class ParamParser {
+class ParamParser implements Parser{
 
     String getName(String sql){
         String name = ''
@@ -28,26 +28,14 @@ class ParamParser {
         return inOut
     }
 
+    @Override
     Param parse(File file){
         Param param = new Param()
-
-        file.eachLine { String line ->
-            if(line.trim()){
-
-                String[] sqlElements = line.split(" ")
-            }
-
-        }
-
-        for (String sqlElement : sqlElements){
-            switch(sqlElement){
-                case('create'):
-                    // Do something
-                break
-
-            }
-
-        }
         return param
+    }
+
+    @Override
+    Param parse(String sqlStatement) {
+        return null
     }
 }

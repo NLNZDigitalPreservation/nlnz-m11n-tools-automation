@@ -3,11 +3,25 @@ package nz.govt.nzqa.m11n.tools.automation.parser
 import nz.govt.nzqa.dbmigrate.model.Constraint
 import nz.govt.nzqa.dbmigrate.model.Criteria
 
-class ConstraintParser {
+class ConstraintParser implements Parser {
 
     String getType(String sql){
-        String type = ''
+        String type = 'field'
 
+        switch(sql){
+            case (sql.equalsIgnoreCase("PRIMARY KEY")):
+                type = 'PK'
+                break
+            case (sql.equalsIgnoreCase("FOREIGN KEY")):
+                type = 'FK'
+                break
+            case (sql.equalsIgnoreCase("UNIQUE")):
+                type = 'Unique'
+                break
+            case (sql.equalsIgnoreCase("CHECK")):
+                type = 'Check'
+                break
+        }
         return type
     }
 
@@ -59,26 +73,36 @@ class ConstraintParser {
         return criteria
     }
 
-    Constraint parse(File file){
+    @Override
+    Constraint parse(String sql){
+        Constraint constraint = new Constraint()
+
+        def constraintResult = (sql =~ /(?i)CONSTRAINT (\w+) (.*) (CLUSTERED|NONCLUSTERED) \((\w+)\)/)
+
+        if (constraintResult){
+            constraint.setType(getType(constraintResult[0][2].toString()))
+            constraint.setName(getName(constraintResult[0][1].toString()))
+            constraint.setSubType(getSubType(constraintResult[0][3].toString()))
+        }
+
+        return constraint
+    }
+
+    @Override
+    Constraint parse(File file) {
         Constraint constraint = new Constraint()
 
         file.eachLine { String line ->
-            if(line.trim()){
+            def constraintResult = (line =~ /(?i)CONSTRAINT (\w+) (.*) (CLUSTERED|NONCLUSTERED) \((\w+)\)/)
 
-                String[] sqlElements = line.split(" ")
+            if (constraintResult){
+                constraint.setType(getType(constraintResult[0][2].toString()))
+                constraint.setName(getName(constraintResult[0][1].toString()))
+                constraint.setSubType(getSubType(constraintResult[0][3].toString()))
             }
 
         }
 
-        for (String sqlElement : sqlElements){
-            switch(sqlElement){
-                case('create'):
-                    // Do something
-                break
-
-            }
-
-        }
         return constraint
     }
 }

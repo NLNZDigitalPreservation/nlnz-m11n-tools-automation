@@ -1,6 +1,5 @@
 import nz.govt.nzqa.eqa.tools.build.ArtifactUploadParameters
 import nz.govt.nzqa.eqa.tools.build.EqaBuildTool
-import nz.govt.nzqa.eqa.tools.build.version.BuildDependency
 import nz.govt.nzqa.eqa.tools.build.version.BuildVersion
 import nz.govt.nzqa.eqa.tools.build.version.DependencyVersionFactory
 
@@ -55,21 +54,47 @@ EqaBuildTool eqaBuildTool = project.eqaBuildPluginExtension.eqaBuildTool
 DependencyVersionFactory versionFactory = new DependencyVersionFactory(project, false)
 
 dependencies { dependencyHandler ->
-    // We set dependencies as compileOnly so that dependency changes will trigger a new build
-    // but projects/subprojects that include this subproject will not include these dependencies
-    // in their transitive dependency chain
+    // We use the latest groovy 2.x version for building this library
+    // compile 'org.codehaus.groovy:groovy-all:2.4.+'
+    compile localGroovy()
 
-    BuildDependency coreDependency = new BuildDependency(project: project,
-            projectName: 'm11n-tools-automation-core', dependencyHandler: dependencyHandler)
-    compile coreDependency.asDependency()
 
-    compile gradleApi()
+    // Use the latest version
+    compile "com.google.guava:guava:+"
+    // Use the latest version
+    compile "org.apache.commons:commons-lang3:+"
+
+    compile group: 'org.jboss.tattletale', name: 'tattletale', version: '1.1.2.Final'
+    compile group: 'org.jboss.tattletale', name: 'tattletale-ant', version: '1.1.2.Final'
+    compile group: 'org.jboss.tattletale', name: 'tattletale-maven', version: '1.1.2.Final'
+
+    // Use database model object
+    compile group: 'nz.govt.nzqa.m11n.tools', name: 'm11n-tools-automation-dbmodel', version: '1.0.0-SNAPSHOT'
+
+    compileOnly 'org.slf4j:slf4j-api:1.7.+'
+
+    // We use the awesome Spock testing and specification framework
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4', {
+        // Avoid this error:
+        // ... Caused by: java.lang.ExceptionInInitializerError ...
+        //     Caused by: groovy.lang.GroovyRuntimeException: Conflicting module versions. Module [groovy-all is loaded in version 2.4.7 and you are trying to load version 2.4.1
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    // latest version
+    testCompile 'junit:junit:4.12'
+
+    // latest version
+    testCompile 'org.mockito:mockito-all:1.10.19'
+
+    // use sl4j logging for tests
+    testCompile 'org.slf4j:slf4j-log4j12:1.7.+'
+
 }
 
 jar {
     includeEmptyDirs = false
 
-    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Plugin Jar'))
+    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Jar'))
 }
 
 task jarSources(type: Jar, dependsOn: classes) {
@@ -78,8 +103,15 @@ task jarSources(type: Jar, dependsOn: classes) {
 
     from sourceSets.main.allSource
 
-    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Plugin Sources Jar'))
+    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Sources Jar'))
 }
+
+// We want to force a specific version as part of our dependency resolution
+//configurations.all {
+//    resolutionStrategy {
+//        force 'org.codehaus.groovy:groovy-all:2.4.+'
+//    }
+//}
 
 artifacts {
     publishableArtifacts jar, jarSources
