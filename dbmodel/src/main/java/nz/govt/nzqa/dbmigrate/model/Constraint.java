@@ -7,10 +7,10 @@ public class Constraint {
     private String name;
     private String subType;
     private String action;
-    private List<Object> fields;
+    private List<String> fields;
     private String tableName;
     private String referenceTableName;
-    private List<Object> referenceFields;
+    private List<String> referenceFields;
     private Criteria criteria;
 
 
@@ -46,11 +46,11 @@ public class Constraint {
         this.action = action;
     }
 
-    public List<Object> getFields() {
+    public List<String> getFields() {
         return fields;
     }
 
-    public void setFields(List<Object> fields) {
+    public void setFields(List<String> fields) {
         this.fields = fields;
     }
 
@@ -70,11 +70,11 @@ public class Constraint {
         this.referenceTableName = referenceTableName;
     }
 
-    public List<Object> getReferenceFields() {
+    public List<String> getReferenceFields() {
         return referenceFields;
     }
 
-    public void setReferenceFields(List<Object> referenceFields) {
+    public void setReferenceFields(List<String> referenceFields) {
         this.referenceFields = referenceFields;
     }
 
@@ -93,14 +93,14 @@ public class Constraint {
                 ", subType=" + subType +
                 ", action=" + action +
                 ", fields={");
-                for (Object o: fields) {
-                    buff.append(o.toString() + ",");
+                for (String o: fields) {
+                    buff.append(o + ",");
                 }
                 buff.append("}, table=" + tableName +
                 ", referenceTable=" + referenceTableName +
                 ", referenceFields={");
-                for (Object o: referenceFields) {
-                    buff.append(o.toString() + ",");
+                for (String o: referenceFields) {
+                    buff.append(o + ",");
                 }
                 buff.append("}, criteria=" + criteria.toString() +
                 "]");
