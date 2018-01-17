@@ -40,7 +40,7 @@ class SybaseOperator {
         return word.substring(0, 1).toUpperCase() + word.substring(1)
     }
 
-    void writeLineBufferIntoFirstFile(File sqlFile, String[] lineBufferForFirstFile) {
+    void writeLineBufferIntoFile(File sqlFile, String[] lineBufferForFirstFile) {
         for (String line : lineBufferForFirstFile) {
             sqlFile << line + '\r\n'
         }
@@ -102,7 +102,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -173,7 +173,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -232,7 +232,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -291,7 +291,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -362,7 +362,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -417,7 +417,7 @@ class SybaseOperator {
                     counter++
 
                     if (firstFileNotCreated) {
-                        writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                         firstFileNotCreated = false
                     }
                     sqlFile << line + '\r\n'
@@ -452,10 +452,12 @@ class SybaseOperator {
         int counter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
+        boolean isAlterTable = false
         String[] lineBufferForFirstFile = []
 
         String sqlFileName = ''
         def sqlFile
+        def alterTableFile
 
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
@@ -474,12 +476,28 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
                     sqlFile << line + '\r\n'
-                } else if (firstFileNotCreated) {
+                } else if (lineChecker.lineStartsWith(line, "alter table")){
+                    isAlterTable = true
+
+                    // Create a new file for new entity
+                    String sqlAlterTableFileName = outputDir + File.separator + "splitTables-alter-" + counter + "-" + currentEntityName + ".sql"
+                    new File(sqlAlterTableFileName).createNewFile()
+                    alterTableFile = new File(sqlAlterTableFileName)
+                    log.info("File '${sqlAlterTableFileName}' created")
+
+                    alterTableFile << line + '\r\n'
+                } else if (isAlterTable){
+                    if (line.startsWith("go")){
+                        isAlterTable = false
+                    }
+                    alterTableFile << line + '\r\n'
+                }
+                else if (firstFileNotCreated) {
                     lineBufferForFirstFile += line
                 } else {
                     sqlFile << line + '\r\n'
@@ -543,7 +561,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -618,7 +636,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -673,7 +691,7 @@ class SybaseOperator {
                     counter++
 
                     if (firstFileNotCreated) {
-                        writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                         firstFileNotCreated = false
                     }
 
@@ -727,7 +745,7 @@ class SybaseOperator {
                     counter++
 
                     if (firstFileNotCreated) {
-                        writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                         firstFileNotCreated = false
                     }
 
@@ -781,7 +799,7 @@ class SybaseOperator {
                     counter++
 
                     if (firstFileNotCreated) {
-                        writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                         firstFileNotCreated = false
                     }
 
@@ -851,7 +869,7 @@ class SybaseOperator {
                         counter++
 
                         if (firstFileNotCreated) {
-                            writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                             firstFileNotCreated = false
                         }
                     }
@@ -927,7 +945,7 @@ class SybaseOperator {
                             counter++
 
                             if (firstFileNotCreated) {
-                                writeLineBufferIntoFirstFile(sqlFile, lineBufferForFirstFile)
+                                writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
                                 firstFileNotCreated = false
                             }
                         }
