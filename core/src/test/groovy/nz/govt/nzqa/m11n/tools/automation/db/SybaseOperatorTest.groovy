@@ -94,7 +94,7 @@ class SybaseOperatorTest {
     }
 
     /**
-     * Expect 676 tables
+     * Expect 676 tables and alter table statements (in splitForeignKey folder)
      */
     @Test
     void testSplitTables() {

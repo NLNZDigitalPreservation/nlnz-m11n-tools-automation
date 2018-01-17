@@ -444,12 +444,16 @@ class SybaseOperator {
         log.info("=============== Starting splitTables() =============== ")
 
         String outputDir = destinationDir + File.separator + "splitTables"
+        String fkOutputDir = destinationDir + File.separator + "splitForeignKeys"
         new File(outputDir).mkdir()
+        new File(fkOutputDir).mkdir()
         log.info("New directory '${outputDir}' created")
+        log.info("New directory '${fkOutputDir}' created")
 
         LineChecker lineChecker = new LineChecker()
 
         int counter = 0
+        int fkCounter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
         boolean isAlterTable = false
@@ -485,10 +489,12 @@ class SybaseOperator {
                     isAlterTable = true
 
                     // Create a new file for new entity
-                    String sqlAlterTableFileName = outputDir + File.separator + "splitTables-alter-" + counter + "-" + currentEntityName + ".sql"
+                    String sqlAlterTableFileName = fkOutputDir + File.separator + "splitTables-" + fkCounter + "-alter-" + currentEntityName + ".sql"
                     new File(sqlAlterTableFileName).createNewFile()
                     alterTableFile = new File(sqlAlterTableFileName)
                     log.info("File '${sqlAlterTableFileName}' created")
+
+                    fkCounter ++
 
                     alterTableFile << line + '\r\n'
                 } else if (isAlterTable){
