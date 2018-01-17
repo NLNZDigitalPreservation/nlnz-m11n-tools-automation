@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.parser
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Attribute
 
 class AttributeParser implements Parser{
@@ -58,7 +59,7 @@ class AttributeParser implements Parser{
 
     String getDefaultValueDataType(String attributeString){
         def result = (attributeString =~ /(?i)DEFAULT (\d+)/)
-        String defaultValueDataType = (result? 'int' : 'char')
+        String defaultValueDataType = (result? DBObjMapper.VALUETYPE_INT :  DBObjMapper.VALUETYPE_CHAR)
         return defaultValueDataType
     }
 

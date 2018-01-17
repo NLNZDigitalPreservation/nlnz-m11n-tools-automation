@@ -3,6 +3,9 @@ package nz.govt.nzqa.dbmigrate.mapper;
 import java.util.*;
 
 public class DBObjMapper {
+    public static ObjMapper USE = new ObjMapper("", "USE", "USE");
+    public static ObjMapper GO = new ObjMapper("", "GO", "GO");
+
     public static ObjMapper KEY_COLUMN = new ObjMapper("COLUMN", "Column", "COLUMN");
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
     public static ObjMapper KEY_GRANT = new ObjMapper("GRANT", "GRANT", "GRANT");
@@ -37,7 +40,6 @@ public class DBObjMapper {
     public static ObjMapper CONSTRAINT_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
     public static ObjMapper CONSTRAINT_REFERENCES = new ObjMapper("REFERENCES", "REFERENCES", "REFERENCES");
 
-
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");
     public static List<String> OPERATORS = new ArrayList<String>(Arrays.asList(">", ">=", "<", "<=", "="));
@@ -50,10 +52,30 @@ public class DBObjMapper {
     public static DataTypeMapper CRITERIA_VALUETYPE_INT = new DataTypeMapper("INT", "","", "(", ")");
     public static DataTypeMapper CRITERIA_VALUETYPE_CHAR = new DataTypeMapper("CHAR", "'", "'","'", "'");
 
+    public static String VALUETYPE_INT = "int";
+    public static String VALUETYPE_CHAR = "char";
 
     public static ObjMapper INDEX_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper INDEX_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
 
+    public static ObjMapper FOLDER_FIELD_DEFAULT = new ObjMapper("Defaults", "splitDefaults", "splitDefaults");
+    public static ObjMapper FOLDER_FIELD_USERDATATYPE = new ObjMapper("CustomDataTypes", "splitUserDatatypes", "splitUserDatatypes");
+    public static ObjMapper FOLDER_FIELD_TABLE = new ObjMapper("Tables", "splitTables", "splitTables");
+    public static ObjMapper FOLDER_FIELD_PRIMARYKEY = new ObjMapper("Keys", "splitPrimaryKeys", "splitPrimaryKeys");
+    public static ObjMapper FOLDER_FIELD_FOREIGNKEY = new ObjMapper("Keys", "splitForeignKeys", "splitForeignKeys");
+    public static ObjMapper FOLDER_FIELD_CHECKCONSTRAINT = new ObjMapper("Constraints", "splitCheckConstraints", "splitCheckConstraints");
+    public static ObjMapper FOLDER_FIELD_UNIQUE = new ObjMapper("Constraints", "splitUniqueKeys", "splitUniqueKeys");
+    public static ObjMapper FOLDER_FIELD_INDEX = new ObjMapper("Indexes", "splitIndices", "splitIndices");
+    public static ObjMapper FOLDER_FIELD_VIEW = new ObjMapper("Views", "splitViews", "splitViews");
+    public static ObjMapper FOLDER_FIELD_TRIGGER = new ObjMapper("Triggers", "splitTriggers", "splitTriggers");
+    public static ObjMapper FOLDER_FIELD_PROCEDURE = new ObjMapper("Procedures", "splitSPs", "splitSPs");
+    public static ObjMapper FOLDER_FIELD_FUNCTION = new ObjMapper("Functions", "splitFunctions", "splitFunctions");
+    public static ObjMapper FOLDER_FIELD_USER = new ObjMapper("Users", "splitUsers", "splitUsers");
+    public static ObjMapper FOLDER_FIELD_GROUP = new ObjMapper("Groups", "splitGroups", "splitGroups");
+    public static ObjMapper FOLDER_FIELD_RULE = new ObjMapper("Rules", "splitRules", "splitRules");
+    public static ObjMapper FOLDER_FIELD_MESSAGE = new ObjMapper("Messages", "splitUserMessages", "splitUserMessages");
+
+    public static ObjMapper REGEX_ = new ObjMapper("", "NONCLUSTERED", "NONCLUSTERED");
 
 
 

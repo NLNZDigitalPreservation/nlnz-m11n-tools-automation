@@ -1,5 +1,5 @@
 rootProject.name = 'm11n-tools-automation'
-include ":dbmodel", ":core", ":plugin", ":deparser"
+include ":dbmodel", ":core", ":plugin", ":deparser", ":parser"
 
 // Correctly refer to the children build files
 rootProject.children.each { child ->

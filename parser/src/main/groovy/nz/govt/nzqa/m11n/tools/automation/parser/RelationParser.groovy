@@ -4,45 +4,51 @@ import nz.govt.nzqa.dbmigrate.model.Relation
 
 class RelationParser implements Parser{
 
-    String getType(String sql){
-        String type = ''
-
+    String getType(String sqlStatement){
+        def result = (sqlStatement =~ /(?i)(GRANT) (.*) ON (\S+) TO (\S+)/)
+        String type = (result? result[0][1] : '')
         return type
     }
 
-    String getName(String sql){
+    String getName(String sqlStatement){
         String name = ''
-
+        //TODO figure out this field
         return name
     }
 
-    String getAction(String sql){
-        String action = ''
+    String getAction(String sqlStatement){
+        def result = (sqlStatement =~ /(?i)(GRANT) (.*) ON (\S+) TO (\S+)/)
+        String action = (result? result[0][2] : '')
 
         return action
     }
 
-    String getGrantTo(String sql){
-        String grantTo = ''
+    String getGrantTo(String sqlStatement){
+        def result = (sqlStatement =~ /(?i)(GRANT) (.*) ON (\S+) TO (\S+)/)
+        String grantTo = (result? result[0][4] : '')
 
         return grantTo
     }
 
-    String getGrantObjectDb(String sql){
-        String grantObjectDb = ''
+    String getGrantObjectDb(String sqlStatement){
+        def result = (sqlStatement =~ /(?i)(GRANT) (.*) ON (\S+) TO (\S+)/)
+        String[] dbObject = (result? result[0][3].toString().split("\\.") : '')
+        String grantObjectDb = (dbObject? dbObject[0] : '')
 
         return grantObjectDb
     }
 
-    String getGrantObjectName(String sql){
-        String grantObjectName = ''
+    String getGrantObjectName(String sqlStatement){
+        def result = (sqlStatement =~ /(?i)(GRANT) (.*) ON (\S+) TO (\S+)/)
+        String[] dbObject = (result? result[0][3].toString().split("\\.") : '')
+        String grantObjectName = (dbObject? dbObject[1] : '')
 
         return grantObjectName
     }
 
-    String getGrantSubObjects(String sql){
-        String grantSubObjects = ''
-
+    List<String> getGrantSubObjects(String sqlStatement){
+        List<String> grantSubObjects = new ArrayList<String>()
+        //TODO figure out this field
         return grantSubObjects
     }
 
@@ -54,6 +60,16 @@ class RelationParser implements Parser{
 
     @Override
     Relation parse(String sqlStatement) {
-        return null
+        Relation relation = new Relation()
+
+        relation.setType(getType(sqlStatement))
+        relation.setName(getName(sqlStatement))
+        relation.setAction(getAction(sqlStatement))
+        relation.setGrantTo(getGrantTo(sqlStatement))
+        relation.setGrantObjectDB(getGrantObjectDb(sqlStatement))
+        relation.setGrantObjectName(getGrantObjectName(sqlStatement))
+        relation.setGrantSubObjects(getGrantSubObjects(sqlStatement))
+
+        return relation
     }
 }
