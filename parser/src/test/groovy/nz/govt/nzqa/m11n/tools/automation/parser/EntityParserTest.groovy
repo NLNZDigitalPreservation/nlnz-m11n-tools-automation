@@ -1,8 +1,9 @@
 package nz.govt.nzqa.m11n.tools.automation.parser
 
-import nz.govt.nzqa.m11n.tools.automation.parser.EntityParser
+import nz.govt.nzqa.dbmigrate.model.Entity
 import org.junit.Before
 import org.junit.Test
+import static org.junit.Assert.assertEquals
 
 /**
  * Tests the {@link nz.govt.nzqa.m11n.tools.automation.parser.EntityParser}.
@@ -19,8 +20,12 @@ class EntityParserTest {
 
     @Test
     void shouldParseTypeNameAction() {
-        String lineName = ''
-        String currentEntityNameTest = ''
-        assertEquals(entityParser.parser("CREATE TABLE"))
+
+        Entity entity = new Entity()
+        entity.name = 'ACADEMIC_YEAR'
+        entity.databaseName = 'dbo'
+        Entity generatedEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileCreateTable.sql"))
+        assertEquals(entity.name, generatedEntity.name)
+        assertEquals(entity.databaseName, generatedEntity.databaseName)
     }
 }

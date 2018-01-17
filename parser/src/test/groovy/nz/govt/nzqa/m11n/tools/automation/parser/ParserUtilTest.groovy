@@ -16,17 +16,17 @@ import static org.junit.Assert.assertEquals
 
 class ParserUtilTest {
 
-    ParserUtil util
+    ParserUtil parserUtil
 
     @Before
     void setup() {
-        util = new ParserUtil()
+        parserUtil = new ParserUtil()
     }
 
     @Test
     void shouldReturnOneStatement() {
         String statement = 'USE eqa_prod'
-        List<String> statements = util.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileUseSchema.sql'))
+        List<String> statements = parserUtil.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileUseSchema.sql'))
         assertTrue('Return exactly one statement', statements.size() == 1)
         assertEquals('Return the correct statement', statement, statements.get(0))
     }
@@ -34,7 +34,7 @@ class ParserUtilTest {
     @Test
     void shouldReturnTwoStatement() {
         List<String> expectedStatements = Files.readAllLines(Paths.get('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileCreateTable-expected.sql'))
-        List<String> statements = util.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileCreateTable.sql'))
+        List<String> statements = parserUtil.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileCreateTable.sql'))
 
         System.out.println("Expected: " + expectedStatements)
         System.out.println("Actual: " + statements)
@@ -45,4 +45,13 @@ class ParserUtilTest {
             assertEquals('Return the correct statement', expectedStatements.get(index).replaceAll(" ", ""), statements.get(index).replaceAll(" ", ""))
         }
     }
+
+    @Test
+    void shouldReturnCorrectParser() {
+
+        String folderName = 'splitTables'
+        Parser parser = parserUtil.getParser(folderName)
+        assertEquals(parser.class, EntityParser.class)
+    }
+
 }
