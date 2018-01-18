@@ -2,7 +2,9 @@ package nz.govt.nzqa.m11n.tools.automation.wrapper
 
 import nz.govt.nzqa.dbmigrate.model.MigrateWrapper
 import nz.govt.nzqa.m11n.tools.automation.parser.Parser
-import nz.govt.nzqa.m11n.tools.automation.parser.ParserUtil
+import nz.govt.nzqa.m11n.tools.automation.parser.sybase.ParserUtil
+import nz.govt.nzqa.m11n.tools.automation.wrapper.Wrapper
+import nz.govt.nzqa.m11n.tools.automation.wrapper.WrapperUtil
 
 /**
  * Assume files in each split folder are of the same schema. New split folders should be created for files from a different schema

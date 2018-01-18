@@ -10,10 +10,11 @@ public class DBObjMapper {
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
     public static ObjMapper KEY_GRANT = new ObjMapper("GRANT", "GRANT", "GRANT");
 
-    public static ObjMapper ACTION_CREATE = new ObjMapper("CREATE", "", "");
+    public static ObjMapper ACTION_CREATE = new ObjMapper("CREATE", "CREATE", "CREATE");
     public static ObjMapper ACTION_ADD = new ObjMapper("ADD", "ADD", "WITH CHECK ADD");
     public static ObjMapper ACTION_DROP = new ObjMapper("DROP", "DROP", "DROP");
     public static ObjMapper ACTION_DROPONLY = new ObjMapper("DROPONLY", "DROP", "DROP");
+    public static ObjMapper ACTION_ALTER = new ObjMapper("ALTER", "ALTER", "ALTER");
     public static ObjMapper ACTION_SELECT = new ObjMapper("SELECT", "SELECT", "SELECT");
     public static ObjMapper ACTION_INSERT = new ObjMapper("INSERT", "INSERT", "INSERT");
     public static ObjMapper ACTION_UPDATE = new ObjMapper("UPDATE", "UPDATE", "UPDATE");
@@ -75,7 +76,39 @@ public class DBObjMapper {
     public static ObjMapper FOLDER_FIELD_RULE = new ObjMapper("Rules", "splitRules", "splitRules");
     public static ObjMapper FOLDER_FIELD_MESSAGE = new ObjMapper("Messages", "splitUserMessages", "splitUserMessages");
 
-    public static ObjMapper REGEX_ = new ObjMapper("", "NONCLUSTERED", "NONCLUSTERED");
+    public static ObjMapper REGEX_DATABASE_NAME = new ObjMapper("DatabaseName", "", "");
+    public static ObjMapper REGEX_TYPE = new ObjMapper("Type", "", "");
+    public static ObjMapper REGEX_SUB_TYPE = new ObjMapper("SubType", "", "");
+    public static ObjMapper REGEX_NAME = new ObjMapper("Name", "", "");
+    public static ObjMapper REGEX_ACTION = new ObjMapper("Action", "", "");
+    public static ObjMapper REGEX_OPERATION_TYPE = new ObjMapper("OperationType", "", "");
+    public static ObjMapper REGEX_FIELDS = new ObjMapper("Fields", "", "");
+    public static ObjMapper REGEX_DATA_TYPE = new ObjMapper("DataType", "", "");
+    public static ObjMapper REGEX_QUERY_VALUE = new ObjMapper("QueryValue", "", "");
+    public static ObjMapper REGEX_CONSRTAINTS = new ObjMapper("Constraints", "", "");
+    public static ObjMapper REGEX_GRANTS = new ObjMapper("Grant", "", "");
+    public static ObjMapper REGEX_LOCKS = new ObjMapper("Grant", "", "");
+    public static ObjMapper REGEX_LENGTH = new ObjMapper("Length", "", "");
+    public static ObjMapper REGEX_FRACTION = new ObjMapper("Fraction", "", "");
+    public static ObjMapper REGEX_DEFAULT_VALUE = new ObjMapper("DefaultValue", "", "");
+    public static ObjMapper REGEX_DEFAULT_VALUE_DATA_TYPE = new ObjMapper("DefaultValueDataType", "", "");
+    public static ObjMapper REGEX_IS_NULL = new ObjMapper("IsNull", "", "");
+    public static ObjMapper REGEX_IN_FIELDS = new ObjMapper("InFields", "", "");
+    public static ObjMapper REGEX_RETURN_TYPE = new ObjMapper("ReturnType", "", "");
+    public static ObjMapper REGEX_SQL = new ObjMapper("SQL", "", "");
+    public static ObjMapper REGEX_GRANT_TO = new ObjMapper("GrantTo", "", "");
+    public static ObjMapper REGEX_GRANT_OBJECT_DB = new ObjMapper("GrantObjectDB", "", "");
+    public static ObjMapper REGEX_GRANT_OBJECT_NAME = new ObjMapper("GrantObjectName", "", "");
+    public static ObjMapper REGEX_GRANT_SUBOBJECTS = new ObjMapper("GrantSubObjects", "", "");
+    public static ObjMapper REGEX_IN_OUT = new ObjMapper("InOut", "", "");
+    public static ObjMapper REGEX_TABLE_NAME = new ObjMapper("TableName", "", "");
+    public static ObjMapper REGEX_REFERENCE_TABLE_NAME = new ObjMapper("ReferenceTableName", "", "");
+    public static ObjMapper REGEX_REFERENCE_FIELDS = new ObjMapper("ReferenceFields", "", "");
+    public static ObjMapper REGEX_CRITERIA = new ObjMapper("Criteria", "", "");
+
+
+
+
 
 
 
