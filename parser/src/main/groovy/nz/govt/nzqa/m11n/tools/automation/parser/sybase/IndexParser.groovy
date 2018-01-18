@@ -1,6 +1,7 @@
-package nz.govt.nzqa.m11n.tools.automation.parser
+package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
 import nz.govt.nzqa.dbmigrate.model.Index
+import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 
 class IndexParser implements Parser{
 

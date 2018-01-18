@@ -1,4 +1,4 @@
-package nz.govt.nzqa.m11n.tools.automation.parser
+package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
 import com.google.common.base.Predicates
 import com.google.common.collect.Collections2
@@ -7,9 +7,14 @@ import nz.govt.nzqa.dbmigrate.model.Attribute
 import nz.govt.nzqa.dbmigrate.model.Constraint
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Relation
+import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+
+/**
+ * Assume all create table statements will not have alter table add foreign key constraints
+ */
 
 class EntityParser implements Parser{
 

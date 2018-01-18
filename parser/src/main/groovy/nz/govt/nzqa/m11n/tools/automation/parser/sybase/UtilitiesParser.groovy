@@ -1,8 +1,9 @@
-package nz.govt.nzqa.m11n.tools.automation.parser
+package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
 import nz.govt.nzqa.dbmigrate.model.Param
 import nz.govt.nzqa.dbmigrate.model.Relation
 import nz.govt.nzqa.dbmigrate.model.Utilities
+import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 
 class UtilitiesParser implements Parser {
 

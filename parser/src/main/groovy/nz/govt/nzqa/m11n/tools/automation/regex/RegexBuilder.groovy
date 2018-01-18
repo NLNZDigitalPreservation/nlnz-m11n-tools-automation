@@ -4,6 +4,7 @@ interface RegexBuilder {
 
     String build (String className, String fieldName, String parameter)
     String build (String className, String fieldName)
+
     String buildEntityRegex(String fieldName, String parameter)
     String buildAttributeRegex(String fieldName, String parameter)
     String buildRelationRegex(String fieldName, String parameter)
