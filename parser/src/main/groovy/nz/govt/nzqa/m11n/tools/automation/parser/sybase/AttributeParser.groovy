@@ -12,7 +12,8 @@ class AttributeParser implements Parser{
     String getType(String sqlStatement){
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String type = (result && result[0][1].toString().equalsIgnoreCase('CREATE')? 'Column' : '')
+        String type = (result && result[0][1].toString().equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getSybaseKey())?
+                DBObjMapper.KEY_COLUMN.getObjKey() : '')
 
         return type
     }
@@ -44,9 +45,9 @@ class AttributeParser implements Parser{
     String getLength(String attributeString){
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_LENGTH.getObjKey())
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
-        def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : '')
+        def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : attributeFields[1])
         String[] types = (type? type[0][2].toString().split(",") : '')
-        String length =  (types.size() == 2? types[0] : type[0][2])
+        String length =  (types.size() == 2? types[0] : (types.size() > 0? type[0][2] : ''))
         return length
     }
 
@@ -68,9 +69,11 @@ class AttributeParser implements Parser{
     }
 
     String getDefaultValueDataType(String attributeString){
-        String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey())
-        def result = (attributeString =~ /$regex/)
-        String defaultValueDataType = (result? DBObjMapper.VALUETYPE_INT :  DBObjMapper.VALUETYPE_CHAR)
+        String intRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.VALUETYPE_INT)
+        String charRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.VALUETYPE_CHAR)
+        def result = (attributeString =~ /$intRegex/)
+        String defaultValueDataType = (result? DBObjMapper.VALUETYPE_INT :
+                ((attributeString =~/$charRegex/)? DBObjMapper.VALUETYPE_CHAR : ''))
         return defaultValueDataType
     }
 

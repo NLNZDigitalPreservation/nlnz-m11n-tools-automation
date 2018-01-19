@@ -17,7 +17,8 @@ class RelationParser implements Parser{
     }
 
     String getName(String sqlStatement){
-        String name = ''
+        def result = (sqlStatement =~ /$regex/)
+        String name = (result? result[0][0] : '')
         //TODO figure out this field
         return name
     }

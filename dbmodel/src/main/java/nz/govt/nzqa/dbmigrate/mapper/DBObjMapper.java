@@ -9,6 +9,7 @@ public class DBObjMapper {
     public static ObjMapper KEY_COLUMN = new ObjMapper("COLUMN", "Column", "COLUMN");
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
     public static ObjMapper KEY_GRANT = new ObjMapper("GRANT", "GRANT", "GRANT");
+    public static ObjMapper KEY_LOCK = new ObjMapper("LOCK", "LOCK", "");
 
     public static ObjMapper ACTION_CREATE = new ObjMapper("CREATE", "CREATE", "CREATE");
     public static ObjMapper ACTION_ADD = new ObjMapper("ADD", "ADD", "WITH CHECK ADD");
@@ -105,12 +106,7 @@ public class DBObjMapper {
     public static ObjMapper REGEX_REFERENCE_TABLE_NAME = new ObjMapper("ReferenceTableName", "", "");
     public static ObjMapper REGEX_REFERENCE_FIELDS = new ObjMapper("ReferenceFields", "", "");
     public static ObjMapper REGEX_CRITERIA = new ObjMapper("Criteria", "", "");
-
-
-
-
-
-
+    public static ObjMapper REGEX_ACTION_ENTITY = new ObjMapper("ActionEntity", "", "");
 
 //    public List<String> OPERATORS
 

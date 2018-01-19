@@ -8,6 +8,7 @@ import nz.govt.nzqa.dbmigrate.model.Constraint
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Relation
 import nz.govt.nzqa.m11n.tools.automation.parser.Parser
+import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -18,26 +19,32 @@ import java.util.regex.Pattern
 
 class EntityParser implements Parser{
 
+    SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
+
     String getDatabaseName(String sqlStatement){
-        def result = (sqlStatement =~ /(?i)(CREATE|ALTER|ADD|DROP|DROPONLY) (\S+) (\S+)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
         String databaseName = (result? result[0][3].toString().split("\\.")[0] : '')
         return databaseName
     }
 
     String getType(String sqlStatement){
-        def result = (sqlStatement =~ /(?i)(CREATE|ALTER|ADD|DROP|DROPONLY) (\S+)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
         String type = (result? result[0][2].toString() : '')
         return type
     }
 
     String getName(String sqlStatement){
-        def result = (sqlStatement =~ /(?i)(CREATE|ALTER|ADD|DROP|DROPONLY) (\S+) (\S+)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
         String name = (result ? result[0][3].toString().split("\\.")[1]: '')
         return name
     }
 
     String getAction(String sqlStatement){
-        def result = (sqlStatement =~ /(?i)(CREATE|ALTER|ADD|DROP|DROPONLY)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
         String action = (result? result[0][1].toString() : '')
         return action
     }
@@ -52,7 +59,8 @@ class EntityParser implements Parser{
         AttributeParser attributeParser = new AttributeParser()
         Map<String, Attribute> attributeMap = new HashMap<>()
 
-        def result = (sqlStatement =~ /(?i)(CREATE|ALTER|ADD|DROP|DROPONLY) (\S+) (\S+) \((.*)\)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_FIELDS.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
         List<String> attributes = result? (result[0][4].toString().split(", ").toList()) : new ArrayList<String>()
         Collection<String> attributeStrings = Collections2.filter(attributes, Predicates.not(Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey())))
 
@@ -83,7 +91,8 @@ class EntityParser implements Parser{
         ConstraintParser constraintParser = new ConstraintParser()
         Map<String, Constraint> constraintMap = new HashMap<>()
 
-        def result = (sqlStatement =~ /(?i)(CREATE|ALTER|ADD|DROP|DROPONLY) (\S+) (\S+) \((.*)\)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_CONSRTAINTS.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
         List<String> attributes = result? (result[0][4].toString().split(", ").toList()) : new ArrayList<String>()
         Collection<String> constraintStrings = Collections2.filter(attributes, Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey()))
 
@@ -111,12 +120,13 @@ class EntityParser implements Parser{
     List<String> getLocks(String sqlStatement){
         List<String> locks = new ArrayList<String>()
 
-        Pattern pattern = Pattern.compile(/(?i)LOCK (\S+)/)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_LOCKS.getObjKey())
+        Pattern pattern = Pattern.compile(/$regex/)
         Matcher matcher = pattern.matcher(sqlStatement)
 
         while(matcher.find()){
             String lockName = matcher.group(1)
-            locks.add("[" + lockName + "]")
+            locks.add(lockName)
         }
         return locks
     }
@@ -127,9 +137,10 @@ class EntityParser implements Parser{
         ParserUtil util = new ParserUtil()
         List<String> grantStatements = new ArrayList<>()
         List<String> statements = util.getStatementsFromFile(file)
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
 
         for(String statement : statements){
-            if (statement =~ /(?i)(CREATE |ALTER |ADD |DROP |DROPONLY )/) {
+            if (statement =~ /$regex/) {
                 entity.setDatabaseName(getDatabaseName(statement))
                 entity.setType(getType(statement))
                 entity.setName(getName(statement))
@@ -153,8 +164,9 @@ class EntityParser implements Parser{
     Entity parse(String sqlStatement) {
         Entity entity = new Entity()
         List<String> grantStatements = new ArrayList<>()
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
 
-        if (sqlStatement =~ /(?i)(CREATE |ALTER |ADD |DROP |DROPONLY )/) {
+        if (sqlStatement =~ /$regex/) {
             entity.setDatabaseName(getDatabaseName(sqlStatement))
             entity.setType(getType(sqlStatement))
             entity.setName(getName(sqlStatement))

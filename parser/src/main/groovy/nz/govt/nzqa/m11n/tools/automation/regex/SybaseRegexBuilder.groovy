@@ -60,7 +60,25 @@ class SybaseRegexBuilder implements RegexBuilder {
 
     @Override
     String buildEntityRegex(String fieldName, String parameter) {
-        return null
+        String regexString = ''
+
+        switch(fieldName){
+            case(DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case(DBObjMapper.REGEX_TYPE.getObjKey()):
+            case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_ACTION.getObjKey()):
+            case(DBObjMapper.REGEX_FIELDS.getObjKey()):case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
+            case(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey()):
+                //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+)
+                regexString = String.format("(?i)(?i)(%s|%s|%s|%s) (\\S+) (\\S+) \\((.*)\\)",
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
+                        DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
+                break
+
+            case(DBObjMapper.REGEX_LOCKS.getObjKey()):
+                //(?i)LOCK (\S+)
+                regexString = String.format("(?i)%s (\\S+)", DBObjMapper.KEY_LOCK.getSybaseKey())
+                break
+        }
+        return regexString
     }
 
     @Override
@@ -85,7 +103,15 @@ class SybaseRegexBuilder implements RegexBuilder {
                 break
 
             case(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey()):
-                regexString = "(?i)DEFAULT (\\d+)"
+                switch(parameter){
+                    case(DBObjMapper.VALUETYPE_INT):
+                        regexString = "(?i)DEFAULT (\\d+)"
+                        break
+
+                    case(DBObjMapper.VALUETYPE_CHAR):
+                        regexString = "(?i)DEFAULT (\\S+)"
+                        break
+                }
                 break
 
             case(DBObjMapper.REGEX_IS_NULL.getObjKey()):
