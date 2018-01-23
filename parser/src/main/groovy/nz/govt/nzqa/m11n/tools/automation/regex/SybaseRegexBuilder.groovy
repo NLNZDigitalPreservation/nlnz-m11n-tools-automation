@@ -154,7 +154,7 @@ class SybaseRegexBuilder implements RegexBuilder {
 
     @Override
     String buildRelationRegex(String fieldName, String parameter) {
-        String regexString = "(?i)(GRANT) (.*) ON (\\S+) TO (\\S+)"
+        String regexString = "(?i)(GRANT) (.*) ON (\\S+\\((.*)\\)|\\S+) TO (\\S+)"
         return regexString
     }
 

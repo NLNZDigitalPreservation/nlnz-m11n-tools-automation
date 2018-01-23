@@ -19,7 +19,6 @@ class RelationParser implements Parser{
     String getName(String sqlStatement){
         def result = (sqlStatement =~ /$regex/)
         String name = (result? result[0][0] : '')
-        //TODO figure out this field
         return name
     }
 
@@ -32,7 +31,7 @@ class RelationParser implements Parser{
 
     String getGrantTo(String sqlStatement){
         def result = (sqlStatement =~ /$regex/)
-        String grantTo = (result? result[0][4] : '')
+        String grantTo = (result? result[0][5] : '')
 
         return grantTo
     }
@@ -54,8 +53,9 @@ class RelationParser implements Parser{
     }
 
     List<String> getGrantSubObjects(String sqlStatement){
-        List<String> grantSubObjects = new ArrayList<String>()
-        //TODO figure out this field
+        def result = (sqlStatement =~ /$regex/)
+        List<String> grantSubObjects = Arrays.asList(result? result[0][4].toString()
+                .replaceAll("\\s|\\(|\\)", "").split(",") : '')
         return grantSubObjects
     }
 

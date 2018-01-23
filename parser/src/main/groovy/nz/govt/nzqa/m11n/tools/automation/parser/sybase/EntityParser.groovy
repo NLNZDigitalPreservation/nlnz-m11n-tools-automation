@@ -94,7 +94,7 @@ class EntityParser implements Parser{
     String getDataType(String sqlStatement){
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        List<String> fields = Arrays.asList(result? result[0][1].toString().replaceAll("'", "").split(",") : '')
+        List<String> fields = Arrays.asList(result? result[0][1].toString().replaceAll("'|\\s", "").split(",") : '')
         String dataType = (fields.size() > 0? fields[1] : '')
 
         return dataType

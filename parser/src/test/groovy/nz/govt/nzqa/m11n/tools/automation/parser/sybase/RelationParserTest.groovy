@@ -75,4 +75,14 @@ class RelationParserTest {
         assertEquals(relation3.getGrantObjectName(), generatedRelation3.getGrantObjectName())
 //        assertEquals(relation3.getGrantSubObjects(), generatedRelation3.getGrantSubObjects())
     }
+
+    @Test
+    void shouldReturnCorrectSubObjectList() {
+        String relationString = 'GRANT SELECT ON dbo.sysobjects(name,id,uid,type,userstat,sysstat) TO public'
+        List<String> subObjects = Arrays.asList('name','id','uid','type','userstat','sysstat')
+        List<String> testSubObjects = relationParser.getGrantSubObjects(relationString)
+
+        assertEquals(subObjects, testSubObjects)
+    }
+
 }
