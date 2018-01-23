@@ -50,7 +50,24 @@ class EntityParser implements Parser{
     }
 
     String getOperationType(String sqlStatement){
-        String operationType = ''
+        String operationType = ""
+
+        String createRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_OPERATION_TYPE.getObjKey(), DBObjMapper.ACTION_CREATE.getSybaseKey())
+        String defaultRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_OPERATION_TYPE.getObjKey(), DBObjMapper.ENTITY_DEFAULT.getSybaseKey())
+
+        if(sqlStatement =~ /$defaultRegex/){
+            operationType = DBObjMapper.ENTITY_OPERATION_TYP_DEFAULT_VALUE.getObjKey()
+        }
+
+        else if (sqlStatement =~ /$createRegex/){
+            if (sqlStatement.toLowerCase().contains("select ")){
+                operationType = DBObjMapper.ENTITY_OPERATION_TYP_DERIVED.getObjKey()
+            }
+
+            else{
+                operationType = DBObjMapper.ENTITY_OPERATION_TYP_DIRECT.getObjKey()
+            }
+        }
 
         return operationType
     }
@@ -75,13 +92,18 @@ class EntityParser implements Parser{
     }
 
     String getDataType(String sqlStatement){
-        String dataType = ''
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
+        List<String> fields = Arrays.asList(result? result[0][1].toString().replaceAll("'", "").split(",") : '')
+        String dataType = (fields.size() > 0? fields[1] : '')
 
         return dataType
     }
 
     String getQueryValue(String sqlStatement){
-        String queryValue = ''
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_QUERY_VALUE.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
+        String queryValue = (result? result[0][1].toString() : '')
 
         return queryValue
     }
@@ -145,7 +167,10 @@ class EntityParser implements Parser{
                 entity.setType(getType(statement))
                 entity.setName(getName(statement))
                 entity.setAction(getAction(statement))
+                entity.setOperationType(getOperationType(statement))
                 entity.setFields(getFields(statement))
+                entity.setDataType(getDataType(statement))
+                entity.setQueryValue(getQueryValue(statement))
                 entity.setConstraints(getConstraints(statement))
                 entity.setLocks(getLocks(statement))
             }

@@ -43,16 +43,16 @@ class EntityParserTest {
         List<Constraint> constraintList = getConstraintList(constraintOneString)
 
         String grantOneString =
-                'GRANT REFERENCES ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO read_only\n' +
-                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO rma_users\n' +
-                'GRANT INSERT ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT DELETE ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT UPDATE ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT DELETE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT TRUNCATE TABLE ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
-                'GRANT UPDATE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT REFERENCES ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO read_only ' +
+                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO rma_users ' +
+                'GRANT INSERT ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT DELETE ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT UPDATE ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT DELETE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT TRUNCATE TABLE ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT UPDATE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user ' +
                 'GRANT TRANSFER TABLE ON dbo.ACADEMIC_YEAR TO eqa_user'
         List<Relation> grantList = getRelationList(grantOneString)
 
@@ -109,6 +109,85 @@ class EntityParserTest {
 
     }
 
+    @Test
+    void shouldReturnCorrectOperationTypes(){
+        String createStatement = 'CREATE TABLE dbo.ACADEMIC_YEAR (' +
+                'academic_year            char(4)    NOT NULL, ' +
+                'academic_year_desc       descr      NOT NULL, ' +
+                'academic_year_start      datetime   NOT NULL, ' +
+                'academic_year_end        datetime   NOT NULL, ' +
+                'academic_year_type       varchar(4) NOT NULL,    ' +
+                'academic_year_sort_order sortkey    NOT NULL, ' +
+                'CONSTRAINT PK_ACADEMIC_YEAR PRIMARY KEY CLUSTERED (academic_year)) ' +
+                'LOCK DATAROWS'
+
+        String opTypeCreate = 'Direct'
+        String testOpTypeCreate = entityParser.getOperationType(createStatement)
+        assertEquals(opTypeCreate, testOpTypeCreate)
+
+        String defaultStatement = 'CREATE DEFAULT dbo.Yes AS 1'
+        String opTypeDefault= 'DefaultValue'
+        String testOpTypeDefault = entityParser.getOperationType(defaultStatement)
+        assertEquals(opTypeDefault, testOpTypeDefault)
+
+        String deriveStatement = 'CREATE VIEW dbo.VW_PEOPLE' +
+                'AS ' +
+                '/***************************************************** ' +
+                ' * VW_PEOPLE - replicates web view W_PEOPLE ' +
+                ' * ' +
+                ' * Copyright 2003 SolNet Limited and New Zealand ' +
+                ' * Qualifications Authority.  All rights reserved. ' +
+                ' * ' +
+                ' * $Id: VW_PEOPLE.sql,v 1.1 2007/06/15 03:25:17 antonyb Exp $ ' +
+                ' * Author: Origainally Matt Watson (NZQA) ' +
+                ' * ' +
+                ' * ' +
+                ' * Version: $Revision: 1.1 $ ' +
+                ' * Source:  $Source: /usr/local/git/cvs/eqa/eqa/apps/exams/db/views/VW_PEOPLE.sql,v $ ' +
+                ' * Author:  $Author: antonyb $ ' +
+                ' *************************************************/ ' +
+                'SELECT ' +
+                '    p.perorg_id, ' +
+                '    n.title, ' +
+                '    n.name1, ' +
+                '    n.name2, ' +
+                '    n.name3, ' +
+                '    n.surname, ' +
+                '    p.dob, ' +
+                '    p.ird_number, ' +
+                '    p.gender_code ' +
+                'FROM ' +
+                '    PERORG p, ' +
+                '    NAME   n ' +
+                'WHERE ' +
+                '    p.perorg_type_code = \'P\'         and ' +
+                '    p.is_learner       = 0           and ' +
+                '    p.perorg_id        = n.perorg_id and ' +
+                '    p.perorg_status    = \'AC\'        and ' +
+                '    n.preferred_ind    = 1           and ' +
+                '    n.active_ind       = 1'
+
+        String opTypeDerive= 'Derived'
+        String testOpTypeDerive = entityParser.getOperationType(deriveStatement)
+        assertEquals(opTypeDerive, testOpTypeDerive)
+    }
+
+    @Test
+    void shouldExtractCorrectDatatypeForSysType(){
+        String sqlStatement = 'EXEC sp_addtype \'dt\',\'datetime\',\'NULL\''
+        String dataType = 'datetime'
+        String testDataType = entityParser.getDataType(sqlStatement)
+        assertEquals(dataType, testDataType)
+    }
+
+    @Test
+    void shouldExtractDefaultValue(){
+        String sqlStatement = 'CREATE DEFAULT dbo.Yes AS 1'
+        String defaultValue = '1'
+        String testDefaultValue = entityParser.getQueryValue(sqlStatement)
+        assertEquals(defaultValue, testDefaultValue)
+    }
+
     List<Attribute> getAttributeList(String attributeOneString){
         List<Attribute> attributeList = new ArrayList<>()
         String[] attributeStrings = attributeOneString.split(",")
@@ -137,7 +216,7 @@ class EntityParserTest {
 
     List<Relation> getRelationList(String grantOneString){
         List<Relation> grantList = new ArrayList<>()
-        String[] grantStrings = grantOneString.split("\n")
+        String[] grantStrings = grantOneString.split(" ")
         for (String grantString : grantStrings){
             grantList.add(relationParser.parse(grantString))
         }

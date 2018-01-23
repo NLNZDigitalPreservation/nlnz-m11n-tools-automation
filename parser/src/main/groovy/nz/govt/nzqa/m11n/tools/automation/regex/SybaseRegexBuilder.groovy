@@ -83,6 +83,31 @@ class SybaseRegexBuilder implements RegexBuilder {
                 //(?i)LOCK (\S+)
                 regexString = String.format("(?i)%s (\\S+)", DBObjMapper.KEY_LOCK.getSybaseKey())
                 break
+
+            case(DBObjMapper.REGEX_OPERATION_TYPE.getObjKey()):
+                switch(parameter){
+                    case(DBObjMapper.ACTION_CREATE.getSybaseKey()):
+                        //(?i)CREATE
+                        regexString = String.format("(?i)%s ", DBObjMapper.ACTION_CREATE.getSybaseKey())
+                        break
+
+                    case(DBObjMapper.ENTITY_DEFAULT.getSybaseKey()):
+                        //(?i)DEFAULT (\S+) AS
+                        regexString = String.format("(?i)%s (\\S+) %s", DBObjMapper.ENTITY_DEFAULT.getSybaseKey(),
+                        DBObjMapper.AS.getSybaseKey())
+                        break
+                }
+                break
+
+            case(DBObjMapper.REGEX_QUERY_VALUE.getObjKey()):
+                //(?i)AS (.*)
+                regexString = String.format("(?i)%s (.*)",DBObjMapper.AS.getSybaseKey())
+                break
+
+            case(DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
+                //(?i)EXEC sp_add\S+ (.*)
+                regexString = String.format("(?i)EXEC %s\\S+ (.*)",DBObjMapper.SP_ADD.getSybaseKey())
+                break
         }
         return regexString
     }
