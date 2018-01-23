@@ -5,6 +5,7 @@ import java.util.*;
 public class DBObjMapper {
     public static ObjMapper USE = new ObjMapper("", "USE", "USE");
     public static ObjMapper GO = new ObjMapper("", "GO", "GO");
+    public static ObjMapper AS = new ObjMapper("", "AS", "AS");
 
     public static ObjMapper KEY_COLUMN = new ObjMapper("COLUMN", "Column", "COLUMN");
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
@@ -32,6 +33,10 @@ public class DBObjMapper {
     public static ObjMapper ENTITY_USER = new ObjMapper("USER", "sp_adduser", "TABLE");
     public static ObjMapper ENTITY_RULE = new ObjMapper("RULE", "RULE", "TABLE");
     public static ObjMapper ENTITY_MESSAGE = new ObjMapper("MESSAGE", "MESSAGE", "MESSAGE");
+    public static ObjMapper ENTITY_INDEX= new ObjMapper("INDEX", "INDEX", "INDEX");
+    public static ObjMapper ENTITY_PROCEDURE = new ObjMapper("PROCEDURE", "PROCEDURE", "PROCEDURE");
+    public static ObjMapper ENTITY_FUNCTION = new ObjMapper("FUNCTION", "FUNCTION", "FUNCTION");
+    public static ObjMapper ENTITY_TRIGGER= new ObjMapper("TRIGGER", "TRIGGER", "TRIGGER");
 
     public static ObjMapper CONSTRAINT_PRIMARYKEY = new ObjMapper("PK", "PRIMARY KEY", "PRIMARY KEY");
     public static ObjMapper CONSTRAINT_UNIQUE = new ObjMapper("UNIQUE", "UNIQUE", "UNIQUE");
@@ -84,6 +89,7 @@ public class DBObjMapper {
     public static ObjMapper REGEX_ACTION = new ObjMapper("Action", "", "");
     public static ObjMapper REGEX_OPERATION_TYPE = new ObjMapper("OperationType", "", "");
     public static ObjMapper REGEX_FIELDS = new ObjMapper("Fields", "", "");
+    public static ObjMapper REGEX_FIELD_NAME = new ObjMapper("FieldName", "", "");
     public static ObjMapper REGEX_DATA_TYPE = new ObjMapper("DataType", "", "");
     public static ObjMapper REGEX_QUERY_VALUE = new ObjMapper("QueryValue", "", "");
     public static ObjMapper REGEX_CONSRTAINTS = new ObjMapper("Constraints", "", "");
@@ -107,6 +113,14 @@ public class DBObjMapper {
     public static ObjMapper REGEX_REFERENCE_FIELDS = new ObjMapper("ReferenceFields", "", "");
     public static ObjMapper REGEX_CRITERIA = new ObjMapper("Criteria", "", "");
     public static ObjMapper REGEX_ACTION_ENTITY = new ObjMapper("ActionEntity", "", "");
+    public static ObjMapper REGEX_ACTION_UTILITIES = new ObjMapper("ActionUtilities", "", "");
+
+    public static ObjMapper ENTITY_OPERATION_TYP_DIRECT = new ObjMapper("Direct", "", "");
+    public static ObjMapper ENTITY_OPERATION_TYP_DERIVED = new ObjMapper("Derived", "", "");
+    public static ObjMapper ENTITY_OPERATION_TYP_DEFAULT_VALUE = new ObjMapper("DefaultValue", "", "");
+
+    public static ObjMapper SP_ADD = new ObjMapper("", "sp_add", "");
+
 
 //    public List<String> OPERATORS
 

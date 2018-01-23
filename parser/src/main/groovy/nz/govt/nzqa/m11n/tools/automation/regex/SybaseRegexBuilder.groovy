@@ -159,7 +159,20 @@ class SybaseRegexBuilder implements RegexBuilder {
 
     @Override
     String buildUtilitiesRegex(String fieldName, String parameter) {
-        return null
+        String regexString = ''
+
+        switch(fieldName){
+            case(DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case(DBObjMapper.REGEX_TYPE.getObjKey()):
+            case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_ACTION.getObjKey()):
+            case(DBObjMapper.REGEX_ACTION_UTILITIES.getObjKey()):
+                //(?i)(CREATE|DROP) (PROCEDURE|TRIGGER|FUNCTION) (\S+)
+                regexString = String.format("(?i)(%s|%s) (%s|%s|%s) (\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
+                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.ENTITY_PROCEDURE.getSybaseKey(),
+                        DBObjMapper.ENTITY_TRIGGER.getSybaseKey(), DBObjMapper.ENTITY_FUNCTION.getSybaseKey())
+                break
+
+        }
+        return regexString
     }
 
     @Override
@@ -175,9 +188,20 @@ class SybaseRegexBuilder implements RegexBuilder {
             case (DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case (DBObjMapper.REGEX_ACTION.getObjKey()):
             case (DBObjMapper.REGEX_NAME.getObjKey()):case (DBObjMapper.REGEX_TABLE_NAME.getObjKey()):
             case(DBObjMapper.REGEX_FIELD_NAME.getObjKey()):
-                //(?i)(CREATE|DROP) (.*) INDEX (\S+) ON ((\S+)\((.*)\)|\S+)
-                regexString = String.format("(?i)(%s|%s) (.*) %s (\\S+) ON ((\\S+)\\((.*)\\)|\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
-                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.ENTITY_INDEX.getSybaseKey())
+                switch(parameter) {
+                    case (DBObjMapper.ACTION_DROP.getObjKey()):
+                        //((DROP) INDEX (\S+)
+                        regexString = String.format("(?i)(%s) %s (\\S+)", DBObjMapper.ACTION_DROP.getSybaseKey(),
+                                DBObjMapper.ENTITY_INDEX.getSybaseKey())
+                        break
+
+                    default:
+                        //(?i)(CREATE) (.*) INDEX (\S+) ON ((\S+)\((.*)\)|\S+)
+                        regexString = String.format("(?i)(%s) (.*) %s (\\S+) ON ((\\S+)\\((.*)\\)|\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
+                                DBObjMapper.ENTITY_INDEX.getSybaseKey())
+                        break
+
+                }
                 break
         }
         return regexString

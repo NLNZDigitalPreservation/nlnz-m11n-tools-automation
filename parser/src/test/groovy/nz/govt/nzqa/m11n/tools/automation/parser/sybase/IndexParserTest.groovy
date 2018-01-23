@@ -46,5 +46,30 @@ class IndexParserTest {
 //        assertEquals(index.getWithClause(), testIndex.getWithClause())
     }
 
+    @Test
+    void shouldReturnIndexWithDrop(){
+        String indexString = 'DROP INDEX ACADEMIC_YEAR.idx_academic_year_01'
+
+        Index index = new Index()
+        index.setType('')
+        index.setName('idx_academic_year_01')
+        index.setAction('DROP')
+        index.setDatabaseName('')
+        index.setTableName('ACADEMIC_YEAR')
+//        index.setFieldNames('')
+//        index.setWithClause()
+
+        Index testIndex = indexParser.parse(indexString)
+
+        assertEquals(index.getType(), testIndex.getType())
+        assertEquals(index.getName(), testIndex.getName())
+        assertEquals(index.getAction(), testIndex.getAction())
+        assertEquals(index.getDatabaseName(), testIndex.getDatabaseName())
+        assertEquals(index.getTableName(), testIndex.getTableName())
+//        assertEquals(index.getFieldNames(), testIndex.getFieldNames())
+//        assertEquals(index.getWithClause(), testIndex.getWithClause())
+
+    }
+
 
 }

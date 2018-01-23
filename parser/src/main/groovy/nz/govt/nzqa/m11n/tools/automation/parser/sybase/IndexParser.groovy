@@ -35,25 +35,45 @@ class IndexParser implements Parser{
     }
 
     String getName(String sqlStatement){
-        String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_NAME.getObjKey())
-        def result = (sqlStatement =~ /$regex/)
-        String name = (result? result[0][3].toString() : '')
+        String createRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_TABLE_NAME.getObjKey(), DBObjMapper.ACTION_CREATE.getObjKey())
+        String dropRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_TABLE_NAME.getObjKey(), DBObjMapper.ACTION_DROP.getObjKey())
+        def createResult = (sqlStatement =~ /$createRegex/)
+        def dropResult = (sqlStatement =~ /$dropRegex/)
+
+        String name = (createResult? createResult[0][3] : (dropResult? dropResult[0][2].toString().split("\\.")[1] : ''))
 
         return name
     }
 
     String getAction(String sqlStatement){
-        String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey())
-        def result = (sqlStatement =~ /$regex/)
-        String action = (result? result[0][1].toString() : '')
+        String createRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey(), DBObjMapper.ACTION_CREATE.getObjKey())
+        String dropRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey(), DBObjMapper.ACTION_DROP.getObjKey())
+
+        def createResult = (sqlStatement =~ /$createRegex/)
+        def dropResult = (sqlStatement =~ /$dropRegex/)
+
+        String action = (createResult? createResult[0][1].toString() : (dropResult? dropResult[0][1] : ''))
 
         return action
     }
 
     String getTableName(String sqlStatement){
-        String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_TABLE_NAME.getObjKey())
-        def result = (sqlStatement =~ /$regex/)
-        String tableName = (result? result[0][5].toString().split("\\.")[1] : '')
+        String tableName = ''
+        String createRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_NAME.getObjKey(), DBObjMapper.ACTION_CREATE.getObjKey())
+        String dropRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_NAME.getObjKey(), DBObjMapper.ACTION_DROP.getObjKey())
+
+        def createResult = (sqlStatement =~ /$createRegex/)
+        def dropResult = (sqlStatement =~ /$dropRegex/)
+
+        if (createResult){
+            String[] dbTable = createResult[0][5].toString().split("\\.")
+            tableName = (dbTable.size() == 2? dbTable[1] : '')
+        }
+
+        else if (dropResult){
+            String[] tableIndex = dropResult[0][2].toString().split("\\.")
+            tableName = (tableIndex.size() == 2? tableIndex[0] : '')
+        }
 
         return tableName
     }
