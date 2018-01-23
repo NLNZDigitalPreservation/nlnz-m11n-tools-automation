@@ -135,14 +135,16 @@ class ParserUtil {
             case(DBObjMapper.FOLDER_FIELD_DEFAULT.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_USERDATATYPE.getSybaseKey()):
             case(DBObjMapper.FOLDER_FIELD_GROUP.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_USER.getSybaseKey()):
             case(DBObjMapper.FOLDER_FIELD_RULE.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_MESSAGE.getSybaseKey()):
+            case(DBObjMapper.FOLDER_FIELD_FOREIGNKEY.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_CHECKCONSTRAINT.getSybaseKey()):
+            case(DBObjMapper.FOLDER_FIELD_UNIQUE.getSybaseKey()):
                 return new EntityParser()
 
             case(DBObjMapper.FOLDER_FIELD_TRIGGER.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_PROCEDURE.getSybaseKey()):
                 return new UtilitiesParser()
 
-            case(DBObjMapper.FOLDER_FIELD_FOREIGNKEY.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_CHECKCONSTRAINT.getSybaseKey()):
-            case(DBObjMapper.FOLDER_FIELD_UNIQUE.getSybaseKey()):
-                return new ConstraintParser()
+//            case(DBObjMapper.FOLDER_FIELD_FOREIGNKEY.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_CHECKCONSTRAINT.getSybaseKey()):
+//            case(DBObjMapper.FOLDER_FIELD_UNIQUE.getSybaseKey()):
+//                return new ConstraintParser()
 
             case(DBObjMapper.FOLDER_FIELD_INDEX.getSybaseKey()):
                 return new IndexParser()

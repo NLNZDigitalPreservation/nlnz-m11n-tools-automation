@@ -65,10 +65,16 @@ class SybaseRegexBuilder implements RegexBuilder {
         switch(fieldName){
             case(DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case(DBObjMapper.REGEX_TYPE.getObjKey()):
             case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_ACTION.getObjKey()):
-            case(DBObjMapper.REGEX_FIELDS.getObjKey()):case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
             case(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey()):
                 //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+)
-                regexString = String.format("(?i)(?i)(%s|%s|%s|%s) (\\S+) (\\S+) \\((.*)\\)",
+                regexString = String.format("(?i)(%s|%s|%s|%s) (\\S+) (\\S+)",
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
+                        DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
+                break
+
+            case(DBObjMapper.REGEX_FIELDS.getObjKey()):case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
+                //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+) \((.*)\)
+                regexString = String.format("(?i)(%s|%s|%s|%s) (\\S+) (\\S+) \\((.*)\\)",
                         DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
                         DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
                 break

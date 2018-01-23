@@ -15,7 +15,7 @@ class SybaseWrapper implements Wrapper {
     WrapperUtil wrapperUtil = new WrapperUtil()
 
     @Override
-    Object parse(String splitFoldersDir) {
+    MigrateWrapper parse(String splitFoldersDir) {
         MigrateWrapper migrateWrapper = new MigrateWrapper()
 
         List<String> splitFolderNames = parserUtil.getAllFolderNames(splitFoldersDir)
@@ -28,13 +28,17 @@ class SybaseWrapper implements Wrapper {
             boolean isFirstFile = true
 
             for (String splitFileName : splitFileNames) {
+                String splitFilePath = splitFolderPath + File.separator + splitFileName
+                System.out.println("splitFileName: " + splitFileName)
+                System.out.println("splitFilePath: " + splitFilePath)
+
                 Parser parser = parserUtil.getParser(splitFolderName)
                 if (isFirstFile) {
-                    migrateWrapper.setSchema(parserUtil.getSchema(new File(splitFileName)))
+                    migrateWrapper.setSchema(parserUtil.getSchema(new File(splitFilePath)))
                     isFirstFile = false
                 }
 
-                Object dataModelObj = parser.parse(new File(splitFileName))
+                Object dataModelObj = parser.parse(new File(splitFilePath))
                 String dataModelName = wrapperUtil.getDataModelName(dataModelObj)
                 fieldMap.put(dataModelName, dataModelObj)
             }

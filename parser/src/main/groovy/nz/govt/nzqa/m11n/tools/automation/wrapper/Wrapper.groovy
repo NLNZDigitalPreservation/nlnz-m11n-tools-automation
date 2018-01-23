@@ -1,6 +1,8 @@
 package nz.govt.nzqa.m11n.tools.automation.wrapper
 
+import nz.govt.nzqa.dbmigrate.model.MigrateWrapper
+
 interface Wrapper {
 
-    Object parse(String splitFoldersDir)
+    MigrateWrapper parse(String splitFoldersDir)
 }

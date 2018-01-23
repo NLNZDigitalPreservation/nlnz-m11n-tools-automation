@@ -128,6 +128,7 @@ class EntityParserTest {
         for (String constraintString : constraintStrings){
             Constraint constraint = constraintParser.parse(constraintString)
             constraint.setAction('CREATE')
+            constraint.setType('PK')
             constraintList.add(constraint)
         }
 
