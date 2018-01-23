@@ -1,6 +1,5 @@
 package nz.govt.nzqa.m11n.tools.automation.regex
 
-import com.sun.corba.se.impl.dynamicany.DynValueImpl
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.m11n.tools.automation.parser.sybase.AttributeParser
 import nz.govt.nzqa.m11n.tools.automation.parser.sybase.ConstraintParser
@@ -170,7 +169,18 @@ class SybaseRegexBuilder implements RegexBuilder {
 
     @Override
     String buildIndexRegex(String fieldName, String parameter) {
-        return null
+        String regexString = ''
+
+        switch(fieldName) {
+            case (DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case (DBObjMapper.REGEX_ACTION.getObjKey()):
+            case (DBObjMapper.REGEX_NAME.getObjKey()):case (DBObjMapper.REGEX_TABLE_NAME.getObjKey()):
+            case(DBObjMapper.REGEX_FIELD_NAME.getObjKey()):
+                //(?i)(CREATE|DROP) (.*) INDEX (\S+) ON ((\S+)\((.*)\)|\S+)
+                regexString = String.format("(?i)(%s|%s) (.*) %s (\\S+) ON ((\\S+)\\((.*)\\)|\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
+                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.ENTITY_INDEX.getSybaseKey())
+                break
+        }
+        return regexString
     }
 
     @Override

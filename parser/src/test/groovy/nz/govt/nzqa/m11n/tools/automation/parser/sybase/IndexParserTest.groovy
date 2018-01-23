@@ -1,0 +1,50 @@
+package nz.govt.nzqa.m11n.tools.automation.parser.sybase
+
+import nz.govt.nzqa.dbmigrate.model.Index
+import org.junit.Before
+import org.junit.Test
+
+import static org.junit.Assert.assertEquals
+
+/**
+ * Tests the {@link nz.govt.nzqa.m11n.tools.automation.parser.sybase.EntityParser}.
+ */
+
+class IndexParserTest {
+
+    IndexParser indexParser = new IndexParser()
+
+    @Before
+    void setup() {
+        indexParser = new IndexParser()
+    }
+
+    @Test
+    void shouldParseIndexAndReturnCorrectIndex() {
+        String indexString = "CREATE NONCLUSTERED INDEX idx_accrd_item_status_hist_01 ON dbo.ACCREDITED_ITEM_STATUS_HIST" +
+                "(accredited_item_id,accredited_item_status,active_ind)"
+
+        Index index = new Index()
+        List<String> fields = Arrays.asList('accredited_item_id','accredited_item_status','active_ind')
+
+        index.setType('NONCLUSTERED')
+        index.setName('idx_accrd_item_status_hist_01')
+        index.setAction('CREATE')
+        index.setDatabaseName('dbo')
+        index.setTableName('ACCREDITED_ITEM_STATUS_HIST')
+        index.setFieldNames(fields)
+//        index.setWithClause()
+
+        Index testIndex = indexParser.parse(indexString)
+
+        assertEquals(index.getType(), testIndex.getType())
+        assertEquals(index.getName(), testIndex.getName())
+        assertEquals(index.getAction(), testIndex.getAction())
+        assertEquals(index.getDatabaseName(), testIndex.getDatabaseName())
+        assertEquals(index.getTableName(), testIndex.getTableName())
+        assertEquals(index.getFieldNames(), testIndex.getFieldNames())
+//        assertEquals(index.getWithClause(), testIndex.getWithClause())
+    }
+
+
+}

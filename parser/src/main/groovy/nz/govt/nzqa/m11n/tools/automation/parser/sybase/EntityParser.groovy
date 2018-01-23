@@ -20,6 +20,7 @@ import java.util.regex.Pattern
 class EntityParser implements Parser{
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
+    ParserUtil util = new ParserUtil()
 
     String getDatabaseName(String sqlStatement){
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey())
@@ -156,7 +157,6 @@ class EntityParser implements Parser{
     @Override
     Entity parse(File file){
         Entity entity = new Entity()
-        ParserUtil util = new ParserUtil()
         List<String> grantStatements = new ArrayList<>()
         List<String> statements = util.getStatementsFromFile(file)
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
