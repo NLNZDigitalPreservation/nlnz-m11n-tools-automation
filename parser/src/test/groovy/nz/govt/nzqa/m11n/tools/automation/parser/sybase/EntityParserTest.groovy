@@ -61,9 +61,6 @@ class EntityParserTest {
         entity.setType('TABLE')
         entity.setName('ACADEMIC_YEAR')
         entity.setAction('CREATE')
-//        entity.setFields(fieldsMap)
-//        entity.setConstraints(constraintsMap)
-//        entity.setGrants(grantsMap)
         entity.setLocks(Arrays.asList('DATAROWS'))
 
         Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileCreateTable.sql"))
@@ -186,10 +183,6 @@ class EntityParserTest {
         entity.setType('TABLE')
         entity.setName('ACRD_INHERITANCE_MAP')
         entity.setAction('DROP')
-//        entity.setFields(fieldsMap)
-//        entity.setConstraints(constraintsMap)
-//        entity.setGrants(grantsMap)
-//        entity.setLocks(Arrays.asList('DATAROWS'))
 
         Entity testEntity = entityParser.parse(sqlStatement)
 
@@ -210,10 +203,6 @@ class EntityParserTest {
         entity.setOperationType('DefaultValue')
         entity.setDataType('int')
         entity.setQueryValue('1')
-//        entity.setFields(fieldsMap)
-//        entity.setConstraints(constraintsMap)
-//        entity.setGrants(grantsMap)
-//        entity.setLocks(Arrays.asList('DATAROWS'))
 
         Entity testEntity = entityParser.parse(sqlStatement)
 
@@ -237,12 +226,7 @@ class EntityParserTest {
         entity.setName('w_providers_all_names')
         entity.setAction('CREATE')
         entity.setOperationType('Derived')
-//        entity.setDataType('')
         entity.setQueryValue('SELECT p.provider_id,  pr.end_date FROM  PROVIDER p WHERE  p.provider_id = pr.perorg_role_id')
-//        entity.setFields(fieldsMap)
-//        entity.setConstraints(constraintsMap)
-//        entity.setGrants(grantsMap)
-//        entity.setLocks(Arrays.asList('DATAROWS'))
 
         Entity testEntity = entityParser.parse(sqlStatement)
 
@@ -260,17 +244,11 @@ class EntityParserTest {
         String sqlStatement = "EXEC sp_addtype 'wwwaddr','varchar(255)','NULL'"
 
         Entity entity = new Entity()
-//        entity.setDatabaseName('')
-        entity.setType('DataType')
+        entity.setType('type')
         entity.setName('wwwaddr')
         entity.setAction('ADD')
-//        entity.setOperationType('')
         entity.setDataType('varchar(255)')
         entity.setQueryValue('NULL')
-//        entity.setFields(fieldsMap)
-//        entity.setConstraints(constraintsMap)
-//        entity.setGrants(grantsMap)
-//        entity.setLocks(Arrays.asList('DATAROWS'))
 
         Entity testEntity = entityParser.parse(sqlStatement)
 
@@ -284,8 +262,141 @@ class EntityParserTest {
     }
 
     @Test
+    void shouldReturnAlterTableFKEntity(){
+        String sqlStatement = 'ALTER TABLE dbo.ACRD_INHERITANCE_MAP ADD CONSTRAINT FK_ACRD_INHERIT_MAP_PROVIDER_1 ' +
+                'FOREIGN KEY (inheriting_moe_provider_id,inheriting_location) REFERENCES dbo.PROVIDER (moe_provider_id,location)'
+
+        Entity entity = new Entity()
+        entity.setDatabaseName('dbo')
+        entity.setType('TABLE')
+        entity.setName('ACRD_INHERITANCE_MAP')
+        entity.setAction('ALTER')
+
+        Constraint constraint = new Constraint()
+        constraint.setType('FK')
+        constraint.setName('FK_ACRD_INHERIT_MAP_PROVIDER_1')
+        constraint.setAction('ADD')
+        List<String> fields = Arrays.asList('inheriting_moe_provider_id','inheriting_location')
+        constraint.setFields(fields)
+        constraint.setTableName('ACRD_INHERITANCE_MAP')
+        constraint.setReferenceTableName('PROVIDER')
+        List<String> refFields = Arrays.asList('moe_provider_id', 'location')
+        constraint.setReferenceFields(refFields)
+
+        Map<String, Constraint> constraintMap = new HashMap<>()
+        constraintMap.put(constraint.getName(), constraint)
+        entity.setConstraints(constraintMap)
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+
+        for (String key : entity.getConstraints().keySet()){
+            Constraint testConstraint = testEntity.getConstraints().get(key)
+            assertEquals(constraint.getType(), testConstraint.getType())
+            assertEquals(constraint.getName(), testConstraint.getName())
+            assertEquals(constraint.getAction(), testConstraint.getAction())
+            assertEquals(constraint.getFields(), testConstraint.getFields())
+            assertEquals(constraint.getTableName(), testConstraint.getTableName())
+            assertEquals(constraint.getReferenceTableName(), testConstraint.getReferenceTableName())
+            assertEquals(constraint.getReferenceFields(), testConstraint.getReferenceFields())
+        }
+//        assertEquals(entity.getOperationType(), testEntity.getOperationType())
+//        assertEquals(entity.getDataType(), testEntity.getDataType())
+//        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+
+    }
+
+    @Test
+    void shouldReturnAlterTableUniqueKeyEntity(){
+        String sqlStatement = 'ALTER TABLE dbo.ASSESS_SESSION_RELATIONSHIP ADD CONSTRAINT AK_ASSESS_SESSION_RELATIONSHIP ' +
+                'UNIQUE NONCLUSTERED (assessment_session_id,related_assessment_session_id,assessment_session_rel_type)'
+
+        Entity entity = new Entity()
+        entity.setDatabaseName('dbo')
+        entity.setType('TABLE')
+        entity.setName('ASSESS_SESSION_RELATIONSHIP')
+        entity.setAction('ALTER')
+
+        Constraint constraint = new Constraint()
+        constraint.setType('UNIQUE')
+        constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
+        constraint.setSubType('NONCLUSTERED')
+        constraint.setAction('ADD')
+        List<String> fields = Arrays.asList('assessment_session_id','related_assessment_session_id', 'assessment_session_rel_type')
+        constraint.setFields(fields)
+        constraint.setTableName('ASSESS_SESSION_RELATIONSHIP')
+
+        Map<String, Constraint> constraintMap = new HashMap<>()
+        constraintMap.put(constraint.getName(), constraint)
+        entity.setConstraints(constraintMap)
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+
+        for (String key : entity.getConstraints().keySet()){
+            Constraint testConstraint = testEntity.getConstraints().get(key)
+            assertEquals(constraint.getType(), testConstraint.getType())
+            assertEquals(constraint.getName(), testConstraint.getName())
+            assertEquals(constraint.getSubType(), testConstraint.getSubType())
+            assertEquals(constraint.getAction(), testConstraint.getAction())
+            assertEquals(constraint.getFields(), testConstraint.getFields())
+            assertEquals(constraint.getTableName(), testConstraint.getTableName())
+        }
+//        assertEquals(entity.getOperationType(), testEntity.getOperationType())
+//        assertEquals(entity.getDataType(), testEntity.getDataType())
+//        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+
+    }
+
+    @Test
+    void shouldReturnCreateRuleEntity(){
+        String sqlStatement = 'CREATE RULE dbo.R_yn AS @column in (0,1)'
+
+        Entity entity = new Entity()
+        entity.setDatabaseName('dbo')
+        entity.setType('RULE')
+        entity.setName('R_yn')
+        entity.setQueryValue('@column in (0,1)')
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+    @Test
+    void shouldReturnCreateUserEntity(){
+        String sqlStatement = "EXEC sp_adduser 'batch_user','batch_user','public'"
+
+        Entity entity = new Entity()
+        entity.setType('user')
+        entity.setName('batch_user')
+        entity.setAction('ADD')
+        entity.setDataType('batch_user')
+        entity.setQueryValue('public')
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+        assertEquals(entity.getDataType(), testEntity.getDataType())
+        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+    @Test
     void shouldExtractCorrectDatatypeForSysType(){
-        String sqlStatement = 'EXEC sp_addtype \'dt\',\'datetime\',\'NULL\''
+        String sqlStatement = "EXEC sp_addtype 'dt','datetime','NULL'"
         String dataType = 'datetime'
         String testDataType = entityParser.getDataType(sqlStatement)
         assertEquals(dataType, testDataType)

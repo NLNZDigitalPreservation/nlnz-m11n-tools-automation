@@ -9,6 +9,7 @@ import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 class ConstraintParser implements Parser {
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
+    ParserUtil util = new ParserUtil()
 
     String getType(String sqlStatement){
         String regex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_TYPE.getObjKey())
@@ -133,6 +134,19 @@ class ConstraintParser implements Parser {
     @Override
     Constraint parse(File file) {
         Constraint constraint = new Constraint()
+        List<String> sqlStatements = util.getStatementsFromFile(file)
+
+        for(String sqlStatement : sqlStatements){
+            constraint.setType(getType(sqlStatement))
+            constraint.setName(getName(sqlStatement))
+            constraint.setSubType(getSubType(sqlStatement))
+            constraint.setAction(getAction(sqlStatement))
+            constraint.setFields(getFields(sqlStatement))
+            constraint.setTableName(getTableName(sqlStatement))
+            constraint.setReferenceTableName(getReferenceTableName(sqlStatement))
+            constraint.setReferenceFields(getReferenceFields(sqlStatement))
+            constraint.setCriteria(getCriteria(sqlStatement))
+        }
         return constraint
     }
 }

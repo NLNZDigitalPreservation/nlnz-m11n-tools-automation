@@ -94,4 +94,30 @@ class ConstraintParserTest {
 //        assertEquals(constraint.setReferenceTableName(), generatedConstraint.setReferenceTableName())
 //        assertEquals(constraint.setReferenceFields(), generatedConstraint.setReferenceFields())
     }
+
+    @Test
+    void shouldReturnConstraintWithDrop(){
+
+        String constraintString = 'ALTER TABLE dbo.ASSESS_SESSION_RELATIONSHIP ' +
+                'DROP CONSTRAINT AK_ASSESS_SESSION_RELATIONSHIP'
+        Constraint constraint = new Constraint()
+        constraint.setType('')
+        constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
+        constraint.setAction('DROP')
+        constraint.setSubType('')
+        constraint.setFields(Arrays.asList(''))
+        constraint.setTableName('ASSESS_SESSION_RELATIONSHIP')
+
+        Constraint generatedConstraint = constraintParser.parse(constraintString)
+
+        assertEquals(constraint.getType(), generatedConstraint.getType())
+        assertEquals(constraint.getName(), generatedConstraint.getName())
+        assertEquals(constraint.getSubType(), generatedConstraint.getSubType())
+        assertEquals(constraint.getAction(), generatedConstraint.getAction())
+        assertEquals(constraint.getFields(), generatedConstraint.getFields())
+        assertEquals(constraint.getTableName(), generatedConstraint.getTableName())
+//        assertEquals(constraint.setReferenceTableName(), generatedConstraint.setReferenceTableName())
+//        assertEquals(constraint.setReferenceFields(), generatedConstraint.setReferenceFields())
+
+    }
 }
