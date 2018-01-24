@@ -65,11 +65,21 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case(DBObjMapper.REGEX_TYPE.getObjKey()):
             case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_ACTION.getObjKey()):
             case(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey()):
-                //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+)
-                regexString = String.format("(?i)(%s|%s|%s|%s) (\\S+) (\\S+)",
-                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
-                        DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
+                switch(parameter) {
+                    case (DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
+                        //(?i)EXEC sp_(\S+) (.*)
+                        regexString = "(?i)EXEC sp_(\\S+) (.*)"
+                        break
+
+                    default:
+                        //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+)
+                        regexString = String.format("(?i)(%s|%s|%s|%s) (\\S+) (\\S+)",
+                                DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
+                                DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
+                        break
+                }
                 break
+
 
             case(DBObjMapper.REGEX_FIELDS.getObjKey()):case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
                 //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+) \((.*)\)
@@ -104,9 +114,19 @@ class SybaseRegexBuilder implements RegexBuilder {
                 break
 
             case(DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
-                //(?i)EXEC sp_add\S+ (.*)
-                regexString = String.format("(?i)EXEC %s\\S+ (.*)",DBObjMapper.SP_ADD.getSybaseKey())
-                break
+                switch(parameter){
+                    case(DBObjMapper.ENTITY_DEFAULT.getObjKey()):
+                        //(?i)DEFAULT (.*) AS (.*)
+                        regexString = String.format("(?i)%s (.*) %s (.*)", DBObjMapper.ENTITY_DEFAULT.getSybaseKey(),
+                                DBObjMapper.AS.getSybaseKey())
+                        break
+
+                    case(DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
+                        //(?i)EXEC sp_(\S+) (.*)
+                        regexString = regexString = "(?i)EXEC sp_(\\S+) (.*)"
+                        break
+                }
+
         }
         return regexString
     }

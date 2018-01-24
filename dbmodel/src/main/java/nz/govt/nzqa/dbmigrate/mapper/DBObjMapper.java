@@ -119,9 +119,6 @@ public class DBObjMapper {
     public static ObjMapper ENTITY_OPERATION_TYP_DERIVED = new ObjMapper("Derived", "", "");
     public static ObjMapper ENTITY_OPERATION_TYP_DEFAULT_VALUE = new ObjMapper("DefaultValue", "", "");
 
-    public static ObjMapper SP_ADD = new ObjMapper("", "sp_add", "");
-
-
 //    public List<String> OPERATORS
 
     private static class ObjMapper {

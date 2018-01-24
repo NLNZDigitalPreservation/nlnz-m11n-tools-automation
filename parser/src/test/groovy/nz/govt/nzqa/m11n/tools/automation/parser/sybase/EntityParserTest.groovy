@@ -43,16 +43,16 @@ class EntityParserTest {
         List<Constraint> constraintList = getConstraintList(constraintOneString)
 
         String grantOneString =
-                'GRANT REFERENCES ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO read_only ' +
-                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO rma_users ' +
-                'GRANT INSERT ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT DELETE ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT UPDATE ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT DELETE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT TRUNCATE TABLE ON dbo.ACADEMIC_YEAR TO eqa_user ' +
-                'GRANT UPDATE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user ' +
+                'GRANT REFERENCES ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO read_only\n' +
+                'GRANT SELECT ON dbo.ACADEMIC_YEAR TO rma_users\n' +
+                'GRANT INSERT ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT DELETE ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT UPDATE ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT DELETE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT TRUNCATE TABLE ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
+                'GRANT UPDATE STATISTICS ON dbo.ACADEMIC_YEAR TO eqa_user\n' +
                 'GRANT TRANSFER TABLE ON dbo.ACADEMIC_YEAR TO eqa_user'
         List<Relation> grantList = getRelationList(grantOneString)
 
@@ -71,6 +71,12 @@ class EntityParserTest {
         assertEquals(entity.getType(), testEntity.getType())
         assertEquals(entity.getName(), testEntity.getName())
         assertEquals(entity.getAction(), testEntity.getAction())
+//        assertEquals(entity.getOperationType(), testEntity.getOperationType())
+//        assertEquals(entity.getFields(), testEntity.getFields())
+//        assertEquals(entity.getDataType(), testEntity.getDataType())
+//        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+//        assertEquals(entity.getConstraints(), testEntity.getConstraints())
+//        assertEquals(entity.getGrants(), testEntity.getGrants())
 
         for(Attribute attribute : attributeList){
             assertEquals(attribute.getType(), testEntity.getFields().get(attribute.getName()).getType())
@@ -173,6 +179,111 @@ class EntityParserTest {
     }
 
     @Test
+    void shouldReturnDropTableEntity() {
+        String sqlStatement = 'DROP TABLE dbo.ACRD_INHERITANCE_MAP'
+        Entity entity = new Entity()
+        entity.setDatabaseName('dbo')
+        entity.setType('TABLE')
+        entity.setName('ACRD_INHERITANCE_MAP')
+        entity.setAction('DROP')
+//        entity.setFields(fieldsMap)
+//        entity.setConstraints(constraintsMap)
+//        entity.setGrants(grantsMap)
+//        entity.setLocks(Arrays.asList('DATAROWS'))
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+    }
+
+    @Test
+    void shouldReturnCreateDefaultEntity() {
+        String sqlStatement = 'CREATE DEFAULT dbo.default_y AS 1'
+        Entity entity = new Entity()
+        entity.setDatabaseName('dbo')
+        entity.setType('DEFAULT')
+        entity.setName('default_y')
+        entity.setAction('CREATE')
+        entity.setOperationType('DefaultValue')
+        entity.setDataType('int')
+        entity.setQueryValue('1')
+//        entity.setFields(fieldsMap)
+//        entity.setConstraints(constraintsMap)
+//        entity.setGrants(grantsMap)
+//        entity.setLocks(Arrays.asList('DATAROWS'))
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+        assertEquals(entity.getOperationType(), testEntity.getOperationType())
+        assertEquals(entity.getDataType(), testEntity.getDataType())
+        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+    @Test
+    void shouldReturnCreateViewEntity(){
+        String sqlStatement = 'CREATE VIEW dbo.w_providers_all_names AS ' +
+                'SELECT p.provider_id,  pr.end_date FROM  PROVIDER p WHERE  p.provider_id = pr.perorg_role_id'
+
+        Entity entity = new Entity()
+        entity.setDatabaseName('dbo')
+        entity.setType('VIEW')
+        entity.setName('w_providers_all_names')
+        entity.setAction('CREATE')
+        entity.setOperationType('Derived')
+//        entity.setDataType('')
+        entity.setQueryValue('SELECT p.provider_id,  pr.end_date FROM  PROVIDER p WHERE  p.provider_id = pr.perorg_role_id')
+//        entity.setFields(fieldsMap)
+//        entity.setConstraints(constraintsMap)
+//        entity.setGrants(grantsMap)
+//        entity.setLocks(Arrays.asList('DATAROWS'))
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+        assertEquals(entity.getOperationType(), testEntity.getOperationType())
+//        assertEquals(entity.getDataType(), testEntity.getDataType())
+        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+    @Test
+    void shouldReturnCreateDatatypeEntity(){
+        String sqlStatement = "EXEC sp_addtype 'wwwaddr','varchar(255)','NULL'"
+
+        Entity entity = new Entity()
+//        entity.setDatabaseName('')
+        entity.setType('DataType')
+        entity.setName('wwwaddr')
+        entity.setAction('ADD')
+//        entity.setOperationType('')
+        entity.setDataType('varchar(255)')
+        entity.setQueryValue('NULL')
+//        entity.setFields(fieldsMap)
+//        entity.setConstraints(constraintsMap)
+//        entity.setGrants(grantsMap)
+//        entity.setLocks(Arrays.asList('DATAROWS'))
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+//        assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+//        assertEquals(entity.getOperationType(), testEntity.getOperationType())
+        assertEquals(entity.getDataType(), testEntity.getDataType())
+        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+    @Test
     void shouldExtractCorrectDatatypeForSysType(){
         String sqlStatement = 'EXEC sp_addtype \'dt\',\'datetime\',\'NULL\''
         String dataType = 'datetime'
@@ -216,7 +327,7 @@ class EntityParserTest {
 
     List<Relation> getRelationList(String grantOneString){
         List<Relation> grantList = new ArrayList<>()
-        String[] grantStrings = grantOneString.split(" ")
+        String[] grantStrings = grantOneString.split("\n")
         for (String grantString : grantStrings){
             grantList.add(relationParser.parse(grantString))
         }
