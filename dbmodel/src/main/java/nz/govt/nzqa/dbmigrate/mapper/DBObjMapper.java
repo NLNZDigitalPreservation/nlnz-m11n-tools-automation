@@ -6,6 +6,8 @@ public class DBObjMapper {
     public static ObjMapper USE = new ObjMapper("", "USE", "USE");
     public static ObjMapper GO = new ObjMapper("", "GO", "GO");
     public static ObjMapper AS = new ObjMapper("", "AS", "AS");
+    public static ObjMapper NULL = new ObjMapper("", "NULL", "NULL");
+    public static ObjMapper NOT_NULL = new ObjMapper("", "NOT NULL", "NOT NULL");
 
     public static ObjMapper KEY_COLUMN = new ObjMapper("COLUMN", "Column", "COLUMN");
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
@@ -49,7 +51,15 @@ public class DBObjMapper {
 
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");
-    public static List<String> OPERATORS = new ArrayList<String>(Arrays.asList(">", ">=", "<", "<=", "="));
+    public static String OPERATOR_OR = "OR";
+    public static String OPERATOR_AND = "AND";
+    public static String OPERATOR_GREATER_THAN = ">";
+    public static String OPERATOR_GREATER_OR_EQUAL = ">=";
+    public static String OPERATOR_LESS_THAN = "<";
+    public static String OPERATOR_LESS_OR_EQAUL = "<=";
+    public static String OPERATOR_EQUAL = "=";
+    public static List<String> OPERATORS = new ArrayList<String>(Arrays.asList(OPERATOR_GREATER_THAN, OPERATOR_GREATER_OR_EQUAL,
+            OPERATOR_LESS_THAN, OPERATOR_LESS_OR_EQAUL, OPERATOR_EQUAL));
 
     public static String SPECIAL_OPERATOR_IN = "IN";
     public static String SPECIAL_OPERATOR_IS = "IS";
@@ -61,6 +71,10 @@ public class DBObjMapper {
 
     public static String VALUETYPE_INT = "int";
     public static String VALUETYPE_CHAR = "char";
+    public static String VALUETYPE_FIELD = "field";
+
+    public static ObjMapper TYPE_CHECK = new ObjMapper("Check", "", "");
+    public static ObjMapper TYPE_CHECK_WRAPPER = new ObjMapper("CheckWrapper", "", "");
 
     public static ObjMapper INDEX_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper INDEX_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
@@ -112,8 +126,15 @@ public class DBObjMapper {
     public static ObjMapper REGEX_REFERENCE_TABLE_NAME = new ObjMapper("ReferenceTableName", "", "");
     public static ObjMapper REGEX_REFERENCE_FIELDS = new ObjMapper("ReferenceFields", "", "");
     public static ObjMapper REGEX_CRITERIA = new ObjMapper("Criteria", "", "");
+    public static ObjMapper REGEX_OPERATION = new ObjMapper("Operation", "", "");
+    public static ObjMapper REGEX_VALUE_TYPE = new ObjMapper("ValueType", "", "");
+    public static ObjMapper REGEX_VALUES = new ObjMapper("Values", "", "");
+    public static ObjMapper REGEX_IS_COMPOSITE = new ObjMapper("IsComposite", "", "");
+    public static ObjMapper REGEX_JOIN_OPERATOR = new ObjMapper("JoinOperator", "", "");
+    public static ObjMapper REGEX_JOIN_CRITERIA = new ObjMapper("JoinCriteria", "", "");
     public static ObjMapper REGEX_ACTION_ENTITY = new ObjMapper("ActionEntity", "", "");
     public static ObjMapper REGEX_ACTION_UTILITIES = new ObjMapper("ActionUtilities", "", "");
+    public static ObjMapper REGEX_ACTION_CRITERIA = new ObjMapper("ActionCriteria", "", "");
 
     public static ObjMapper ENTITY_OPERATION_TYP_DIRECT = new ObjMapper("Direct", "", "");
     public static ObjMapper ENTITY_OPERATION_TYP_DERIVED = new ObjMapper("Derived", "", "");

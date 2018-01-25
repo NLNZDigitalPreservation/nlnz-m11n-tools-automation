@@ -5,6 +5,10 @@ import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 
 class ParserUtil {
 
+
+    private static final CLOSE_BRACKET = ")"
+    private static final OPEN_BRACKET = "("
+
     /**
      * Read the file line by line and extract lines between 'go' as a statement
      * @param file
@@ -159,5 +163,29 @@ class ParserUtil {
 
         }
         return schema
+    }
+
+
+    String getWrapperString(String workingSqlStatement){
+        int closeBracketIndex = workingSqlStatement.indexOf(CLOSE_BRACKET)
+        int openBracketIndex = closeBracketIndex
+
+        boolean openBracketFound = false
+
+        while(!openBracketFound && openBracketIndex > 0){
+            openBracketIndex --
+
+            if(workingSqlStatement[openBracketIndex] == OPEN_BRACKET){
+                openBracketFound = true
+            }
+        }
+
+        String wrapperString = (openBracketFound? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
+                workingSqlStatement.substring(0, closeBracketIndex + 1))
+//        System.out.println("WorkString: " + workingSqlStatement)
+//        System.out.println("WrapperString: " + wrapperString)
+
+        return wrapperString
+
     }
 }
