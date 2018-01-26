@@ -164,6 +164,8 @@ class CriteriaParser implements Parser {
 
                 while (childCriteriaMatcher.find()) {
                     String childCriteriaString = childCriteriaMatcher.group().replaceAll(/(\))\1+/, "\\)")
+                    System.out.println("CheckSqlStatement: " + checkSqlStatement)
+                    System.out.println("ChildString: " + childCriteriaString)
                     Criteria childCriteria = getChildCriteria(checkSqlStatement, childCriteriaString)
 
                     if(criteriaWrapperLinkedList.size() > 0){

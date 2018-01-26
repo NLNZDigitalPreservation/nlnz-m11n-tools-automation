@@ -2,6 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.m11n.tools.automation.parser.Parser
+import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 
 class ParserUtil {
 
@@ -167,8 +168,18 @@ class ParserUtil {
 
 
     String getWrapperString(String workingSqlStatement){
+        SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
+        String childCriteriaRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
+                DBObjMapper.SPECIAL_OPERATOR_IN)
+
+        def result = (workingSqlStatement =~childCriteriaRegex)
+
         int closeBracketIndex = workingSqlStatement.indexOf(CLOSE_BRACKET)
         int openBracketIndex = closeBracketIndex
+
+        if (result){
+            return OPEN_BRACKET + result[0][0] + CLOSE_BRACKET
+        }
 
         boolean openBracketFound = false
 
