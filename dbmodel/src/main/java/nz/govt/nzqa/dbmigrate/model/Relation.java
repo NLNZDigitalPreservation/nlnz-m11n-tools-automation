@@ -11,6 +11,8 @@ public class Relation {
     private String grantObjectName;
     private List<String> grantSubObjects;
 
+    private boolean isTypeReference; //Used to identify Custom Data Type default grant
+
     public String getType() {
         return type;
     }
@@ -67,6 +69,14 @@ public class Relation {
         this.grantSubObjects = grantSubObjects;
     }
 
+    public boolean isTypeReference() {
+        return isTypeReference;
+    }
+
+    public void setTypeReference(boolean typeReference) {
+        isTypeReference = typeReference;
+    }
+
     @Override
     public String toString() {
         StringBuffer buff = new StringBuffer("[type=" + type +
@@ -75,6 +85,7 @@ public class Relation {
                 ", grantTo=" + grantTo +
                 ", grantObjectDB=" + grantObjectDB +
                 ", grantObjectName=" + grantObjectName +
+                ", isTypeReference=" + isTypeReference +
                 ", grantSubObjects={");
                 for (String a: grantSubObjects) {
                     buff.append(a + ",");

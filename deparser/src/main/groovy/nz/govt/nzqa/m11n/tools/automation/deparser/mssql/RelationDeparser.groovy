@@ -2,6 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.deparser.mssql
 
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Relation
+import nz.govt.nzqa.m11n.tools.automation.deparser.mssql.base.Deparser
 
 class RelationDeparser implements Deparser{
 
@@ -24,16 +25,35 @@ class RelationDeparser implements Deparser{
         switch (relation.getType()) {
             case(DBObjMapper.KEY_GRANT.getObjKey()):
 
-                buff.append("\n ")
-                buff.append(DBObjMapper.KEY_GRANT.getMssqlKey())
-                buff.append(" $relation.action ")
-                buff.append(" ON ")
-                if (relation.getGrantObjectDB() != null) {
-                    buff.append(" [$relation.grantObjectDB].")
+                switch (relation.getAction()) {
+                    case (DBObjMapper.ACTION_CONNECT.getObjKey()):
+                        buff.append("\n ")
+                        buff.append(DBObjMapper.KEY_GRANT.getMssqlKey())
+                        buff.append(" $relation.action TO ")
+                        buff.append("[$relation.grantTo] ")
+                        if (relation.getGrantObjectDB() != null) {
+                            buff.append("AS [$relation.grantObjectDB]")
+                        }
+                        break
+                    default:
+                        buff.append("\n ")
+                        buff.append(DBObjMapper.KEY_GRANT.getMssqlKey())
+                        buff.append(" $relation.action ")
+                        buff.append("ON ")
+                        if (relation.isTypeReference()) {
+                            buff.append("TYPE::")
+                        }
+                        if (relation.getGrantObjectDB() != null) {
+                            buff.append("[$relation.grantObjectDB].")
+                        }
+                        buff.append("[$relation.grantObjectName] TO ")
+                        buff.append("[$relation.grantTo] ")
+                        if (relation.getGrantObjectDB() != null) {
+                            buff.append("AS [$relation.grantObjectDB]")
+                        }
+                        break
                 }
-                buff.append("[$relation.grantObjectName] TO ")
-                buff.append("[$relation.grantTo] ")
-                //TODO AS [dbo]
+
                 break
         }
 
