@@ -51,6 +51,10 @@ public class DBObjMapper {
 
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");
+    public static ObjMapper PARAM_INPUT_AND_OUTPUT = new ObjMapper("BOTH", "INOUT", "");
+    public static ObjMapper PARAM_OUTPUT = new ObjMapper("OUTPUT", "OUTPUT", "");
+    public static ObjMapper PARAM_INPUT = new ObjMapper("INPUT", "", "");
+
     public static String OPERATOR_OR = "OR";
     public static String OPERATOR_AND = "AND";
     public static String OPERATOR_GREATER_THAN = ">";
@@ -135,6 +139,8 @@ public class DBObjMapper {
     public static ObjMapper REGEX_ACTION_ENTITY = new ObjMapper("ActionEntity", "", "");
     public static ObjMapper REGEX_ACTION_UTILITIES = new ObjMapper("ActionUtilities", "", "");
     public static ObjMapper REGEX_ACTION_CRITERIA = new ObjMapper("ActionCriteria", "", "");
+    public static ObjMapper REGEX_TRIGGER_TABLE_NAME = new ObjMapper("TriggerTableName", "", "");
+    public static ObjMapper REGEX_TRIGGER_OPERATIONS = new ObjMapper("TriggerOperations", "", "");
 
     public static ObjMapper ENTITY_OPERATION_TYP_DIRECT = new ObjMapper("Direct", "", "");
     public static ObjMapper ENTITY_OPERATION_TYP_DERIVED = new ObjMapper("Derived", "", "");

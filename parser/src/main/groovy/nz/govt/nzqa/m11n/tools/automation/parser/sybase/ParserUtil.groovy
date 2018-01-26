@@ -22,7 +22,7 @@ class ParserUtil {
 
         file.eachLine { String line ->
             if (line.trim()) {
-                line = line.trim()
+                line = line.trim().replaceAll(/\s\s+/, '\\s')
                 if (line.equalsIgnoreCase(DBObjMapper.GO.getSybaseKey())) {
                     statements.add(statement)
                     newStatement = true
