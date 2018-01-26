@@ -373,7 +373,7 @@ class SybaseRegexBuilder implements RegexBuilder {
 
                     case(DBObjMapper.REGEX_CRITERIA.getObjKey()):
                         //(?i)(\w+) (IN|IS|>|<|>=|<=|=|BETWEEN) (NULL|NOT NULL|\S+ AND \S+|\(.*?\)|\S+)
-                        regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (%s|%s|\\S+ %s \\S+|\\(.*?\\)|\\S+)",
+                        regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (%s|%s|\\S+ %s \\S+|\\(.*?\\)|\\w+)",
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                                 DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                                 DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
@@ -397,7 +397,7 @@ class SybaseRegexBuilder implements RegexBuilder {
                 switch(parameter) {
                     case(DBObjMapper.SPECIAL_OPERATOR_IN):
                         //(?i)(\w+) (IN|IS|>|<|>=|<=|=|BETWEEN) (NULL|NOT NULL|\S+ AND \S+|\(.*?\)|\S+)
-                        regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (%s|%s|\\S+ %s \\S+|\\(.*?\\)|\\S+)",
+                        regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (%s|%s|\\S+ %s \\S+|\\(.*?\\)|\\w+)",
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                                 DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                                 DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
@@ -415,7 +415,7 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_FIELD_NAME.getObjKey()):case(DBObjMapper.REGEX_VALUES.getObjKey()):
             case(DBObjMapper.REGEX_OPERATION.getObjKey()):
                 //(?i)(\w+) (IN|IS|>|<|>=|<=|=|BETWEEN) (NULL|NOT NULL|\S+ AND \S+|\(.*?\)|\S+)
-                regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (%s|%s|\\S+ %s \\S+|\\(.*?\\)|\\S+)",
+                regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (%s|%s|\\S+ %s \\S+|\\(.*?\\)|\\w+)",
                         DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                         DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                         DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
@@ -448,7 +448,7 @@ class SybaseRegexBuilder implements RegexBuilder {
 
                     case(DBObjMapper.VALUETYPE_CHAR):
                         //(?i)(\w+) (IN|IS|>|<|>=|<=|=|BETWEEN) (\S+ AND \S+|\S+)
-                        regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (\\S+ %s \\S+|\\S+)",
+                        regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (\\S+ %s \\S+|\\w+)",
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                                 DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                                 DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
