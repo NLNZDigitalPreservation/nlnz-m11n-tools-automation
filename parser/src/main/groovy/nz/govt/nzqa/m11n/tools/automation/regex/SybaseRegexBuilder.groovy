@@ -193,13 +193,59 @@ class SybaseRegexBuilder implements RegexBuilder {
                         DBObjMapper.ENTITY_TRIGGER.getSybaseKey(), DBObjMapper.ENTITY_FUNCTION.getSybaseKey())
                 break
 
+            case(DBObjMapper.REGEX_TRIGGER_TABLE_NAME.getObjKey()):case(DBObjMapper.REGEX_TRIGGER_OPERATIONS.getObjKey()):
+                //(?i)CREATE TRIGGER (\S+) ON (\S+) FOR (.*) AS (.*)
+                regexString = String.format("(?i)%s %s (\\S+) ON (\\S+) FOR (.*) AS (.*)",
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ENTITY_TRIGGER.getSybaseKey())
+                break
+
+            case(DBObjMapper.REGEX_IN_FIELDS.getObjKey()):
+                //(?i)CREATE PROCEDURE (\S+) (.*) AS (.*)
+                regexString = String.format("(?i)%s %s (\\S+) (.*) AS (\\S+)",
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(),DBObjMapper.ENTITY_PROCEDURE.getSybaseKey())
+                break
+
+            case(DBObjMapper.REGEX_SQL.getObjKey()):
+                //(?i)CREATE .* AS (.*)
+                regexString = String.format("(?i)%s .* AS (.*)", DBObjMapper.ACTION_CREATE.getSybaseKey())
+                break
+
         }
         return regexString
     }
 
     @Override
     String buildParamRegex(String fieldName, String parameter) {
-        return null
+        String regexString = ''
+
+        switch(fieldName){
+            case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
+                //(?i)@(\S+) (\S+)
+                regexString = "(?i)@(\\S+) (\\S+)"
+                break
+
+            case(DBObjMapper.REGEX_DEFAULT_VALUE.getObjKey()):
+                //(?i)@(\S+) (\S+) = (\S+)
+                regexString = "@(\\S+) (\\S+) = (\\S+)"
+                break
+
+            case(DBObjMapper.REGEX_IN_OUT.getObjKey()):
+                switch(parameter){
+                    case(DBObjMapper.ENTITY_DEFAULT.getObjKey()):
+                        //(?i)@(\S+) (\S+) = (\S+) (OUTPUT|INOUT)
+                        regexString = String.format("(?i)@(\\S+) (\\S+) = (\\S+) (%s|%s)",
+                                DBObjMapper.PARAM_OUTPUT.getSybaseKey(),DBObjMapper.PARAM_INPUT_AND_OUTPUT.getSybaseKey())
+                        break
+
+                    default:
+                        //(?i)@(\S+) (\S+) (OUTPUT|INOUT)
+                        regexString = String.format("(?i)@(\\S+) (\\S+) (%s|%s)",
+                                DBObjMapper.PARAM_OUTPUT.getSybaseKey(),DBObjMapper.PARAM_INPUT_AND_OUTPUT.getSybaseKey())
+                        break
+                }
+                break
+        }
+        return regexString
     }
 
     @Override

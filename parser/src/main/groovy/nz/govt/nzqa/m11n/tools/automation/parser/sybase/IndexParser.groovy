@@ -96,15 +96,15 @@ class IndexParser implements Parser{
     @Override
     Index parse(File file){
         Index index = new Index()
-        List<String> statements = util.getStatementsFromFile(file)
-        for(String statement : statements){
-            index.setType(getType(statement))
-            index.setName(getName(statement))
-            index.setAction(getAction(statement))
-            index.setDatabaseName(getDatabaseName(statement))
-            index.setTableName(getTableName(statement))
-            index.setFieldNames(getFieldNames(statement))
-            index.setWithClause(getWithClause(statement))
+        List<String> sqlStatements = util.getStatementsFromFile(file)
+        for(String sqlStatement : sqlStatements){
+            index.setType(getType(sqlStatement))
+            index.setName(getName(sqlStatement))
+            index.setAction(getAction(sqlStatement))
+            index.setDatabaseName(getDatabaseName(sqlStatement))
+            index.setTableName(getTableName(sqlStatement))
+            index.setFieldNames(getFieldNames(sqlStatement))
+            index.setWithClause(getWithClause(sqlStatement))
         }
 
         return index
