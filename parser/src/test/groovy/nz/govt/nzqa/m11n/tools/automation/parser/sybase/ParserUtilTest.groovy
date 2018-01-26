@@ -26,18 +26,15 @@ class ParserUtilTest {
     @Test
     void shouldReturnOneStatement() {
         String statement = 'USE eqa_prod'
-        List<String> statements = parserUtil.getStatementsFromFile(new File('parser/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileUseSchema.sql'))
+        List<String> statements = parserUtil.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileUseSchema.sql'))
         assertTrue('Return exactly one statement', statements.size() == 1)
         assertEquals('Return the correct statement', statement, statements.get(0))
     }
 
     @Test
     void shouldReturnTwoStatement() {
-        List<String> expectedStatements = Files.readAllLines(Paths.get('parser/src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileCreateTable-expected.sql'))
-        List<String> statements = parserUtil.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/resource/parserUtilTestFileCreateTable.sql'))
-
-        System.out.println("Expected: " + expectedStatements)
-        System.out.println("Actual: " + statements)
+        List<String> expectedStatements = Files.readAllLines(Paths.get('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileCreateTable-expected.sql'))
+        List<String> statements = parserUtil.getStatementsFromFile(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileCreateTable.sql'))
 
         assertEquals('Return ' + expectedStatements.size() +' statements', expectedStatements.size(), statements.size())
 

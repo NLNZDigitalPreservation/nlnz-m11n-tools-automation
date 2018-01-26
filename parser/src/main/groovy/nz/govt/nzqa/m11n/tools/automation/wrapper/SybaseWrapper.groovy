@@ -29,11 +29,11 @@ class SybaseWrapper implements Wrapper {
 
             for (String splitFileName : splitFileNames) {
                 String splitFilePath = splitFolderPath + File.separator + splitFileName
-                System.out.println("splitFileName: " + splitFileName)
-                System.out.println("splitFilePath: " + splitFilePath)
+//                System.out.println("splitFileName: " + splitFileName)
+//                System.out.println("splitFilePath: " + splitFilePath)
 
                 Parser parser = parserUtil.getParser(splitFolderName)
-                if (isFirstFile) {
+                if (isFirstFile && (migrateWrapper.getSchema() == null || migrateWrapper.getSchema().isEmpty())) {
                     migrateWrapper.setSchema(parserUtil.getSchema(new File(splitFilePath)))
                     isFirstFile = false
                 }

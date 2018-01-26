@@ -271,6 +271,12 @@ class SybaseRegexBuilder implements RegexBuilder {
 
                 }
                 break
+
+            case(DBObjMapper.REGEX_WITH_CLAUSE.getObjKey()):
+            //(?i)WITH (.*)
+            regexString = "(?i)WITH (.*)"
+                break
+
         }
         return regexString
     }

@@ -56,7 +56,6 @@ class UtilitiesParser implements Parser {
                 new ArrayList<String>())
 
         for (String paramString : paramStrings){
-            System.out.println("ParamString: " + paramString)
             Param param = paramParser.parse(paramString)
             paramMap.put(param.getName(), param)
         }

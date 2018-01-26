@@ -113,14 +113,12 @@ class CriteriaParser implements Parser {
 
     LinkedList<Criteria> getJoinCriteriaForOutmostWrapper(String finalSqlStatement, Map<String, Criteria> wrapperMap){
         LinkedList<Criteria> criteriaLinkedList = new LinkedList<>()
-        System.out.println("FinalsqlStatement: " + finalSqlStatement)
         String wrapperRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_JOIN_CRITERIA.getObjKey())
         Pattern wrapperPattern = Pattern.compile(/$wrapperRegex/)
         Matcher wrapperMatcher = wrapperPattern.matcher(finalSqlStatement)
 
        while(wrapperMatcher.find()){
            String index = wrapperMatcher.group()
-           System.out.println("Criteria Index: " + index)
            Criteria criteriaWrapper = wrapperMap.get(index)
            criteriaLinkedList.add(criteriaWrapper)
        }
@@ -164,8 +162,6 @@ class CriteriaParser implements Parser {
                 Pattern childCriteriaPattern = Pattern.compile(/$childCriteriaRegex/)
                 Matcher childCriteriaMatcher = childCriteriaPattern.matcher(wrapperString)
 
-//                System.out.println("workingSqlStatement: " + workingSqlStatement)
-
                 while (childCriteriaMatcher.find()) {
                     String childCriteriaString = childCriteriaMatcher.group().replaceAll(/(\))\1+/, "\\)")
                     Criteria childCriteria = getChildCriteria(checkSqlStatement, childCriteriaString)
@@ -195,7 +191,6 @@ class CriteriaParser implements Parser {
 
     Criteria getChildCriteria(String sqlStatement, String childCriteriaString){
         Criteria childCriteria = new Criteria()
-//        System.out.println("childCriteriaString: " + childCriteriaString)
         childCriteria.setType(getType(childCriteriaString))
         childCriteria.setFieldName(getFieldName(childCriteriaString))
         childCriteria.setOperation(getOperation(childCriteriaString))

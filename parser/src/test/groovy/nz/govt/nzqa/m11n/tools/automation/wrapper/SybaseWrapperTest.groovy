@@ -38,10 +38,10 @@ class SybaseWrapperTest {
         String testDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource'
         MigrateWrapper testMigrateWrapper = sybaseWrapper.parse(testDir)
 
-        System.out.println("getTables size: " + testMigrateWrapper.getTables().size())
-        System.out.println("getTables keys: " + testMigrateWrapper.getTables().keySet())
-        System.out.println("getKeys size: " + testMigrateWrapper.getKeys().size())
-        System.out.println("getKeys keys: " + testMigrateWrapper.getKeys().keySet())
+//        System.out.println("getTables size: " + testMigrateWrapper.getTables().size())
+//        System.out.println("getTables keys: " + testMigrateWrapper.getTables().keySet())
+//        System.out.println("getKeys size: " + testMigrateWrapper.getKeys().size())
+//        System.out.println("getKeys keys: " + testMigrateWrapper.getKeys().keySet())
 
         assertEquals(migrateWrapper.getTables().size(), testMigrateWrapper.getTables().size())
         assertEquals(migrateWrapper.getTables().keySet(), testMigrateWrapper.getTables().keySet())

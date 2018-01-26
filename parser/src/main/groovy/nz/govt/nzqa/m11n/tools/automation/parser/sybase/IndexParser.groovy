@@ -87,8 +87,9 @@ class IndexParser implements Parser{
     }
 
     String getWithClause(String sqlStatement){
-        String withClause = ''
-        //TODO figure out how to get this field
+        String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_WITH_CLAUSE.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
+        String withClause = (result? result[0][1] : "")
         return withClause
     }
 

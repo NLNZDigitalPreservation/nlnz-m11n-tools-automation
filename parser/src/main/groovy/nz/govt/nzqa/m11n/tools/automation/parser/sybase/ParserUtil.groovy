@@ -182,8 +182,6 @@ class ParserUtil {
 
         String wrapperString = (openBracketFound? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
                 workingSqlStatement.substring(0, closeBracketIndex + 1))
-//        System.out.println("WorkString: " + workingSqlStatement)
-//        System.out.println("WrapperString: " + wrapperString)
 
         return wrapperString
 

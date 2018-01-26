@@ -8,7 +8,6 @@ import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 class ParamParser implements Parser{
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
-    ParserUtil util = new ParserUtil()
 
     String getName(String paramString){
         String regex = regexBuilder.buildParamRegex(DBObjMapper.REGEX_NAME.getObjKey())
