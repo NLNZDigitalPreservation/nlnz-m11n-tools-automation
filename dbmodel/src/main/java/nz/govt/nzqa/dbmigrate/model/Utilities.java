@@ -1,5 +1,6 @@
 package nz.govt.nzqa.dbmigrate.model;
 
+import java.util.List;
 import java.util.Map;
 
 public class Utilities {
@@ -11,6 +12,8 @@ public class Utilities {
     private String returnType;
     private String sql;
     private Map<String, Relation> grants;
+    private String triggerTableName;
+    private List<String> triggerOperations;
 
     public String getDatabaseName() {
         return databaseName;
@@ -76,6 +79,22 @@ public class Utilities {
         this.grants = grants;
     }
 
+    public String getTriggerTableName() {
+        return triggerTableName;
+    }
+
+    public void setTriggerTableName(String triggerTableName) {
+        this.triggerTableName = triggerTableName;
+    }
+
+    public List<String> getTriggerOperations() {
+        return triggerOperations;
+    }
+
+    public void setTriggerOperations(List<String> triggerOperations) {
+        this.triggerOperations = triggerOperations;
+    }
+
     @Override
     public String toString() {
         StringBuffer buff = new StringBuffer("[database=" + databaseName +
@@ -88,7 +107,13 @@ public class Utilities {
                 }
                 buff.append("}, returnType=" + returnType +
                 ", sql=" + sql +
-                ", grants={");
+                ", triggerTableName=" + triggerTableName +
+                ", triggerOperations={");
+                for (String optr: triggerOperations) {
+                    buff.append(optr + ",");
+                }
+                buff.append("}");
+                buff.append(", grants={");
                 for (Relation a: grants.values()) {
                     buff.append(a.toString() + ",");
                 }

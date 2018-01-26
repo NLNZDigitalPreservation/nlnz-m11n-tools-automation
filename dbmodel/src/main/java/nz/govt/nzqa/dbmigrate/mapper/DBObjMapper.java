@@ -12,13 +12,18 @@ public class DBObjMapper {
     public static ObjMapper KEY_COLUMN = new ObjMapper("COLUMN", "Column", "COLUMN");
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
     public static ObjMapper KEY_GRANT = new ObjMapper("GRANT", "GRANT", "GRANT");
+    public static ObjMapper KEY_INDEX = new ObjMapper("INDEX", "INDEX", "INDEX");
     public static ObjMapper KEY_LOCK = new ObjMapper("LOCK", "LOCK", "");
 
     public static ObjMapper ACTION_CREATE = new ObjMapper("CREATE", "CREATE", "CREATE");
+    public static ObjMapper ACTION_ALTER = new ObjMapper("ALTER", "ALTER", "ALTER");
     public static ObjMapper ACTION_ADD = new ObjMapper("ADD", "ADD", "WITH CHECK ADD");
     public static ObjMapper ACTION_DROP = new ObjMapper("DROP", "DROP", "DROP");
     public static ObjMapper ACTION_DROPONLY = new ObjMapper("DROPONLY", "DROP", "DROP");
-    public static ObjMapper ACTION_ALTER = new ObjMapper("ALTER", "ALTER", "ALTER");
+    public static ObjMapper ACTION_ADD_DATATYPE = new ObjMapper("ADDTYPE", "sp_addtype", "CREATE");
+    public static ObjMapper ACTION_DROP_DATATYPE = new ObjMapper("DROPTYPE", "sp_droptype", "DROP");
+    public static ObjMapper ACTION_ADD_USER = new ObjMapper("ADDUSER", "sp_adduser", "CREATE");
+    public static ObjMapper ACTION_ADD_MESSAGE = new ObjMapper("ADDMSG", "sp_addmessage", "CREATE");
     public static ObjMapper ACTION_SELECT = new ObjMapper("SELECT", "SELECT", "SELECT");
     public static ObjMapper ACTION_INSERT = new ObjMapper("INSERT", "INSERT", "INSERT");
     public static ObjMapper ACTION_UPDATE = new ObjMapper("UPDATE", "UPDATE", "UPDATE");
@@ -26,14 +31,22 @@ public class DBObjMapper {
     public static ObjMapper ACTION_TRUNCATE = new ObjMapper("TRUNCATE", "TRUNCATE", "TRUNCATE");
     public static ObjMapper ACTION_TRANSFER = new ObjMapper("TRANSFER", "TRANSFER", "TRANSFER");
     public static ObjMapper ACTION_REFERENCES = new ObjMapper("REFERENCES", "REFERENCES", "REFERENCES");
+    public static ObjMapper ACTION_EXECUTE = new ObjMapper("EXECUTE", "EXECUTE", "EXECUTE");
+    public static ObjMapper ACTION_CONNECT = new ObjMapper("CONNECT", "CONNECT", "CONNECT");
+
+    public static ObjMapper OPERATION_DIRECT = new ObjMapper("DIRECT", "", "");
+    public static ObjMapper OPERATION_DERIEVED = new ObjMapper("DERIEVED", "", "");
+    public static ObjMapper OPERATION_DEFAULT = new ObjMapper("DEFAULT", "", "");
 
     public static ObjMapper ENTITY_TABLE = new ObjMapper("TABLE", "TABLE", "TABLE");
+    public static ObjMapper ENTITY_KEY = new ObjMapper("KEY", "TABLE", "TABLE");
+    public static ObjMapper ENTITY_CONSTRAINT = new ObjMapper("CONSTRAINT", "TABLE", "TABLE");
     public static ObjMapper ENTITY_VIEW = new ObjMapper("VIEW", "VIEW", "VIEW");
     public static ObjMapper ENTITY_DEFAULT = new ObjMapper("DEFAULT", "DEFAULT", "DEFAULT");
     public static ObjMapper ENTITY_DATATYPE = new ObjMapper("DATATYPE", "sp_addtype", "TYPE");
-    public static ObjMapper ENTITY_GROUP = new ObjMapper("GROUP", "sp_addgroup", "TABLE");
-    public static ObjMapper ENTITY_USER = new ObjMapper("USER", "sp_adduser", "TABLE");
-    public static ObjMapper ENTITY_RULE = new ObjMapper("RULE", "RULE", "TABLE");
+    public static ObjMapper ENTITY_GROUP = new ObjMapper("GROUP", "sp_addgroup", "GROUP");
+    public static ObjMapper ENTITY_USER = new ObjMapper("USER", "sp_adduser", "USER");
+    public static ObjMapper ENTITY_RULE = new ObjMapper("RULE", "RULE", "RULE");
     public static ObjMapper ENTITY_MESSAGE = new ObjMapper("MESSAGE", "MESSAGE", "MESSAGE");
     public static ObjMapper ENTITY_INDEX= new ObjMapper("INDEX", "INDEX", "INDEX");
     public static ObjMapper ENTITY_PROCEDURE = new ObjMapper("PROCEDURE", "PROCEDURE", "PROCEDURE");
@@ -48,6 +61,7 @@ public class DBObjMapper {
     public static ObjMapper CONSTRAINT_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper CONSTRAINT_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
     public static ObjMapper CONSTRAINT_REFERENCES = new ObjMapper("REFERENCES", "REFERENCES", "REFERENCES");
+
 
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");
@@ -68,6 +82,7 @@ public class DBObjMapper {
 
     public static DataTypeMapper CRITERIA_VALUETYPE_INT = new DataTypeMapper("INT", "","", "(", ")");
     public static DataTypeMapper CRITERIA_VALUETYPE_CHAR = new DataTypeMapper("CHAR", "'", "'","'", "'");
+    public static DataTypeMapper CRITERIA_VALUETYPE_FIELD = new DataTypeMapper("FIELD", "","", "[", "]");
 
     public static String VALUETYPE_INT = "int";
     public static String VALUETYPE_CHAR = "char";
@@ -78,6 +93,13 @@ public class DBObjMapper {
 
     public static ObjMapper INDEX_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper INDEX_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
+
+    public static ObjMapper PARAM_IN = new ObjMapper("IN", "","");
+    public static ObjMapper PARAM_OUT = new ObjMapper("OUT", "OUTPUT", "OUTPUT");
+
+    public static ObjMapper UTILITIES_PROC = new ObjMapper("PROC", "PROCEDURE", "PROCEDURE");
+    public static ObjMapper UTILITIES_FUNCTION = new ObjMapper("FN", "FUNCTION", "FUNCTION");
+    public static ObjMapper UTILITIES_TRIGGER = new ObjMapper("TRIG", "TRIGGER", "TRIGGER");
 
     public static ObjMapper FOLDER_FIELD_DEFAULT = new ObjMapper("Defaults", "splitDefaults", "splitDefaults");
     public static ObjMapper FOLDER_FIELD_USERDATATYPE = new ObjMapper("CustomDataTypes", "splitUserDatatypes", "splitUserDatatypes");
@@ -236,4 +258,28 @@ public class DBObjMapper {
         }
 
     }
+
+    public static DataTypeConvertor SYBASE_MSSQL_DATATYPE_CONVERSION_MAP = new DataTypeConvertor();
+
+    private static class DataTypeConvertor {
+        Map<String, String> map = new HashMap<>();
+
+        private DataTypeConvertor(){
+            initializeDataTypeConversionMap();
+        }
+
+        void initializeDataTypeConversionMap() {
+            map.put("UNIVARCHAR", "NVARCHAR");
+        }
+
+        public String getMssqlForSybaseType(String dataType) {
+            return dataType != null ?
+                    (
+                            map.containsKey(dataType.toUpperCase()) ? map.get(dataType.toUpperCase()) : dataType.toUpperCase()
+                    ) : dataType;
+        }
+    }
+
+
+
 }

@@ -2,6 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.deparser.mssql
 
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Criteria
+import nz.govt.nzqa.m11n.tools.automation.deparser.mssql.base.Deparser
 
 class CriteriaDeparser implements Deparser{
 
@@ -63,6 +64,9 @@ class CriteriaDeparser implements Deparser{
                                     case (DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()):
                                         bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_CHAR))
                                         break
+                                    case (DBObjMapper.CRITERIA_VALUETYPE_FIELD.getDataTypeKey()):
+                                        bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_FIELD))
+                                        break
                                 }
 
                                 break
@@ -84,6 +88,9 @@ class CriteriaDeparser implements Deparser{
                                         case (DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()):
                                             bf.append(addValue( val, DBObjMapper.CRITERIA_VALUETYPE_CHAR))
                                             break
+                                        case (DBObjMapper.CRITERIA_VALUETYPE_FIELD.getDataTypeKey()):
+                                            bf.append(addValue( val, DBObjMapper.CRITERIA_VALUETYPE_FIELD))
+                                            break
                                     }
                                 }
                                 bf.append(" ) ")
@@ -104,6 +111,10 @@ class CriteriaDeparser implements Deparser{
                                     case (DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()):
                                         bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_CHAR))
                                         break
+
+                                    case (DBObjMapper.CRITERIA_VALUETYPE_FIELD.getDataTypeKey()):
+                                        bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_FIELD))
+                                        break
                                 }
                                 bf.append(" AND [$criteria.fieldName] <= " )
                                 switch (criteria.getValueType()) {
@@ -113,6 +124,10 @@ class CriteriaDeparser implements Deparser{
 
                                     case (DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()):
                                         bf.append(addValue( criteria.getValues().get(1), DBObjMapper.CRITERIA_VALUETYPE_CHAR))
+                                        break
+
+                                    case (DBObjMapper.CRITERIA_VALUETYPE_FIELD.getDataTypeKey()):
+                                        bf.append(addValue( criteria.getValues().get(1), DBObjMapper.CRITERIA_VALUETYPE_FIELD))
                                         break
                                 }
 

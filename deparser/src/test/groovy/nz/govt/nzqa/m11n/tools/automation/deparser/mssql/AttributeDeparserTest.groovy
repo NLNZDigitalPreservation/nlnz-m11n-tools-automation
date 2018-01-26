@@ -15,7 +15,8 @@ class AttributeDeparserTest {
         attribute.setType(DBObjMapper.KEY_COLUMN.getObjKey())
         attribute.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
         attribute.setName('inheriting_moe_provider_id')
-        attribute.setDataType('OBJECT_ID')
+        //attribute.setDataType('object_id')
+        attribute.setDataType('univarchar')
         attribute.setNull(false)
 
         deparser = new AttributeDeparser(attribute)

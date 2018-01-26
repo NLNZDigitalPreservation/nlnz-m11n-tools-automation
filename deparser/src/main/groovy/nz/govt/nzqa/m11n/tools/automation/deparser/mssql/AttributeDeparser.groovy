@@ -2,6 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.deparser.mssql
 
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Attribute
+import nz.govt.nzqa.m11n.tools.automation.deparser.mssql.base.Deparser
 
 class AttributeDeparser implements Deparser{
 
@@ -25,24 +26,37 @@ class AttributeDeparser implements Deparser{
                 // Do something
                 switch (attribute.getAction()) {
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
-                        buff.append("\n [$attribute.name] [$attribute.dataType] ")
-                        if (attribute.length != null) {
-                            if (attribute.fraction != null) {
-                                buff.append(" ($attribute.length, $attribute.length) ")
-                            } else {
-                                buff.append(" ($attribute.length) ")
-                            }
-                        }
-                        if (attribute.isNull()) {
-                            buff.append(" NULL")
-                        } else {
-                            buff.append(" NOT NULL")
-                        }
+                        buff.append(frameAttribute(DBObjMapper.ACTION_CREATE))
+                        break
+                    case (DBObjMapper.ACTION_ADD.getObjKey()):
+                        buff.append(frameAttribute(DBObjMapper.ACTION_ADD))
                         break
                 }
                 break
         }
 
         outputStatement = buff.toString();
+    }
+
+    String frameAttribute(DBObjMapper.ObjMapper action) {
+        StringBuffer buff = new StringBuffer("")
+        buff.append("\n ")
+        if (action.getObjKey() == DBObjMapper.ACTION_ADD.getObjKey()) {
+            buff.append(DBObjMapper.ACTION_ADD.getMssqlKey() + " ")
+        }
+        buff.append("[$attribute.name] [" + DBObjMapper.SYBASE_MSSQL_DATATYPE_CONVERSION_MAP.getMssqlForSybaseType(attribute.getDataType()) + "] ")
+        if (attribute.length != null) {
+            if (attribute.fraction != null) {
+                buff.append(" ($attribute.length, $attribute.length) ")
+            } else {
+                buff.append(" ($attribute.length) ")
+            }
+        }
+        if (attribute.isNull()) {
+            buff.append(" NULL")
+        } else {
+            buff.append(" NOT NULL")
+        }
+        return buff.toString()
     }
 }
