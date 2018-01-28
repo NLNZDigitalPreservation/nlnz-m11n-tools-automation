@@ -33,6 +33,9 @@ class SybaseWrapperTest {
         Map<String, Entity> keyMap = new HashMap<>()
         Entity fk = entityParser.parse(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitForeignKeys/splitTables-0-alter-dbo.ACADEMIC_YEAR_TYPE.sql'))
         keyMap.put(fk.getName(), fk)
+
+        Entity fk2 = entityParser.parse(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitForeignKeys/splitTables-2-alter-dbo.ACCREDITED_ITEM.sql'))
+        keyMap.put(fk2.getName(), fk2)
         migrateWrapper.setKeys(keyMap)
 
         String testDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource'
@@ -48,7 +51,8 @@ class SybaseWrapperTest {
         assertEquals(migrateWrapper.getTables().get('ACADEMIC_YEAR_TYPE').getAction(), 'CREATE')
 
         assertEquals(migrateWrapper.getKeys().keySet(), testMigrateWrapper.getKeys().keySet())
-        assertEquals(migrateWrapper.getKeys().get('ACADEMIC_YEAR').getAction(), 'ALTER')
+        assertEquals(migrateWrapper.getKeys().get('FK_ACCRED_ITEM_CREATE_CASE').getAction(), 'ALTER')
+        assertEquals(migrateWrapper.getKeys().get('FK_ACA_YEAR_ACA_YEAR_TYPE').getAction(), 'ALTER')
         assertEquals(migrateWrapper.getSchema(), testMigrateWrapper.getSchema())
 
     }
