@@ -268,7 +268,7 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('TABLE')
+        entity.setType('CONSTRAINT')
         entity.setName('ACRD_INHERITANCE_MAP')
         entity.setAction('ALTER')
 
@@ -317,7 +317,7 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('TABLE')
+        entity.setType('CONSTRAINT')
         entity.setName('ASSESS_SESSION_RELATIONSHIP')
         entity.setAction('ALTER')
 
@@ -430,6 +430,7 @@ class EntityParserTest {
             Constraint constraint = constraintParser.parse(constraintString)
             constraint.setAction('CREATE')
             constraint.setType('PK')
+            constraint.setTableName('ACADEMIC_YEAR')
             constraintList.add(constraint)
         }
 

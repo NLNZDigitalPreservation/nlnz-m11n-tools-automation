@@ -24,8 +24,11 @@ class EntityParser implements Parser{
 
     String getDatabaseName(String sqlStatement){
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey())
+        String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey(), DBObjMapper.ACTION_ALTER.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String databaseName = (result? result[0][3].toString().split("\\.")[0] : '')
+        def alterResult = (sqlStatement =~ /$alterRegex/)
+        String databaseName = (alterResult? alterResult[0][2].toString().split("\\.")[0]
+                : result? result[0][3].toString().split("\\.")[0] : '')
         return databaseName
     }
 
@@ -53,18 +56,19 @@ class EntityParser implements Parser{
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
         def alterResult = (sqlStatement =~ /$alterRegex/)
 
-        if (result){
+        if (alterResult){
+            String[] dbName = alterResult[0][2].toString().split("\\.")
+            name = (dbName.size() == 2? dbName[1]: '')
+        }
+
+        else if (result){
             String[] dbName = result[0][3].toString().split("\\.")
-            name = (dbName.size() == 2? dbName[1]: result[0][3].toString())
+            name = (dbName.size() == 2? dbName[1]: '')
         }
 
         else if (dataTypeResult){
             String[] nameTypeValue = dataTypeResult[0][3].toString().replaceAll("'|\\s", "").split(",")
             name = (nameTypeValue.size() == 3? nameTypeValue[0] : '')
-        }
-
-        else if (alterResult){
-            name = alterResult[0][5].toString()
         }
 
         return name

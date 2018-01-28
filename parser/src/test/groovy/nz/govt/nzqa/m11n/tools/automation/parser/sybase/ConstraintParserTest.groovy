@@ -128,7 +128,7 @@ class ConstraintParserTest {
                 "ADD CONSTRAINT CHK_CFN_CATEGORY_BSAS_ACCR_LVL " +
                 "CHECK (bsas_accreditation_level in ('01','02','03','04'))"
         Constraint constraint = new Constraint()
-        constraint.setType('')
+        constraint.setType('CHECK')
         constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
         constraint.setAction('DROP')
         constraint.setSubType('')
