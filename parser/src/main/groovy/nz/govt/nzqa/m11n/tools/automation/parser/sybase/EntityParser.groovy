@@ -207,6 +207,7 @@ class EntityParser implements Parser{
         for (String constraintString : constraintStrings){
             Constraint constraint = constraintParser.parse(constraintString)
             constraint.setAction(constraintParser.getAction(sqlStatement))
+            constraint.setTableName(constraintParser.getTableName(sqlStatement))
             constraintMap.put(constraint.getName(), constraint)
         }
 

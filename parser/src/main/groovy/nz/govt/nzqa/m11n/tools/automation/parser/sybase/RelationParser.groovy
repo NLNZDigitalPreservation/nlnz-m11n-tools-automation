@@ -5,6 +5,8 @@ import nz.govt.nzqa.dbmigrate.model.Relation
 import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 
+import java.lang.reflect.Array
+
 class RelationParser implements Parser{
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
@@ -54,8 +56,8 @@ class RelationParser implements Parser{
 
     List<String> getGrantSubObjects(String sqlStatement){
         def result = (sqlStatement =~ /$regex/)
-        List<String> grantSubObjects = Arrays.asList(result? result[0][4].toString()
-                .replaceAll("\\s|\\(|\\)", "").split(",") : '')
+        List<String> grantSubObjects = (result? Arrays.asList(result[0][4].toString()
+                .replaceAll("\\s|\\(|\\)", "").split(",")) : null)
         return grantSubObjects
     }
 
