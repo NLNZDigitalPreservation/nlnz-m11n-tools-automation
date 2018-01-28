@@ -25,7 +25,6 @@ class SybaseWrapper implements Wrapper {
             List<String> splitFileNames = parserUtil.getSqlFilesInDir(splitFolderPath)
             Map<String, Object> fieldMap = new HashMap<>()
             String fieldName = parserUtil.getFieldName(splitFolderName)
-            boolean isFirstFile = true
 
             for (String splitFileName : splitFileNames) {
                 String splitFilePath = splitFolderPath + File.separator + splitFileName
@@ -33,9 +32,8 @@ class SybaseWrapper implements Wrapper {
 //                System.out.println("splitFilePath: " + splitFilePath)
 
                 Parser parser = parserUtil.getParser(splitFolderName)
-                if (isFirstFile && (migrateWrapper.getSchema() == null || migrateWrapper.getSchema().isEmpty())) {
+                if (migrateWrapper.getSchema() == null || migrateWrapper.getSchema().isEmpty()) {
                     migrateWrapper.setSchema(parserUtil.getSchema(new File(splitFilePath)))
-                    isFirstFile = false
                 }
 
                 Object dataModelObj = parser.parse(new File(splitFilePath))

@@ -46,18 +46,25 @@ class EntityParser implements Parser{
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+        String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
+                DBObjMapper.ACTION_ALTER.getObjKey())
 
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
+        def alterResult = (sqlStatement =~ /$alterRegex/)
 
         if (result){
             String[] dbName = result[0][3].toString().split("\\.")
-            name = (dbName.size() == 2? dbName[1]: '')
+            name = (dbName.size() == 2? dbName[1]: result[0][3].toString())
         }
 
         else if (dataTypeResult){
             String[] nameTypeValue = dataTypeResult[0][3].toString().replaceAll("'|\\s", "").split(",")
             name = (nameTypeValue.size() == 3? nameTypeValue[0] : '')
+        }
+
+        else if (alterResult){
+            name = alterResult[0][5].toString()
         }
 
         return name
@@ -68,11 +75,18 @@ class EntityParser implements Parser{
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+        String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
+                DBObjMapper.ACTION_ALTER.getObjKey())
 
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
+        def alterResult = (sqlStatement =~ /$alterRegex/)
 
-        if (result){
+        if (alterResult){
+            action = DBObjMapper.ACTION_ALTER.getObjKey()
+        }
+
+        else if (result) {
             action = result[0][1].toString()
         }
 

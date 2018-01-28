@@ -72,11 +72,18 @@ class SybaseRegexBuilder implements RegexBuilder {
                                 DBObjMapper.ACTION_DROP.getObjKey())
                         break
 
+                    case(DBObjMapper.ACTION_ALTER.getObjKey()):
+                        //(?i)ALTER (\S+) (\S+) (ADD|DROP) (\S+) (\S+)
+                        regexString = String.format("(?i)%s (\\S+) (\\S+) (%s|%s) (\\S+) (\\S+)",
+                                DBObjMapper.ACTION_ALTER.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
+                                DBObjMapper.ACTION_DROPONLY.getSybaseKey())
+                        break
+
                     default:
-                        //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+)
-                        regexString = String.format("(?i)(%s|%s|%s|%s) (\\S+) (\\S+)",
+                        //(?i)(CREATE|ADD|DROP) (\S+) (\S+)
+                        regexString = String.format("(?i)(%s|%s|%s) (\\S+) (\\S+)",
                                 DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
-                                DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
+                                DBObjMapper.ACTION_DROPONLY.getSybaseKey())
                         break
                 }
                 break
