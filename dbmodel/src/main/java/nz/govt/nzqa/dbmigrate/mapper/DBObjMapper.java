@@ -71,6 +71,7 @@ public class DBObjMapper {
 
     public static String OPERATOR_OR = "OR";
     public static String OPERATOR_AND = "AND";
+    public static String OPERATOR_NOT = "NOT";
     public static String OPERATOR_GREATER_THAN = ">";
     public static String OPERATOR_GREATER_OR_EQUAL = ">=";
     public static String OPERATOR_LESS_THAN = "<";

@@ -1,8 +1,8 @@
 package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Attribute
 import nz.govt.nzqa.dbmigrate.model.Constraint
-import nz.govt.nzqa.dbmigrate.model.Criteria
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Relation
 import org.junit.Before
@@ -59,9 +59,9 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('TABLE')
+        entity.setType(DBObjMapper.ENTITY_TABLE.getObjKey())
         entity.setName('ACADEMIC_YEAR')
-        entity.setAction('CREATE')
+        entity.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
         entity.setLocks(Arrays.asList('DATAROWS'))
 
         Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileCreateTable.sql"))
@@ -181,9 +181,9 @@ class EntityParserTest {
         String sqlStatement = 'DROP TABLE dbo.ACRD_INHERITANCE_MAP'
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('TABLE')
+        entity.setType(DBObjMapper.ENTITY_TABLE.getObjKey())
         entity.setName('ACRD_INHERITANCE_MAP')
-        entity.setAction('DROP')
+        entity.setAction(DBObjMapper.ACTION_DROPONLY.getObjKey())
 
         Entity testEntity = entityParser.parse(sqlStatement)
 
@@ -198,11 +198,11 @@ class EntityParserTest {
         String sqlStatement = 'CREATE DEFAULT dbo.default_y AS 1'
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('DEFAULT')
+        entity.setType(DBObjMapper.ENTITY_DEFAULT.getObjKey())
         entity.setName('default_y')
-        entity.setAction('CREATE')
+        entity.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
         entity.setOperationType('DefaultValue')
-        entity.setDataType('int')
+        entity.setDataType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         entity.setQueryValue('1')
 
         Entity testEntity = entityParser.parse(sqlStatement)
@@ -223,9 +223,9 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('VIEW')
+        entity.setType(DBObjMapper.ENTITY_VIEW.getObjKey())
         entity.setName('w_providers_all_names')
-        entity.setAction('CREATE')
+        entity.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
         entity.setOperationType('Derived')
         entity.setQueryValue('SELECT p.provider_id,  pr.end_date FROM  PROVIDER p WHERE  p.provider_id = pr.perorg_role_id')
 
@@ -247,9 +247,9 @@ class EntityParserTest {
         Entity entity = new Entity()
         entity.setType('type')
         entity.setName('wwwaddr')
-        entity.setAction('ADD')
+        entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         entity.setDataType('varchar(255)')
-        entity.setQueryValue('NULL')
+        entity.setQueryValue(DBObjMapper.NULL.getSybaseKey())
 
         Entity testEntity = entityParser.parse(sqlStatement)
 
@@ -269,14 +269,14 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('KEY')
+        entity.setType(DBObjMapper.ENTITY_KEY.getObjKey())
         entity.setName('ACRD_INHERITANCE_MAP')
-        entity.setAction('ALTER')
+        entity.setAction(DBObjMapper.ACTION_ALTER.getObjKey())
 
         Constraint constraint = new Constraint()
-        constraint.setType('FK')
+        constraint.setType(DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey())
         constraint.setName('FK_ACRD_INHERIT_MAP_PROVIDER_1')
-        constraint.setAction('ADD')
+        constraint.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         List<String> fields = Arrays.asList('inheriting_moe_provider_id','inheriting_location')
         constraint.setFields(fields)
         constraint.setTableName('ACRD_INHERITANCE_MAP')
@@ -318,15 +318,15 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('KEY')
+        entity.setType(DBObjMapper.ENTITY_KEY.getObjKey())
         entity.setName('ASSESS_SESSION_RELATIONSHIP')
-        entity.setAction('ALTER')
+        entity.setAction(DBObjMapper.ACTION_ALTER.getObjKey())
 
         Constraint constraint = new Constraint()
-        constraint.setType('UNIQUE')
+        constraint.setType(DBObjMapper.CONSTRAINT_UNIQUE.getObjKey())
         constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
-        constraint.setSubType('NONCLUSTERED')
-        constraint.setAction('ADD')
+        constraint.setSubType(DBObjMapper.CONSTRAINT_NONCLUSTERED.getObjKey())
+        constraint.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         List<String> fields = Arrays.asList('assessment_session_id','related_assessment_session_id', 'assessment_session_rel_type')
         constraint.setFields(fields)
         constraint.setTableName('ASSESS_SESSION_RELATIONSHIP')
@@ -363,7 +363,7 @@ class EntityParserTest {
 
         Entity entity = new Entity()
         entity.setDatabaseName('dbo')
-        entity.setType('RULE')
+        entity.setType(DBObjMapper.ENTITY_RULE.getObjKey())
         entity.setName('R_yn')
         entity.setQueryValue('@column in (0,1)')
 
@@ -382,7 +382,7 @@ class EntityParserTest {
         Entity entity = new Entity()
         entity.setType('user')
         entity.setName('batch_user')
-        entity.setAction('ADD')
+        entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         entity.setDataType('batch_user')
         entity.setQueryValue('public')
 
@@ -424,8 +424,8 @@ class EntityParserTest {
         String[] attributeStrings = attributeOneString.split(",")
         for (String attributeString : attributeStrings){
             Attribute attribute = attributeParser.parse(attributeString)
-            attribute.setAction('CREATE')
-            attribute.setType('COLUMN')
+            attribute.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
+            attribute.setType(DBObjMapper.KEY_COLUMN.getObjKey())
             attributeList.add(attribute)
         }
 
@@ -437,8 +437,8 @@ class EntityParserTest {
         String[] constraintStrings = constraintOneString.split(",")
         for (String constraintString : constraintStrings){
             Constraint constraint = constraintParser.parse(constraintString)
-            constraint.setAction('CREATE')
-            constraint.setType('PK')
+            constraint.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
+            constraint.setType(DBObjMapper.CONSTRAINT_PRIMARYKEY.getObjKey())
             constraint.setTableName('ACADEMIC_YEAR')
             constraintList.add(constraint)
         }

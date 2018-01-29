@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 import org.junit.Before
 import org.junit.Test
@@ -71,6 +72,33 @@ class ParserUtilTest {
         String testWrapperString3 = parserUtil.getWrapperString(workingString3)
         assertEquals(wrapperString3, testWrapperString3)
 
+    }
+
+    @Test
+    void shouldIgnoreSpacesAndReturnCorrectAction(){
+        String actionString2 = 'dROP '
+        String actionString3 = 'ADD '
+        String actionString4 = ' Create '
+        String actionString5 = '='
+        String actionString6 = '= '
+
+        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString2))
+        assertEquals(DBObjMapper.ACTION_ADD.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString3))
+        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString4))
+        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyfromRawString(actionString5))
+        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyfromRawString(actionString6))
+    }
+
+    @Test
+    void shouldIgnoreSpacesAndReturnCorrectOperation(){
+        String opString1 = 'is'
+
+        assertEquals(DBObjMapper.SPECIAL_OPERATOR_IS, parserUtil.getOperatorObjKeyfromRawString(opString1))
+//        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString2))
+//        assertEquals(DBObjMapper.ACTION_ADD.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString3))
+//        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString4))
+//        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyfromRawString(actionString5))
+//        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyfromRawString(actionString6))
     }
 
 }

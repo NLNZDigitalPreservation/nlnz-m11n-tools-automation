@@ -173,11 +173,7 @@ class ParserUtil {
         String childCriteriaInOperatorRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
                 DBObjMapper.SPECIAL_OPERATOR_IN)
 
-//        String childCriteriaRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
-//                DBObjMapper.REGEX_CHECK_WRAPPER_WITH_CHILD_CRITERIA.getObjKey())
-
         def opInResult = (workingSqlStatement =~ childCriteriaInOperatorRegex)
-//        def result = (workingSqlStatement =~ childCriteriaRegex)
 
         int closeBracketIndex = workingSqlStatement.indexOf(CLOSE_BRACKET)
         int openBracketIndex = closeBracketIndex
@@ -186,21 +182,105 @@ class ParserUtil {
             return OPEN_BRACKET + opInResult[0][0] + CLOSE_BRACKET
         }
 
-//        else if (result) {
+        boolean openBracketFound = false
 
-            boolean openBracketFound = false
+        while (!openBracketFound && openBracketIndex > 0) {
+            openBracketIndex--
 
-            while (!openBracketFound && openBracketIndex > 0) {
-                openBracketIndex--
-
-                if (workingSqlStatement[openBracketIndex] == OPEN_BRACKET) {
-                    openBracketFound = true
-                }
+            if (workingSqlStatement[openBracketIndex] == OPEN_BRACKET) {
+                openBracketFound = true
             }
-            wrapperString = (openBracketFound ? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
-                    workingSqlStatement.substring(0, closeBracketIndex + 1))
-//        }
+        }
+        wrapperString = (openBracketFound ? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
+                workingSqlStatement.substring(0, closeBracketIndex + 1))
 
         return wrapperString
+    }
+
+    String getOperatorObjKeyfromRawString(String operatorString){
+        String cleanOperator = operatorString.replaceAll("\\s", "").toUpperCase()
+        String key = cleanOperator
+
+        switch(cleanOperator){
+            case(DBObjMapper.OPERATOR_OR):
+                key = DBObjMapper.OPERATOR_OR
+                break
+
+            case(DBObjMapper.OPERATOR_AND):
+                key = DBObjMapper.OPERATOR_AND
+                break
+
+            case(DBObjMapper.OPERATOR_NOT):
+                key = DBObjMapper.OPERATOR_NOT
+                break
+
+            case(DBObjMapper.SPECIAL_OPERATOR_IS):
+                key = DBObjMapper.SPECIAL_OPERATOR_IS
+                break
+
+            case(DBObjMapper.SPECIAL_OPERATOR_IN):
+                key = DBObjMapper.SPECIAL_OPERATOR_IN
+                break
+
+            case(DBObjMapper.SPECIAL_OPERATOR_BETWEEN):
+                key = DBObjMapper.SPECIAL_OPERATOR_BETWEEN
+                break
+        }
+
+        return key
+    }
+
+    String getActionObjKeyfromRawString(String actionString){
+
+        String cleanAction = actionString.replaceAll("\\s", "").toUpperCase()
+        String action = cleanAction
+
+        switch(cleanAction){
+            case(DBObjMapper.ACTION_DROP.getSybaseKey()):
+                action = DBObjMapper.ACTION_DROPONLY.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_CREATE.getSybaseKey()):
+                action = DBObjMapper.ACTION_CREATE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_ALTER.getSybaseKey()):
+                action = DBObjMapper.ACTION_ALTER.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_ADD.getSybaseKey()):
+                action = DBObjMapper.ACTION_ADD.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_SELECT.getSybaseKey()):
+                action = DBObjMapper.ACTION_SELECT.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_INSERT.getSybaseKey()):
+                action = DBObjMapper.ACTION_INSERT.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_UPDATE.getSybaseKey()):
+                action = DBObjMapper.ACTION_UPDATE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_DELETE.getSybaseKey()):
+                action = DBObjMapper.ACTION_DELETE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_TRUNCATE.getSybaseKey()):
+                action = DBObjMapper.ACTION_TRUNCATE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_TRANSFER.getSybaseKey()):
+                action = DBObjMapper.ACTION_TRANSFER.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_REFERENCES.getSybaseKey()):
+                action = DBObjMapper.ACTION_REFERENCES.getObjKey()
+                break
+    }
+        return action
+
     }
 }

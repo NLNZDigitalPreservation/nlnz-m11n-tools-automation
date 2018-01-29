@@ -88,22 +88,20 @@ class EntityParser implements Parser{
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
         def alterResult = (sqlStatement =~ /$alterRegex/)
 
+        String actionString = ''
+
         if (alterResult){
             action = DBObjMapper.ACTION_ALTER.getObjKey()
         }
 
         else if (result) {
-            action = result[0][1].toString()
+            actionString = result[0][1]
+            action = util.getActionObjKeyfromRawString(actionString)
         }
 
         else if (dataTypeResult){
-            if (dataTypeResult[0][1].toString().equalsIgnoreCase(DBObjMapper.ACTION_ADD.getObjKey())){
-                action = DBObjMapper.ACTION_ADD.getObjKey()
-            }
-            else if(dataTypeResult[0][1].toString().equalsIgnoreCase(DBObjMapper.ACTION_DROP.getObjKey())){
-                action = DBObjMapper.ACTION_DROP.getObjKey()
-            }
-
+            actionString = dataTypeResult[0][1]
+            action = util.getActionObjKeyfromRawString(actionString)
         }
 
         return action
@@ -120,7 +118,7 @@ class EntityParser implements Parser{
         }
 
         else if (sqlStatement =~ /$createRegex/){
-            if (sqlStatement.toLowerCase().contains("select ")){
+            if (sqlStatement.toUpperCase().contains(DBObjMapper.ACTION_SELECT.getSybaseKey() + " ")){
                 operationType = DBObjMapper.ENTITY_OPERATION_TYP_DERIVED.getObjKey()
             }
 
