@@ -36,10 +36,12 @@ class EntityParser implements Parser{
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+        String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey(), DBObjMapper.ACTION_ALTER.getObjKey())
+        def alterResult = (sqlStatement =~ /$alterRegex/)
 
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
-        String type = (result? result[0][2].toString() : (dataTypeResult? dataTypeResult[0][2] : ''))
+        String type = (alterResult? DBObjMapper.ENTITY_KEY.getObjKey() : result? result[0][2].toString() : dataTypeResult? dataTypeResult[0][2] : '')
 
         return type
     }
