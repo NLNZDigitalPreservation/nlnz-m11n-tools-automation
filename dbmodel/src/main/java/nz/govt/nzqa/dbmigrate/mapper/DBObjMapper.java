@@ -88,10 +88,6 @@ public class DBObjMapper {
     public static DataTypeMapper CRITERIA_VALUETYPE_CHAR = new DataTypeMapper("CHAR", "'", "'","'", "'");
     public static DataTypeMapper CRITERIA_VALUETYPE_FIELD = new DataTypeMapper("FIELD", "","", "[", "]");
 
-    public static String VALUETYPE_INT = "int";
-    public static String VALUETYPE_CHAR = "char";
-    public static String VALUETYPE_FIELD = "field";
-
     public static ObjMapper INDEX_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper INDEX_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
 

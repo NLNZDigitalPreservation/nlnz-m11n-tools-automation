@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Attribute
 import org.junit.Before
 import org.junit.Test
@@ -29,7 +30,7 @@ class AttributeParserTest {
 //        attribute1.setType('')
         attribute1.setName('academic_year')
 //        attribute.setAction('')
-        attribute1.setDataType('char')
+        attribute1.setDataType(DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
         attribute1.setLength('4')
         attribute1.setFraction('')
         attribute1.setDefaultValue('')
@@ -40,7 +41,7 @@ class AttributeParserTest {
 //        attribute2.setType('')
         attribute2.setName('academic_year_type')
 //        attribute2.setAction('')
-        attribute2.setDataType('varchar')
+        attribute2.setDataType('varchar'.toUpperCase())
         attribute2.setLength('4')
         attribute2.setFraction('')
         attribute2.setDefaultValue('')
@@ -79,7 +80,7 @@ class AttributeParserTest {
 //        attribute.setType('')
         attribute.setName('academic_year')
 //        attribute.setAction('')
-        attribute.setDataType('char')
+        attribute.setDataType(DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
         attribute.setLength('4')
         attribute.setFraction('')
         attribute.setDefaultValue('')
@@ -107,7 +108,7 @@ class AttributeParserTest {
 //        attribute.setType('')
         attribute.setName('academic_year')
 //        attribute.setAction('')
-        attribute.setDataType('int')
+        attribute.setDataType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         attribute.setLength('10')
         attribute.setFraction('2')
         attribute.setDefaultValue('')
@@ -135,11 +136,11 @@ class AttributeParserTest {
 //        attribute.setType('')
         attribute.setName('file_type_code')
 //        attribute.setAction('')
-        attribute.setDataType('char')
+        attribute.setDataType(DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
         attribute.setLength('3')
         attribute.setFraction('')
         attribute.setDefaultValue("DM1")
-        attribute.setDefaultValDataType("char")
+        attribute.setDefaultValDataType(DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
         attribute.setNull(false)
 
         Attribute generatedAttribute = attributeParser.parse(attributeString)
@@ -164,11 +165,11 @@ class AttributeParserTest {
 //        attribute.setType('')
         attribute.setName('file_type_code')
 //        attribute.setAction('')
-        attribute.setDataType('int')
+        attribute.setDataType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         attribute.setLength('10')
         attribute.setFraction('2')
         attribute.setDefaultValue("30")
-        attribute.setDefaultValDataType("int")
+        attribute.setDefaultValDataType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         attribute.setNull(false)
 
         Attribute generatedAttribute = attributeParser.parse(attributeString)
@@ -192,7 +193,7 @@ class AttributeParserTest {
 //        attribute.setType('')
         attribute.setName('academic_year_desc')
 //        attribute.setAction('')
-        attribute.setDataType('descr')
+        attribute.setDataType('descr'.toUpperCase())
         attribute.setLength('')
         attribute.setFraction('')
         attribute.setDefaultValue("")

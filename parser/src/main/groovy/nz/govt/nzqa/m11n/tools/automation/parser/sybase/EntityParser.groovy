@@ -162,7 +162,8 @@ class EntityParser implements Parser{
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
 
         if (defaultResult){
-            dataType = (defaultResult[0][2].toString().contains("'")? DBObjMapper.VALUETYPE_CHAR: DBObjMapper.VALUETYPE_INT)
+            dataType = (defaultResult[0][2].toString().contains("'")? DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()
+                    : DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         }
 
         else if (dataTypeResult){

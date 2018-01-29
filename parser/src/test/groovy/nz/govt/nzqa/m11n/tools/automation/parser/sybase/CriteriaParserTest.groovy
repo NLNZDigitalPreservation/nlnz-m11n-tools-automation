@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Criteria
 import org.junit.Before
 import org.junit.Test
@@ -34,9 +35,9 @@ class CriteriaParserTest {
         childCriteria3.setType("CHECK")
         childCriteria3.setFieldName("school_support_ind")
         childCriteria3.setOperation("=")
-        childCriteria3.setValueType("int")
+        childCriteria3.setValueType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         childCriteria3.setValues(Arrays.asList('1'))
-        childCriteria3.setJoinOperator('or')
+        childCriteria3.setJoinOperator(DBObjMapper.OPERATOR_OR)
         childCriteria3.setComposite(false)
 
         Criteria testChildCriteria3 = criteriaParser.getChildCriteria(checkStatement, childCriteriaString3)
@@ -54,9 +55,9 @@ class CriteriaParserTest {
         childCriteria2.setType("CHECK")
         childCriteria2.setFieldName("school_support_ind")
         childCriteria2.setOperation("=")
-        childCriteria2.setValueType("int")
+        childCriteria2.setValueType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         childCriteria2.setValues(Arrays.asList('0'))
-        childCriteria2.setJoinOperator('or')
+        childCriteria2.setJoinOperator(DBObjMapper.OPERATOR_OR)
         childCriteria2.setComposite(true)
         childCriteria2.setJoinCriteria(new LinkedList<Criteria>(Arrays.asList(childCriteria3)))
 
@@ -73,7 +74,7 @@ class CriteriaParserTest {
         Criteria childCriteria1 = new Criteria()
         childCriteria1.setType("CHECK")
         childCriteria1.setFieldName("school_support_ind")
-        childCriteria1.setOperation("is")
+        childCriteria1.setOperation(DBObjMapper.SPECIAL_OPERATOR_IS)
         childCriteria1.setValueType("")
         childCriteria1.setValues(Arrays.asList('null'))
         childCriteria1.setJoinOperator("")
@@ -169,8 +170,8 @@ class CriteriaParserTest {
         Criteria childCriteria = new Criteria()
         childCriteria.setType("CHECK")
         childCriteria.setFieldName("bsas_accreditation_level")
-        childCriteria.setOperation("in")
-        childCriteria.setValueType("char")
+        childCriteria.setOperation("IN")
+        childCriteria.setValueType(DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
         childCriteria.setValues(Arrays.asList("'01'","'02'","'03'","'04'"))
         childCriteria.setComposite(false)
 
@@ -196,8 +197,8 @@ class CriteriaParserTest {
         Criteria childCriteria = new Criteria()
         childCriteria.setType("CHECK")
         childCriteria.setFieldName("assigned_marker_code")
-        childCriteria.setOperation("between")
-        childCriteria.setValueType("int")
+        childCriteria.setOperation("BETWEEN")
+        childCriteria.setValueType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         childCriteria.setValues(Arrays.asList('1000', '9999'))
         childCriteria.setComposite(false)
 

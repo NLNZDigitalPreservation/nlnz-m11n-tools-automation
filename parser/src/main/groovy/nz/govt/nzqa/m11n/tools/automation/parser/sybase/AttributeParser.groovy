@@ -37,7 +37,7 @@ class AttributeParser implements Parser{
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
         def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : '')
-        String dataType = (type? type[0][1] : (attributeFields.size() > 0? attributeFields[1] : ''))
+        String dataType = (type? type[0][1].toString().toUpperCase() : (attributeFields.size() > 0? attributeFields[1].toUpperCase(): ''))
 
         return dataType
     }
@@ -69,11 +69,11 @@ class AttributeParser implements Parser{
     }
 
     String getDefaultValueDataType(String attributeString){
-        String intRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.VALUETYPE_INT)
-        String charRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.VALUETYPE_CHAR)
+        String intRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
+        String charRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
         def result = (attributeString =~ /$intRegex/)
-        String defaultValueDataType = (result? DBObjMapper.VALUETYPE_INT :
-                ((attributeString =~/$charRegex/)? DBObjMapper.VALUETYPE_CHAR : ''))
+        String defaultValueDataType = (result? DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey() :
+                ((attributeString =~/$charRegex/)? DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey() : ''))
         return defaultValueDataType
     }
 

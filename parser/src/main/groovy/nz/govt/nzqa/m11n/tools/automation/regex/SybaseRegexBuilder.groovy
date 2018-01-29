@@ -163,11 +163,11 @@ class SybaseRegexBuilder implements RegexBuilder {
 
             case(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey()):
                 switch(parameter){
-                    case(DBObjMapper.VALUETYPE_INT):
+                    case(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()):
                         regexString = "(?i)DEFAULT (\\d+)"
                         break
 
-                    case(DBObjMapper.VALUETYPE_CHAR):
+                    case(DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()):
                         regexString = "(?i)DEFAULT (\\S+)"
                         break
                 }
@@ -454,7 +454,7 @@ class SybaseRegexBuilder implements RegexBuilder {
 
             case(DBObjMapper.REGEX_VALUE_TYPE.getObjKey()):
                 switch (parameter){
-                    case(DBObjMapper.VALUETYPE_INT):
+                    case(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()):
                         //(?i)(\w+) (IN|IS|>|<|>=|<=|=|BETWEEN) (\d+ AND \d+|\d+)
                         regexString = String.format("(?i)(\\w+) (%s|%s|%s|%s|%s|%s|%s|%s) (\\d+ %s \\d+|\\d+)",
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
