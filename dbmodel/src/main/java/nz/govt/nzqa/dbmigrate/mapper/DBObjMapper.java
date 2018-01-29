@@ -92,9 +92,6 @@ public class DBObjMapper {
     public static String VALUETYPE_CHAR = "char";
     public static String VALUETYPE_FIELD = "field";
 
-    public static ObjMapper TYPE_CHECK = new ObjMapper("Check", "", "");
-    public static ObjMapper TYPE_CHECK_WRAPPER = new ObjMapper("CheckWrapper", "", "");
-
     public static ObjMapper INDEX_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper INDEX_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
 

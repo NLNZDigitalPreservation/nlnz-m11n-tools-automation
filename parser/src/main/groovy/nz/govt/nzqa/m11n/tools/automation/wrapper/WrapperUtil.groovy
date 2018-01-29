@@ -18,7 +18,7 @@ class WrapperUtil {
     String getDataModelName (Object dataModelObj){
         String name = ''
         if(dataModelObj instanceof Entity) {
-            if (dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_ALTER.getSybaseKey())){
+            if (dataModelObj.getAction() != null && dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_ALTER.getSybaseKey())){
                 name = (((Entity) dataModelObj).getConstraints().keySet().toArray()[0])
             }
 

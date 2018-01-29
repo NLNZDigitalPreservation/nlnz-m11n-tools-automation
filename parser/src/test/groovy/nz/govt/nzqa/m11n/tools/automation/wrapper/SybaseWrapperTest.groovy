@@ -28,6 +28,8 @@ class SybaseWrapperTest {
         Map<String, Entity> fieldMap = new HashMap<>()
         Entity entity = entityParser.parse(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTables/splitTables-0-dbo.ACADEMIC_YEAR_TYPE.sql'))
         fieldMap.put(entity.getName(), entity)
+        Entity entity2 = entityParser.parse(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTables/splitTables-83-dbo.CFN_CATEGORY.sql'))
+        fieldMap.put(entity2.getName(), entity2)
         migrateWrapper.setTables(fieldMap)
 
         Map<String, Entity> keyMap = new HashMap<>()

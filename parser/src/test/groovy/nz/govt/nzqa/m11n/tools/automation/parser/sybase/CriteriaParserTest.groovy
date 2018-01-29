@@ -31,7 +31,7 @@ class CriteriaParserTest {
         String childCriteriaString3 = 'school_support_ind = 1'
 
         Criteria childCriteria3 = new Criteria()
-        childCriteria3.setType("Check")
+        childCriteria3.setType("CHECK")
         childCriteria3.setFieldName("school_support_ind")
         childCriteria3.setOperation("=")
         childCriteria3.setValueType("int")
@@ -51,7 +51,7 @@ class CriteriaParserTest {
         assertEquals(childCriteria3.getJoinCriteria(), testChildCriteria3.getJoinCriteria())
 
         Criteria childCriteria2 = new Criteria()
-        childCriteria2.setType("Check")
+        childCriteria2.setType("CHECK")
         childCriteria2.setFieldName("school_support_ind")
         childCriteria2.setOperation("=")
         childCriteria2.setValueType("int")
@@ -71,7 +71,7 @@ class CriteriaParserTest {
         assertEquals(childCriteria2.isComposite(), testChildCriteria2.isComposite())
 
         Criteria childCriteria1 = new Criteria()
-        childCriteria1.setType("Check")
+        childCriteria1.setType("CHECK")
         childCriteria1.setFieldName("school_support_ind")
         childCriteria1.setOperation("is")
         childCriteria1.setValueType("")
@@ -91,7 +91,7 @@ class CriteriaParserTest {
         assertEquals(childCriteria1.isComposite(), testChildCriteria1.isComposite())
 
         Criteria outterCriteria = new Criteria()
-        outterCriteria.setType("CheckWrapper")
+        outterCriteria.setType("CHECKWRAPPER")
         outterCriteria.setComposite(false)
         outterCriteria.setJoinCriteria(new LinkedList<Criteria>(Arrays.asList(childCriteria1, childCriteria2, childCriteria3)))
 
@@ -130,17 +130,17 @@ class CriteriaParserTest {
 
         Criteria testCriteria = criteriaParser.parse(sql)
 
-        assertEquals("CheckWrapper", testCriteria.getType())
+        assertEquals("CHECKWRAPPER", testCriteria.getType())
         assertEquals(6, testCriteria.getJoinCriteria().size())
         assertEquals(false, testCriteria.isComposite())
 
         for (Criteria testChildCriteria : testCriteria.getJoinCriteria()){
-            assertEquals("CheckWrapper", testChildCriteria.getType())
+            assertEquals("CHECKWRAPPER", testChildCriteria.getType())
             if (testChildCriteria.getJoinCriteria() != null){
                 assertEquals(5, testChildCriteria.getJoinCriteria().size())
 
                 for (Criteria testChildChildCriteria : testChildCriteria.getJoinCriteria()){
-                    assertEquals("Check", testChildChildCriteria.getType())
+                    assertEquals("CHECK", testChildChildCriteria.getType())
                     assertFalse(testChildChildCriteria.getFieldName().isEmpty())
                     System.out.println("FieldName: " + testChildChildCriteria.getFieldName())
                     System.out.println("Operation: " + testChildChildCriteria.getOperation())
@@ -167,7 +167,7 @@ class CriteriaParserTest {
         String childCriteriaString = "bsas_accreditation_level in ('01','02','03','04')"
 
         Criteria childCriteria = new Criteria()
-        childCriteria.setType("Check")
+        childCriteria.setType("CHECK")
         childCriteria.setFieldName("bsas_accreditation_level")
         childCriteria.setOperation("in")
         childCriteria.setValueType("char")
@@ -194,7 +194,7 @@ class CriteriaParserTest {
         String childCriteriaString = "assigned_marker_code between 1000 and 9999"
 
         Criteria childCriteria = new Criteria()
-        childCriteria.setType("Check")
+        childCriteria.setType("CHECK")
         childCriteria.setFieldName("assigned_marker_code")
         childCriteria.setOperation("between")
         childCriteria.setValueType("int")

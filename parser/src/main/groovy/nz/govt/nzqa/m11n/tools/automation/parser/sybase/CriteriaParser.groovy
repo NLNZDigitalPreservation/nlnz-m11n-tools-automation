@@ -14,13 +14,20 @@ class CriteriaParser implements Parser {
     ParserUtil util = new ParserUtil()
 
     String getType(String childCriteriaString){
+        String type = ''
         String regex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         String childRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_TYPE.getObjKey(), DBObjMapper.SPECIAL_OPERATOR_IN)
-        def result = (childCriteriaString =~ regex)
-        def childResult = (childCriteriaString =~ childRegex)
+        def result = (childCriteriaString =~ /$regex/)
+        def childResult = (childCriteriaString =~ /$childRegex/)
         boolean operatorIsIn = (childResult? childResult[0][2].toString().toLowerCase().equalsIgnoreCase(DBObjMapper.SPECIAL_OPERATOR_IN.toLowerCase()) : null)
 
-        String type = (result && !operatorIsIn? DBObjMapper.TYPE_CHECK_WRAPPER.getObjKey() : DBObjMapper.TYPE_CHECK.getObjKey())
+        if (childCriteriaString.toLowerCase().contains(DBObjMapper.CRITERIA_CHECK.getSybaseKey().toLowerCase())){
+            type = DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey()
+        }
+
+        else{
+            type = (result && !operatorIsIn? DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey() : DBObjMapper.CRITERIA_CHECK.getObjKey())
+        }
 
         return type
     }
