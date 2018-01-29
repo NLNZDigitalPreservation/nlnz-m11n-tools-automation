@@ -2,6 +2,7 @@ package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
 import nz.govt.nzqa.dbmigrate.model.Attribute
 import nz.govt.nzqa.dbmigrate.model.Constraint
+import nz.govt.nzqa.dbmigrate.model.Criteria
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Relation
 import org.junit.Before
@@ -392,6 +393,14 @@ class EntityParserTest {
         assertEquals(entity.getAction(), testEntity.getAction())
         assertEquals(entity.getDataType(), testEntity.getDataType())
         assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+    @Test
+    void shouldParseChecksCorrectly(){
+        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTables/splitTables-83-dbo.CFN_CATEGORY.sql"))
+        assertEquals("CFN_CATEGORY", testEntity.getName())
+        assertEquals("dbo", testEntity.getDatabaseName())
+        assertEquals(3, testEntity.getConstraints().keySet().size())
     }
 
     @Test

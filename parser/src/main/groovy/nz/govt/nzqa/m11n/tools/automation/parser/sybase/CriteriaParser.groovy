@@ -143,22 +143,21 @@ class CriteriaParser implements Parser {
                 DBObjMapper.REGEX_CRITERIA.getObjKey())
         String finalSqlStatement = ''
 
-        def result = (sqlStatement =~ /$checkConstraintRegex/)
+        def result = (sqlStatement.trim() =~ /$checkConstraintRegex/)
         if (result) {
             String checkSqlStatement = result[0][1]
             String workingSqlStatement = checkSqlStatement
 
             int index = 0
             String wrapperStringKey = "[wrapper" + index + "]"
+            String wrapperString = util.getWrapperString(workingSqlStatement)
 
 
-            while(!workingSqlStatement.equalsIgnoreCase(wrapperStringKey)){
-                String wrapperString = util.getWrapperString(workingSqlStatement)
+            while(wrapperString.size() > 0){
                 wrapperStringKey = "[wrapper" + index + "]"
                 criteriaWrapper = new Criteria()
                 criteriaWrapper.setType(getType(result[0][0].toString()))
                 LinkedList<Criteria> criteriaWrapperLinkedList = new LinkedList<>()
-
                 Pattern childCriteriaPattern = Pattern.compile(/$childCriteriaRegex/)
                 Matcher childCriteriaMatcher = childCriteriaPattern.matcher(wrapperString)
 
@@ -178,6 +177,7 @@ class CriteriaParser implements Parser {
                 workingSqlStatement = workingSqlStatement.replace(wrapperString, wrapperStringKey)
                 criteriaWrapper.setJoinOperator(getJoinOperator(workingSqlStatement, wrapperStringKey))
                 wrapperMap.put(wrapperStringKey, criteriaWrapper)
+                wrapperString = util.getWrapperString(workingSqlStatement)
                 index ++
             }
         }

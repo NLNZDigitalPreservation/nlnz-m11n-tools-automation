@@ -46,7 +46,7 @@ class ParserUtil {
 
         List<String> names = new ArrayList<>()
 
-        new File(dbFolderName).eachDir(){
+        new File(dbFolderName).eachDir() {
             dir -> names.add(dir.getName())
         }
 
@@ -64,9 +64,9 @@ class ParserUtil {
         return names.sort() as String[]
     }
 
-    String getFieldName(String splitFolderName){
+    String getFieldName(String splitFolderName) {
         String fieldName = ''
-        switch(splitFolderName){
+        switch (splitFolderName) {
             case (DBObjMapper.FOLDER_FIELD_DEFAULT.getSybaseKey()):
                 fieldName = DBObjMapper.FOLDER_FIELD_DEFAULT.getObjKey()
                 break
@@ -134,30 +134,30 @@ class ParserUtil {
         return fieldName
     }
 
-    Parser getParser(String splitFolderName){
-        switch (splitFolderName){
-            case(DBObjMapper.FOLDER_FIELD_TABLE.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_VIEW.getSybaseKey()):
-            case(DBObjMapper.FOLDER_FIELD_DEFAULT.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_USERDATATYPE.getSybaseKey()):
-            case(DBObjMapper.FOLDER_FIELD_GROUP.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_USER.getSybaseKey()):
-            case(DBObjMapper.FOLDER_FIELD_RULE.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_MESSAGE.getSybaseKey()):
-            case(DBObjMapper.FOLDER_FIELD_FOREIGNKEY.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_CHECKCONSTRAINT.getSybaseKey()):
-            case(DBObjMapper.FOLDER_FIELD_UNIQUE.getSybaseKey()):
+    Parser getParser(String splitFolderName) {
+        switch (splitFolderName) {
+            case (DBObjMapper.FOLDER_FIELD_TABLE.getSybaseKey()): case (DBObjMapper.FOLDER_FIELD_VIEW.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_DEFAULT.getSybaseKey()): case (DBObjMapper.FOLDER_FIELD_USERDATATYPE.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_GROUP.getSybaseKey()): case (DBObjMapper.FOLDER_FIELD_USER.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_RULE.getSybaseKey()): case (DBObjMapper.FOLDER_FIELD_MESSAGE.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_FOREIGNKEY.getSybaseKey()): case (DBObjMapper.FOLDER_FIELD_CHECKCONSTRAINT.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_UNIQUE.getSybaseKey()):
                 return new EntityParser()
 
-            case(DBObjMapper.FOLDER_FIELD_TRIGGER.getSybaseKey()): case(DBObjMapper.FOLDER_FIELD_PROCEDURE.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_TRIGGER.getSybaseKey()): case (DBObjMapper.FOLDER_FIELD_PROCEDURE.getSybaseKey()):
                 return new UtilitiesParser()
 
-            case(DBObjMapper.FOLDER_FIELD_INDEX.getSybaseKey()):
+            case (DBObjMapper.FOLDER_FIELD_INDEX.getSybaseKey()):
                 return new IndexParser()
         }
     }
 
-    String getSchema(File firstFile){
+    String getSchema(File firstFile) {
         String schema = ''
 
         firstFile.eachLine { String line ->
             def result = (line.trim() =~ /(?i)USE (\S+)/)
-            if(result){
+            if (result) {
                 schema = result[0][1]
                 return schema
             }
@@ -167,34 +167,40 @@ class ParserUtil {
     }
 
 
-    String getWrapperString(String workingSqlStatement){
+    String getWrapperString(String workingSqlStatement) {
+        String wrapperString = ''
         SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
-        String childCriteriaRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
+        String childCriteriaInOperatorRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
                 DBObjMapper.SPECIAL_OPERATOR_IN)
 
-        def result = (workingSqlStatement =~childCriteriaRegex)
+//        String childCriteriaRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
+//                DBObjMapper.REGEX_CHECK_WRAPPER_WITH_CHILD_CRITERIA.getObjKey())
+
+        def opInResult = (workingSqlStatement =~ childCriteriaInOperatorRegex)
+//        def result = (workingSqlStatement =~ childCriteriaRegex)
 
         int closeBracketIndex = workingSqlStatement.indexOf(CLOSE_BRACKET)
         int openBracketIndex = closeBracketIndex
 
-        if (result){
-            return OPEN_BRACKET + result[0][0] + CLOSE_BRACKET
+        if (opInResult) {
+            return OPEN_BRACKET + opInResult[0][0] + CLOSE_BRACKET
         }
 
-        boolean openBracketFound = false
+//        else if (result) {
 
-        while(!openBracketFound && openBracketIndex > 0){
-            openBracketIndex --
+            boolean openBracketFound = false
 
-            if(workingSqlStatement[openBracketIndex] == OPEN_BRACKET){
-                openBracketFound = true
+            while (!openBracketFound && openBracketIndex > 0) {
+                openBracketIndex--
+
+                if (workingSqlStatement[openBracketIndex] == OPEN_BRACKET) {
+                    openBracketFound = true
+                }
             }
-        }
-
-        String wrapperString = (openBracketFound? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
-                workingSqlStatement.substring(0, closeBracketIndex + 1))
+            wrapperString = (openBracketFound ? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
+                    workingSqlStatement.substring(0, closeBracketIndex + 1))
+//        }
 
         return wrapperString
-
     }
 }

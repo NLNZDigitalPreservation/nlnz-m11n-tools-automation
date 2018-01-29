@@ -164,6 +164,7 @@ public class DBObjMapper {
     public static ObjMapper REGEX_TRIGGER_TABLE_NAME = new ObjMapper("TriggerTableName", "", "");
     public static ObjMapper REGEX_TRIGGER_OPERATIONS = new ObjMapper("TriggerOperations", "", "");
     public static ObjMapper REGEX_WITH_CLAUSE = new ObjMapper("WithClause", "", "");
+    public static ObjMapper REGEX_CHECK_WRAPPER_WITH_CHILD_CRITERIA = new ObjMapper("CheckWrapperWithChildCriteria", "", "");
 
     public static ObjMapper ENTITY_OPERATION_TYP_DIRECT = new ObjMapper("Direct", "", "");
     public static ObjMapper ENTITY_OPERATION_TYP_DERIVED = new ObjMapper("Derived", "", "");
