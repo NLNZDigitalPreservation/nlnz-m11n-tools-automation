@@ -57,7 +57,7 @@ class RelationParserTest {
         assertEquals(relation1.getGrantTo(), generatedRelation1.getGrantTo())
         assertEquals(relation1.getGrantObjectDB(), generatedRelation1.getGrantObjectDB())
         assertEquals(relation1.getGrantObjectName(), generatedRelation1.getGrantObjectName())
-//        assertEquals(relation1.getGrantSubObjects(), generatedRelation1.getGrantSubObjects())
+        assertEquals(0, generatedRelation1.getGrantSubObjects().size())
 
         assertEquals(relation2.getType(), generatedRelation2.getType())
 //        assertEquals(relation2.getName(), generatedRelation2.getName())
@@ -65,7 +65,7 @@ class RelationParserTest {
         assertEquals(relation2.getGrantTo(), generatedRelation2.getGrantTo())
         assertEquals(relation2.getGrantObjectDB(), generatedRelation2.getGrantObjectDB())
         assertEquals(relation2.getGrantObjectName(), generatedRelation2.getGrantObjectName())
-//        assertEquals(relation2.getGrantSubObjects(), generatedRelation2.getGrantSubObjects())
+        assertEquals(0, generatedRelation2.getGrantSubObjects().size())
 
         assertEquals(relation3.getType(), generatedRelation3.getType())
 //        assertEquals(relation3.getName(), generatedRelation3.getName())
@@ -73,7 +73,7 @@ class RelationParserTest {
         assertEquals(relation3.getGrantTo(), generatedRelation3.getGrantTo())
         assertEquals(relation3.getGrantObjectDB(), generatedRelation3.getGrantObjectDB())
         assertEquals(relation3.getGrantObjectName(), generatedRelation3.getGrantObjectName())
-//        assertEquals(relation3.getGrantSubObjects(), generatedRelation3.getGrantSubObjects())
+        assertEquals(0, generatedRelation3.getGrantSubObjects().size())
     }
 
     @Test

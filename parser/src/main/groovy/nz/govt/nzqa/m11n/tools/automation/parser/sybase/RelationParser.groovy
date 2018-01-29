@@ -6,6 +6,8 @@ import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 
 import java.lang.reflect.Array
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class RelationParser implements Parser{
 
@@ -55,9 +57,17 @@ class RelationParser implements Parser{
     }
 
     List<String> getGrantSubObjects(String sqlStatement){
-        def result = (sqlStatement =~ /$regex/)
-        List<String> grantSubObjects = (result? Arrays.asList(result[0][4].toString()
-                .replaceAll("\\s|\\(|\\)", "").split(",")) : null)
+        List<String> grantSubObjects = new ArrayList<String>()
+
+        Pattern pattern = Pattern.compile(/$regex/)
+        Matcher matcher = pattern.matcher(sqlStatement)
+
+        while(matcher.find()){
+            if (matcher.group(4) != null){
+                grantSubObjects = Arrays.asList(matcher.group(4).toString().replaceAll(" |\\(|\\)", "").split(","))
+            }
+        }
+
         return grantSubObjects
     }
 
