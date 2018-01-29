@@ -43,22 +43,22 @@ class CriteriaParser implements Parser {
     String getValueType(String childCriteriaString){
         String valueType = ''
         String intRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_VALUE_TYPE.getObjKey(), DBObjMapper.VALUETYPE_INT)
-        String charRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_VALUE_TYPE.getObjKey(),DBObjMapper.VALUETYPE_CHAR )
+//        String charRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_VALUE_TYPE.getObjKey(),DBObjMapper.VALUETYPE_CHAR )
         def intResult = (childCriteriaString =~ /$intRegex/)
-        def charResult = (childCriteriaString =~ /$charRegex/)
+//        def charResult = (childCriteriaString =~ /$charRegex/)
 
         if (intResult){
             valueType = DBObjMapper.VALUETYPE_INT
         }
 
-        else if (charResult){
-            String value = charResult[0][3]
-            String operator = charResult[0][2].toString().toLowerCase()
-            if (value.contains('"') || value.contains("'")){
+        else {//if (charResult){
+//            String value = charResult[0][3]
+//            String operator = charResult[0][2].toString().toLowerCase()
+            if (childCriteriaString.contains('"') || childCriteriaString.contains("'")){
                 valueType = DBObjMapper.VALUETYPE_CHAR
             }
 
-            else if (!operator.equalsIgnoreCase(DBObjMapper.SPECIAL_OPERATOR_IS)) {
+            else if (!childCriteriaString.toLowerCase().contains(" is ")) {
                 valueType = DBObjMapper.VALUETYPE_FIELD
             }
         }
@@ -164,8 +164,6 @@ class CriteriaParser implements Parser {
 
                 while (childCriteriaMatcher.find()) {
                     String childCriteriaString = childCriteriaMatcher.group().replaceAll(/(\))\1+/, "\\)")
-                    System.out.println("CheckSqlStatement: " + checkSqlStatement)
-                    System.out.println("ChildString: " + childCriteriaString)
                     Criteria childCriteria = getChildCriteria(checkSqlStatement, childCriteriaString)
 
                     if(criteriaWrapperLinkedList.size() > 0){

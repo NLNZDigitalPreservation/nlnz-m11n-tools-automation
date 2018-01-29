@@ -32,19 +32,14 @@ class SybaseWrapperTest {
 
         Map<String, Entity> keyMap = new HashMap<>()
         Entity fk = entityParser.parse(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitForeignKeys/splitTables-0-alter-dbo.ACADEMIC_YEAR_TYPE.sql'))
-        keyMap.put(fk.getName(), fk)
+        keyMap.put(fk.getConstraints().get("FK_ACA_YEAR_ACA_YEAR_TYPE").getName(), fk)
 
         Entity fk2 = entityParser.parse(new File('src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitForeignKeys/splitTables-2-alter-dbo.ACCREDITED_ITEM.sql'))
-        keyMap.put(fk2.getName(), fk2)
+        keyMap.put(fk2.getConstraints().get("FK_ACCRED_ITEM_CREATE_CASE").getName(), fk2)
         migrateWrapper.setKeys(keyMap)
 
         String testDir = 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource'
         MigrateWrapper testMigrateWrapper = sybaseWrapper.parse(testDir)
-
-//        System.out.println("getTables size: " + testMigrateWrapper.getTables().size())
-//        System.out.println("getTables keys: " + testMigrateWrapper.getTables().keySet())
-//        System.out.println("getKeys size: " + testMigrateWrapper.getKeys().size())
-//        System.out.println("getKeys keys: " + testMigrateWrapper.getKeys().keySet())
 
         assertEquals(migrateWrapper.getTables().size(), testMigrateWrapper.getTables().size())
         assertEquals(migrateWrapper.getTables().keySet(), testMigrateWrapper.getTables().keySet())

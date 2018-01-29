@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.wrapper
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Index
 import nz.govt.nzqa.dbmigrate.model.MigrateWrapper
@@ -17,7 +18,13 @@ class WrapperUtil {
     String getDataModelName (Object dataModelObj){
         String name = ''
         if(dataModelObj instanceof Entity) {
-            name = ((Entity)dataModelObj).getName()
+            if (dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_ALTER.getSybaseKey())){
+                name = (((Entity) dataModelObj).getConstraints().keySet().toArray()[0])
+            }
+
+            else {
+                name = ((Entity) dataModelObj).getName()
+            }
         }
 
         else if(dataModelObj instanceof Utilities) {
