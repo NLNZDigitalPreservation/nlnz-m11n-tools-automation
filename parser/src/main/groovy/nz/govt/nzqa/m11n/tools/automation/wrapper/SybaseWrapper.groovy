@@ -35,7 +35,8 @@ class SybaseWrapper implements Wrapper {
 
                 Object dataModelObj = parser.parse(new File(splitFilePath))
                 String dataModelName = wrapperUtil.getDataModelName(dataModelObj)
-                fieldMap.put(dataModelName, dataModelObj)
+
+                fieldMap = wrapperUtil.putDataModelInMap(fieldMap, dataModelObj, dataModelName)
             }
             wrapperUtil.setField(migrateWrapper, fieldMap, fieldName)
         }
