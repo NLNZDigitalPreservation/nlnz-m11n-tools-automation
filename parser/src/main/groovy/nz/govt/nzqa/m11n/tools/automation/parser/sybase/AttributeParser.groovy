@@ -8,12 +8,18 @@ import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 class AttributeParser implements Parser{
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
+    ParserUtil util = new ParserUtil()
 
     String getType(String sqlStatement){
+        String type = ''
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String type = (result && result[0][1].toString().equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getSybaseKey())?
-                DBObjMapper.KEY_COLUMN.getObjKey() : '')
+
+        if (result) {
+            String actionString = result[0][1]
+            String action = util.getActionObjKeyfromRawString(actionString)
+            type = (action.equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getObjKey())? DBObjMapper.KEY_COLUMN.getObjKey() : '')
+        }
 
         return type
     }
@@ -26,9 +32,14 @@ class AttributeParser implements Parser{
     }
 
     String getAction(String sqlStatement){
+        String action = ''
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_ACTION.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String action = (result? result[0][1].toString() : '')
+
+        if (result){
+            String actionString = result[0][1]
+            action = util.getActionObjKeyfromRawString(actionString)
+        }
 
         return action
     }
