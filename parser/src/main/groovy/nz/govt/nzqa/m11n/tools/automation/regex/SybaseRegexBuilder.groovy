@@ -67,9 +67,8 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey()):
                 switch(parameter) {
                     case (DBObjMapper.ENTITY_DATATYPE.getObjKey()):
-                        //(?i)EXEC sp_(add|drop)(\S+) (\S+)
-                        regexString = String.format("(?i)EXEC sp_(%s|%s)(\\S+) (\\S+)", DBObjMapper.ACTION_ADD.getObjKey(),
-                                DBObjMapper.ACTION_DROP.getObjKey())
+                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (\S+)
+                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (\\S+)"
                         break
 
                     case(DBObjMapper.ACTION_ALTER.getObjKey()):
@@ -130,9 +129,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                         break
 
                     case(DBObjMapper.ENTITY_DATATYPE.getObjKey()):
-                        //(?i)EXEC sp_(add|drop)(\S+) (\S+)
-                        regexString = String.format("(?i)EXEC sp_(%s|%s)(\\S+) (\\S+)", DBObjMapper.ACTION_ADD.getObjKey(),
-                                DBObjMapper.ACTION_DROP.getObjKey())
+                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (\S+)
+                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (\\S+)"
                         break
                 }
 

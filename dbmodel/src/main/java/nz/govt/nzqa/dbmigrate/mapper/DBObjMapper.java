@@ -22,6 +22,7 @@ public class DBObjMapper {
     public static ObjMapper ACTION_DROP_DATATYPE = new ObjMapper("DROPTYPE", "sp_droptype", "DROP");
     public static ObjMapper ACTION_ADD_USER = new ObjMapper("ADDUSER", "sp_adduser", "CREATE");
     public static ObjMapper ACTION_ADD_MESSAGE = new ObjMapper("ADDMSG", "sp_addmessage", "CREATE");
+    public static ObjMapper ACTION_ADD_GROUP = new ObjMapper("ADDGROUP", "sp_addgroup", "CREATE");
     public static ObjMapper ACTION_SELECT = new ObjMapper("SELECT", "SELECT", "SELECT");
     public static ObjMapper ACTION_INSERT = new ObjMapper("INSERT", "INSERT", "INSERT");
     public static ObjMapper ACTION_UPDATE = new ObjMapper("UPDATE", "UPDATE", "UPDATE");

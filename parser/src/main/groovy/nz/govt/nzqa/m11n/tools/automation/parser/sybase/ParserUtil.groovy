@@ -331,6 +331,30 @@ class ParserUtil {
                 type = DBObjMapper.ENTITY_CONSTRAINT.getObjKey()
                 break
 
+            //Entity - datatype
+            case(DBObjMapper.ACTION_ADD_DATATYPE.getSybaseKey()):
+                type = DBObjMapper.ACTION_ADD_DATATYPE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_DROP_DATATYPE.getSybaseKey()):
+                type = DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()
+                break
+
+            //Entity - message
+            case(DBObjMapper.ACTION_ADD_MESSAGE.getSybaseKey()):
+                type = DBObjMapper.ACTION_ADD_MESSAGE.getObjKey()
+                break
+
+            //Entity - user
+            case(DBObjMapper.ACTION_ADD_USER.getSybaseKey()):
+                type = DBObjMapper.ACTION_ADD_USER.getObjKey()
+                break
+
+            //Entity - group
+            case(DBObjMapper.ACTION_ADD_GROUP.getSybaseKey()):
+                type = DBObjMapper.ACTION_ADD_GROUP.getObjKey()
+                break
+
             //Attribute
             case(DBObjMapper.KEY_COLUMN.getSybaseKey()):
                 type = DBObjMapper.KEY_COLUMN.getObjKey()

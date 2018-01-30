@@ -245,7 +245,7 @@ class EntityParserTest {
         String sqlStatement = "EXEC sp_addtype 'wwwaddr','varchar(255)','NULL'"
 
         Entity entity = new Entity()
-        entity.setType('type')
+        entity.setType(DBObjMapper.ACTION_ADD_DATATYPE.getObjKey())
         entity.setName('wwwaddr')
         entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         entity.setDataType('varchar(255)')
@@ -380,7 +380,7 @@ class EntityParserTest {
         String sqlStatement = "EXEC sp_adduser 'batch_user','batch_user','public'"
 
         Entity entity = new Entity()
-        entity.setType('user')
+        entity.setType(DBObjMapper.ACTION_ADD_USER.getObjKey())
         entity.setName('batch_user')
         entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         entity.setDataType('batch_user')
@@ -407,7 +407,7 @@ class EntityParserTest {
     void shouldParseUserDataTypeCorrectly(){
         Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitUserDatatypes/splitUserDatatypes-43-COUNT_1-drop.sql"))
         assertEquals("COUNT_1", testEntity.getName())
-        assertEquals("type", testEntity.getType())
+        assertEquals(DBObjMapper.ACTION_DROP_DATATYPE.getObjKey(), testEntity.getType())
         assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), testEntity.getAction())
     }
 
