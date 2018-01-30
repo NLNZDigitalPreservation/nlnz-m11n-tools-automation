@@ -404,6 +404,14 @@ class EntityParserTest {
     }
 
     @Test
+    void shouldParseUserDataTypeCorrectly(){
+        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitUserDatatypes/splitUserDatatypes-43-COUNT_1-drop.sql"))
+        assertEquals("COUNT_1", testEntity.getName())
+        assertEquals("type", testEntity.getType())
+        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), testEntity.getAction())
+    }
+
+    @Test
     void shouldExtractCorrectDatatypeForSysType(){
         String sqlStatement = "EXEC sp_addtype 'dt','datetime','NULL'"
         String dataType = 'datetime'

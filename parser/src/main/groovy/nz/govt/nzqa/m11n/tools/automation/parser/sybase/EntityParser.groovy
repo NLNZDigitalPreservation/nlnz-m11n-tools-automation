@@ -36,7 +36,7 @@ class EntityParser implements Parser{
         String typeString = ''
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey(),
-                DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey(), DBObjMapper.ACTION_ALTER.getObjKey())
         def alterResult = (sqlStatement =~ /$alterRegex/)
         def result = (sqlStatement =~ /$regex/)
@@ -62,7 +62,7 @@ class EntityParser implements Parser{
         String name = ''
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
-                DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
                 DBObjMapper.ACTION_ALTER.getObjKey())
         def result = (sqlStatement =~ /$regex/)
@@ -81,7 +81,7 @@ class EntityParser implements Parser{
 
         else if (dataTypeResult){
             String[] nameTypeValue = dataTypeResult[0][3].toString().replaceAll("'|\\s", "").split(",")
-            name = (nameTypeValue.size() == 3? nameTypeValue[0] : '')
+            name = (nameTypeValue.size() > 0? nameTypeValue[0] : '')
         }
         return name
     }
@@ -90,7 +90,7 @@ class EntityParser implements Parser{
         String actionString = ''
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey(),
-                DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
                 DBObjMapper.ACTION_ALTER.getObjKey())
         def result = (sqlStatement =~ /$regex/)
@@ -160,7 +160,7 @@ class EntityParser implements Parser{
         String defaultRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey(),
                 DBObjMapper.ENTITY_DEFAULT.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey(),
-                DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
         def defaultResult = (sqlStatement =~ /$defaultRegex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
 
@@ -180,7 +180,7 @@ class EntityParser implements Parser{
         String queryValue = ''
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_QUERY_VALUE.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey(),
-                DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
 
@@ -254,9 +254,11 @@ class EntityParser implements Parser{
         List<String> grantStatements = new ArrayList<>()
         List<String> sqlStatements = util.getStatementsFromFile(file)
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
+        String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey(),
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
 
         for(String sqlStatement : sqlStatements){
-            if (sqlStatement =~ /$regex/) {
+            if ((sqlStatement =~ /$regex/) || (sqlStatement =~ /$dataTypeRegex/)) {
                 entity.setDatabaseName(getDatabaseName(sqlStatement))
                 entity.setType(getType(sqlStatement))
                 entity.setName(getName(sqlStatement))
@@ -284,7 +286,7 @@ class EntityParser implements Parser{
         List<String> grantStatements = new ArrayList<>()
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey(),
-                DBObjMapper.REGEX_DATA_TYPE.getObjKey())
+                DBObjMapper.ENTITY_DATATYPE.getObjKey())
 
         if ((sqlStatement =~ /$regex/) || (sqlStatement =~ /$dataTypeRegex/)) {
             entity.setDatabaseName(getDatabaseName(sqlStatement))

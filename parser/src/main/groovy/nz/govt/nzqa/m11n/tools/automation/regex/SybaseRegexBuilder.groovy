@@ -66,9 +66,9 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_ACTION.getObjKey()):
             case(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey()):
                 switch(parameter) {
-                    case (DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
-                        //(?i)EXEC sp_(add|drop)(\S+) (.*)
-                        regexString = String.format("(?i)EXEC sp_(%s|%s)(\\S+) (.*)", DBObjMapper.ACTION_ADD.getObjKey(),
+                    case (DBObjMapper.ENTITY_DATATYPE.getObjKey()):
+                        //(?i)EXEC sp_(add|drop)(\S+) (\S+)
+                        regexString = String.format("(?i)EXEC sp_(%s|%s)(\\S+) (\\S+)", DBObjMapper.ACTION_ADD.getObjKey(),
                                 DBObjMapper.ACTION_DROP.getObjKey())
                         break
 
@@ -95,15 +95,6 @@ class SybaseRegexBuilder implements RegexBuilder {
                         DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
                         DBObjMapper.ACTION_DROP.getSybaseKey())
                 break
-
-//            case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
-//                //(?i)(ALTER) (\S+) (\S+) ADD CONSTRAINT (.*)|(CREATE|ADD|DROP) (\S+) (\S+) \((.*)\)
-//                regexString = String.format("(?i)%s (\\S+) (\\S+) %s %s (.*)|(%s|ADD|DROP) (\\S+) (\\S+) \\((.*)\\)",
-//                        DBObjMapper.ACTION_ALTER.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
-//                        DBObjMapper.ENTITY_CONSTRAINT.getSybaseKey(),
-//                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
-//                        DBObjMapper.ACTION_DROP.getSybaseKey())
-//                break
 
             case(DBObjMapper.REGEX_LOCKS.getObjKey()):
                 //(?i)LOCK (\S+)
@@ -138,9 +129,9 @@ class SybaseRegexBuilder implements RegexBuilder {
                                 DBObjMapper.AS.getSybaseKey())
                         break
 
-                    case(DBObjMapper.REGEX_DATA_TYPE.getObjKey()):
-                        //(?i)EXEC sp_(add|drop)(\S+) (.*)
-                        regexString = String.format("(?i)EXEC sp_(%s|%s)(\\S+) (.*)", DBObjMapper.ACTION_ADD.getObjKey(),
+                    case(DBObjMapper.ENTITY_DATATYPE.getObjKey()):
+                        //(?i)EXEC sp_(add|drop)(\S+) (\S+)
+                        regexString = String.format("(?i)EXEC sp_(%s|%s)(\\S+) (\\S+)", DBObjMapper.ACTION_ADD.getObjKey(),
                                 DBObjMapper.ACTION_DROP.getObjKey())
                         break
                 }
