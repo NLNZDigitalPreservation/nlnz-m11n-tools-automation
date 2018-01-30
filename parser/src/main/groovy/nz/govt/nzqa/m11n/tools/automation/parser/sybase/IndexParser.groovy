@@ -13,24 +13,18 @@ class IndexParser implements Parser{
         String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         String databaseName = (result? result[0][5].toString().split("\\.")[0] : '')
-
         return databaseName
     }
 
     String getType(String sqlStatement){
-        String type = ''
+        String typeString = ''
         String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_TABLE_NAME.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        if(result){
-            if (result[0][2].toString().contains(DBObjMapper.INDEX_NONCLUSTERED.getSybaseKey())){
-                type = DBObjMapper.INDEX_NONCLUSTERED.getObjKey()
-            }
 
-            else if (result[0][2].toString().contains(DBObjMapper.INDEX_CLUSTERED.getSybaseKey())){
-                type = DBObjMapper.INDEX_CLUSTERED.getObjKey()
-            }
+        if(result) {
+            typeString = result[0][2]
         }
-
+        String type = util.getTypeObjKeyFromRawString(typeString)
         return type
     }
 
@@ -39,21 +33,25 @@ class IndexParser implements Parser{
         String dropRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_TABLE_NAME.getObjKey(), DBObjMapper.ACTION_DROP.getObjKey())
         def createResult = (sqlStatement =~ /$createRegex/)
         def dropResult = (sqlStatement =~ /$dropRegex/)
-
         String name = (createResult? createResult[0][3] : (dropResult? dropResult[0][2].toString().split("\\.")[1] : ''))
-
         return name
     }
 
     String getAction(String sqlStatement){
+        String actionString = ''
         String createRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey(), DBObjMapper.ACTION_CREATE.getObjKey())
         String dropRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey(), DBObjMapper.ACTION_DROP.getObjKey())
-
         def createResult = (sqlStatement =~ /$createRegex/)
         def dropResult = (sqlStatement =~ /$dropRegex/)
 
-        String action = (createResult? createResult[0][1].toString() : (dropResult? dropResult[0][1] : ''))
+        if(createResult){
+            actionString =  createResult[0][1]
+        }
 
+        else if (dropResult){
+            actionString = dropResult[0][1]
+        }
+        String action = util.getActionObjKeyFromRawString(actionString)
         return action
     }
 
@@ -61,7 +59,6 @@ class IndexParser implements Parser{
         String tableName = ''
         String createRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_NAME.getObjKey(), DBObjMapper.ACTION_CREATE.getObjKey())
         String dropRegex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_NAME.getObjKey(), DBObjMapper.ACTION_DROP.getObjKey())
-
         def createResult = (sqlStatement =~ /$createRegex/)
         def dropResult = (sqlStatement =~ /$dropRegex/)
 
@@ -74,7 +71,6 @@ class IndexParser implements Parser{
             String[] tableIndex = dropResult[0][2].toString().split("\\.")
             tableName = (tableIndex.size() == 2? tableIndex[0] : '')
         }
-
         return tableName
     }
 
@@ -82,7 +78,6 @@ class IndexParser implements Parser{
         String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_FIELD_NAME.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         List<String> fieldNames = Arrays.asList(result? result[0][6].toString().split(",") : '')
-
         return  fieldNames
     }
 

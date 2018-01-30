@@ -13,10 +13,11 @@ class RelationParser implements Parser{
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
     String regex = regexBuilder.buildRelationRegex(DBObjMapper.REGEX_TYPE.getObjKey())
+    ParserUtil util = new ParserUtil()
 
     String getType(String sqlStatement){
         def result = (sqlStatement =~ /$regex/)
-        String type = (result? result[0][1] : '')
+        String type = (result? util.getTypeObjKeyFromRawString(result[0][1].toString()) : '')
         return type
     }
 
@@ -28,15 +29,13 @@ class RelationParser implements Parser{
 
     String getAction(String sqlStatement){
         def result = (sqlStatement =~ /$regex/)
-        String action = (result? result[0][2] : '')
-
+        String action = (result? util.getActionObjKeyFromRawString(result[0][2].toString()) : '')
         return action
     }
 
     String getGrantTo(String sqlStatement){
         def result = (sqlStatement =~ /$regex/)
         String grantTo = (result? result[0][5] : '')
-
         return grantTo
     }
 
@@ -44,7 +43,6 @@ class RelationParser implements Parser{
         def result = (sqlStatement =~ /$regex/)
         String[] dbObject = (result? result[0][3].toString().split("\\.") : '')
         String grantObjectDb = (dbObject? dbObject[0] : '')
-
         return grantObjectDb
     }
 
@@ -52,13 +50,11 @@ class RelationParser implements Parser{
         def result = (sqlStatement =~ /$regex/)
         String[] dbObject = (result? result[0][3].toString().split("\\.") : '')
         String grantObjectName = (dbObject? dbObject[1] : '')
-
         return grantObjectName
     }
 
     List<String> getGrantSubObjects(String sqlStatement){
         List<String> grantSubObjects = new ArrayList<String>()
-
         Pattern pattern = Pattern.compile(/$regex/)
         Matcher matcher = pattern.matcher(sqlStatement)
 
@@ -67,20 +63,19 @@ class RelationParser implements Parser{
                 grantSubObjects = Arrays.asList(matcher.group(4).toString().replaceAll(" |\\(|\\)", "").split(","))
             }
         }
-
         return grantSubObjects
     }
 
     @Override
     Relation parse(File file){
         Relation relation = new Relation()
+
         return relation
     }
 
     @Override
     Relation parse(String sqlStatement) {
         Relation relation = new Relation()
-
         relation.setType(getType(sqlStatement))
         relation.setName(getName(sqlStatement))
         relation.setAction(getAction(sqlStatement))

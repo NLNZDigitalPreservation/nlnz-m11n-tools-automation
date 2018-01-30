@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Constraint
 import org.junit.Before
 import org.junit.Test
@@ -24,9 +25,9 @@ class ConstraintParserTest {
 
         String constraintString = 'CONSTRAINT PK_ACADEMIC_YEAR PRIMARY KEY CLUSTERED (academic_year)'
         Constraint constraint = new Constraint()
-        constraint.setType('PK')
+        constraint.setType(DBObjMapper.CONSTRAINT_PRIMARYKEY.getObjKey())
         constraint.setName('PK_ACADEMIC_YEAR')
-        constraint.setSubType('CLUSTERED')
+        constraint.setSubType(DBObjMapper.CONSTRAINT_CLUSTERED.getObjKey())
         constraint.setFields(Arrays.asList('academic_year'))
 
         Constraint generatedConstraint = constraintParser.parse(constraintString)
@@ -49,9 +50,9 @@ class ConstraintParserTest {
                 'FOREIGN KEY (inheriting_moe_provider_id,inheriting_location) ' +
                 'REFERENCES dbo.PROVIDER (moe_provider_id,location)'
         Constraint constraint = new Constraint()
-        constraint.setType('FK')
+        constraint.setType(DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey())
         constraint.setName('FK_ACRD_INHERIT_MAP_PROVIDER_1')
-        constraint.setAction('ADD')
+        constraint.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         constraint.setFields(Arrays.asList('inheriting_moe_provider_id','inheriting_location'))
         constraint.setTableName('ACRD_INHERITANCE_MAP')
         constraint.setReferenceTableName('PROVIDER')
@@ -76,10 +77,10 @@ class ConstraintParserTest {
                 'ADD CONSTRAINT AK_ASSESS_SESSION_RELATIONSHIP ' +
                 'UNIQUE NONCLUSTERED (assessment_session_id,related_assessment_session_id,assessment_session_rel_type)'
         Constraint constraint = new Constraint()
-        constraint.setType('UNIQUE')
+        constraint.setType(DBObjMapper.CONSTRAINT_UNIQUE.getObjKey())
         constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
-        constraint.setAction('ADD')
-        constraint.setSubType('NONCLUSTERED')
+        constraint.setAction(DBObjMapper.ACTION_ADD.getObjKey())
+        constraint.setSubType(DBObjMapper.CONSTRAINT_NONCLUSTERED.getObjKey())
         constraint.setFields(Arrays.asList('assessment_session_id','related_assessment_session_id','assessment_session_rel_type'))
         constraint.setTableName('ASSESS_SESSION_RELATIONSHIP')
 
@@ -103,7 +104,7 @@ class ConstraintParserTest {
         Constraint constraint = new Constraint()
         constraint.setType('')
         constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
-        constraint.setAction('DROP')
+        constraint.setAction(DBObjMapper.ACTION_DROPONLY.getObjKey())
         constraint.setSubType('')
         constraint.setFields(Arrays.asList(''))
         constraint.setTableName('ASSESS_SESSION_RELATIONSHIP')
@@ -128,9 +129,9 @@ class ConstraintParserTest {
                 "ADD CONSTRAINT CHK_CFN_CATEGORY_BSAS_ACCR_LVL " +
                 "CHECK (bsas_accreditation_level in ('01','02','03','04'))"
         Constraint constraint = new Constraint()
-        constraint.setType('CHECK')
+        constraint.setType(DBObjMapper.CONSTRAINT_CHECK.getObjKey())
         constraint.setName('AK_ASSESS_SESSION_RELATIONSHIP')
-        constraint.setAction('DROP')
+        constraint.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         constraint.setSubType('')
         constraint.setFields(Arrays.asList(''))
         constraint.setTableName('ASSESS_SESSION_RELATIONSHIP')

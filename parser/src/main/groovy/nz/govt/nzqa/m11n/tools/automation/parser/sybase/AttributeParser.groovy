@@ -11,36 +11,37 @@ class AttributeParser implements Parser{
     ParserUtil util = new ParserUtil()
 
     String getType(String sqlStatement){
-        String type = ''
+        String typeString = ''
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
 
         if (result) {
             String actionString = result[0][1]
-            String action = util.getActionObjKeyfromRawString(actionString)
-            type = (action.equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getObjKey())? DBObjMapper.KEY_COLUMN.getObjKey() : '')
-        }
+            String action = util.getActionObjKeyFromRawString(actionString)
 
+            if (action.equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getObjKey())){
+                typeString = DBObjMapper.KEY_COLUMN.getObjKey()
+            }
+        }
+        String type = util.getActionObjKeyFromRawString(typeString)
         return type
     }
 
     String getName(String attributeString){
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
         String name = (attributeFields.size() > 0? attributeFields[0] : '')
-
         return name
     }
 
     String getAction(String sqlStatement){
-        String action = ''
+        String actionString = ''
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_ACTION.getObjKey())
         def result = (sqlStatement =~ /$regex/)
 
         if (result){
-            String actionString = result[0][1]
-            action = util.getActionObjKeyfromRawString(actionString)
+            actionString = result[0][1]
         }
-
+        String action = util.getActionObjKeyFromRawString(actionString)
         return action
     }
 
@@ -48,8 +49,7 @@ class AttributeParser implements Parser{
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
         def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : '')
-        String dataType = (type? type[0][1].toString().toUpperCase() : (attributeFields.size() > 0? attributeFields[1].toUpperCase(): ''))
-
+        String dataType = (type? type[0][1].toString() : (attributeFields.size() > 0? attributeFields[1]: ''))
         return dataType
     }
 
@@ -80,11 +80,19 @@ class AttributeParser implements Parser{
     }
 
     String getDefaultValueDataType(String attributeString){
+        String defaultValueDataType = ''
         String intRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         String charRegex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DEFAULT_VALUE_DATA_TYPE.getObjKey(), DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey())
-        def result = (attributeString =~ /$intRegex/)
-        String defaultValueDataType = (result? DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey() :
-                ((attributeString =~/$charRegex/)? DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey() : ''))
+        def intResult = (attributeString =~ /$intRegex/)
+        def charResult = (attributeString =~ /$charRegex/)
+
+        if (intResult){
+            defaultValueDataType = DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()
+        }
+
+        else if (charResult){
+            defaultValueDataType = DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()
+        }
         return defaultValueDataType
     }
 
@@ -92,13 +100,13 @@ class AttributeParser implements Parser{
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_IS_NULL.getObjKey())
         def result = (attributeString =~ /$regex/)
         boolean isNull = !(result)
-
         return isNull
     }
 
     @Override
     Attribute parse(File file){
         Attribute attribute = new Attribute()
+
         return attribute
     }
 
@@ -106,9 +114,7 @@ class AttributeParser implements Parser{
     Attribute parse(String attributeString) {
 
         Attribute attribute = new Attribute()
-
         attribute.setName(getName(attributeString))
-
         attribute.setDataType(getDataType(attributeString))
         attribute.setLength(getLength(attributeString))
         attribute.setFraction(getFraction(attributeString))

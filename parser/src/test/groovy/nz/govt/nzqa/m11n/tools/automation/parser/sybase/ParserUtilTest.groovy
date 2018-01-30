@@ -82,18 +82,18 @@ class ParserUtilTest {
         String actionString5 = '='
         String actionString6 = '= '
 
-        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString2))
-        assertEquals(DBObjMapper.ACTION_ADD.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString3))
-        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString4))
-        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyfromRawString(actionString5))
-        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyfromRawString(actionString6))
+        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), parserUtil.getActionObjKeyFromRawString(actionString2))
+        assertEquals(DBObjMapper.ACTION_ADD.getObjKey(), parserUtil.getActionObjKeyFromRawString(actionString3))
+        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), parserUtil.getActionObjKeyFromRawString(actionString4))
+        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyFromRawString(actionString5))
+        assertEquals(DBObjMapper.OPERATOR_EQUAL, parserUtil.getActionObjKeyFromRawString(actionString6))
     }
 
     @Test
     void shouldIgnoreSpacesAndReturnCorrectOperation(){
         String opString1 = 'is'
 
-        assertEquals(DBObjMapper.SPECIAL_OPERATOR_IS, parserUtil.getOperatorObjKeyfromRawString(opString1))
+        assertEquals(DBObjMapper.SPECIAL_OPERATOR_IS, parserUtil.getOperatorObjKeyFromRawString(opString1))
 //        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString2))
 //        assertEquals(DBObjMapper.ACTION_ADD.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString3))
 //        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), parserUtil.getActionObjKeyfromRawString(actionString4))

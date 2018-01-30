@@ -17,15 +17,13 @@ class UtilitiesParser implements Parser {
         def result = (sqlStatement =~ /$regex/)
         String[] dbName = (result? result[0][3].toString().split("\\.") : [])
         String databaseName = (dbName.size() == 2? dbName[0] : '')
-
         return databaseName
     }
 
     String getType(String sqlStatement){
         String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String type = (result? result[0][2].toString() : '')
-
+        String type = (result? util.getTypeObjKeyFromRawString(result[0][2].toString()) : '')
         return type
     }
 
@@ -34,22 +32,19 @@ class UtilitiesParser implements Parser {
         def result = (sqlStatement =~ /$regex/)
         String[] dbName = (result? result[0][3].toString().split("\\.") : [])
         String name = (dbName.size() == 2? dbName[1] : result[0][3])
-
         return name
     }
 
     String getAction(String sqlStatement){
         String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_ACTION.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String action = (result? result[0][1].toString() : '')
-
+        String action = (result? util.getActionObjKeyFromRawString(result[0][1].toString()) : '')
         return action
     }
 
     Map<String, Param> getInFields(String sqlStatement){
         ParamParser paramParser = new ParamParser()
         Map<String, Param> paramMap = new HashMap<>()
-
         String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_IN_FIELDS.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         List<String> paramStrings = (result? result[0][2].toString().split(",").toList() :
@@ -59,13 +54,11 @@ class UtilitiesParser implements Parser {
             Param param = paramParser.parse(paramString)
             paramMap.put(param.getName(), param)
         }
-
         return paramMap
     }
 
     String getReturnType(String sqlStatement){
         String returnType = ''
-
         return returnType
     }
 
@@ -73,7 +66,6 @@ class UtilitiesParser implements Parser {
         String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_SQL.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         String sql = (result? result[0][1].toString() : "")
-
         return sql
     }
 
@@ -85,7 +77,6 @@ class UtilitiesParser implements Parser {
             Relation relation = relationParser.parse(grantStatement)
             relationMap.put(relation.getName(), relation)
         }
-
         return relationMap
     }
 
@@ -128,7 +119,6 @@ class UtilitiesParser implements Parser {
                 grantStatements.add(sqlStatement)
             }
         }
-
         utilities.setGrants(getGrants(grantStatements))
 
         return utilities
@@ -156,7 +146,6 @@ class UtilitiesParser implements Parser {
         else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())){
             grantStatements.add(sqlStatement)
         }
-
         utilities.setGrants(getGrants(grantStatements))
 
         return utilities

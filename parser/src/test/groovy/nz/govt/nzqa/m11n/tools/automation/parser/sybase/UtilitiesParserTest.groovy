@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.parser.sybase
 
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Utilities
 import org.junit.Before
 import org.junit.Test
@@ -33,30 +34,30 @@ class UtilitiesParserTest {
         // @ErrorMessage varchar(255) output as ..."
 
         assertEquals("dbo", testUtilities.getDatabaseName())
-        assertEquals("procedure", testUtilities.getType())
+        assertEquals(DBObjMapper.ENTITY_PROCEDURE.getObjKey(), testUtilities.getType())
         assertEquals("ContactsMergeCopyName", testUtilities.getName())
-        assertEquals("create", testUtilities.getAction())
+        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), testUtilities.getAction())
         assertEquals(4, testUtilities.getInFields().size())
 
         assertEquals("ContactMergeRunId", testUtilities.getInFields().get("ContactMergeRunId").getName())
         assertEquals("object_id", testUtilities.getInFields().get("ContactMergeRunId").getDataType())
         assertEquals("", testUtilities.getInFields().get("ContactMergeRunId").getDefaultValue())
-        assertEquals("INPUT", testUtilities.getInFields().get("ContactMergeRunId").getInOut())
+        assertEquals(DBObjMapper.PARAM_INPUT.getObjKey(), testUtilities.getInFields().get("ContactMergeRunId").getInOut())
 
         assertEquals("NameId", testUtilities.getInFields().get("NameId").getName())
         assertEquals("object_id", testUtilities.getInFields().get("NameId").getDataType())
         assertEquals("", testUtilities.getInFields().get("NameId").getDefaultValue())
-        assertEquals("INPUT", testUtilities.getInFields().get("NameId").getInOut())
+        assertEquals(DBObjMapper.PARAM_INPUT.getObjKey(), testUtilities.getInFields().get("NameId").getInOut())
 
         assertEquals("DebugYN", testUtilities.getInFields().get("DebugYN").getName())
         assertEquals("char(1)", testUtilities.getInFields().get("DebugYN").getDataType())
         assertEquals("", testUtilities.getInFields().get("DebugYN").getDefaultValue())
-        assertEquals("INPUT", testUtilities.getInFields().get("DebugYN").getInOut())
+        assertEquals(DBObjMapper.PARAM_INPUT.getObjKey(), testUtilities.getInFields().get("DebugYN").getInOut())
 
         assertEquals("ErrorMessage", testUtilities.getInFields().get("ErrorMessage").getName())
         assertEquals("varchar(255)", testUtilities.getInFields().get("ErrorMessage").getDataType())
         assertEquals("", testUtilities.getInFields().get("ErrorMessage").getDefaultValue())
-        assertEquals("OUTPUT", testUtilities.getInFields().get("ErrorMessage").getInOut())
+        assertEquals(DBObjMapper.PARAM_OUTPUT.getObjKey(), testUtilities.getInFields().get("ErrorMessage").getInOut())
     }
 
     @Test
@@ -64,9 +65,9 @@ class UtilitiesParserTest {
         Utilities testUtilities = utilitiesParser.parse(new File(
                 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTriggers/testFile.sql'))
 
-        assertEquals("TRIGGER", testUtilities.getType())
+        assertEquals(DBObjMapper.ENTITY_TRIGGER.getObjKey(), testUtilities.getType())
         assertEquals("du_ACCREDITATION", testUtilities.getName())
-        assertEquals("CREATE", testUtilities.getAction())
+        assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), testUtilities.getAction())
 //        assertEquals(sql, testUtilities.getSql())
         assertEquals("ACCREDITATION", testUtilities.getTriggerTableName())
         assertEquals(Arrays.asList("DELETE", "UPDATE"), testUtilities.getTriggerOperations())

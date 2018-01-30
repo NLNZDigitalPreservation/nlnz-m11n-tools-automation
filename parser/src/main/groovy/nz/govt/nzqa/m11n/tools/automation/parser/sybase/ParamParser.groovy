@@ -8,12 +8,12 @@ import nz.govt.nzqa.m11n.tools.automation.regex.SybaseRegexBuilder
 class ParamParser implements Parser{
 
     SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
+    ParserUtil util = new ParserUtil()
 
     String getName(String paramString){
         String regex = regexBuilder.buildParamRegex(DBObjMapper.REGEX_NAME.getObjKey())
         def result = (paramString =~ /$regex/)
         String name = (result? result[0][1].toString() : '')
-
         return name
     }
 
@@ -21,7 +21,6 @@ class ParamParser implements Parser{
         String regex = regexBuilder.buildParamRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         def result = (paramString =~ /$regex/)
         String dataType = (result? result[0][2].toString() : '')
-
         return dataType
     }
 
@@ -29,53 +28,31 @@ class ParamParser implements Parser{
         String regex = regexBuilder.buildParamRegex(DBObjMapper.REGEX_DEFAULT_VALUE.getObjKey())
         def result = (paramString =~ /$regex/)
         String defaultValue = (result? result[0][3].toString().replaceAll("\\s+", "") : '')
-
         return defaultValue
     }
 
     String getInOut(String paramString){
-        String inOut = DBObjMapper.PARAM_INPUT.getObjKey()
+        String output = ''
         String regex = regexBuilder.buildParamRegex(DBObjMapper.REGEX_IN_OUT.getObjKey())
         String withDefaultRegex = regexBuilder.buildParamRegex(DBObjMapper.REGEX_IN_OUT.getObjKey(), DBObjMapper.ENTITY_DEFAULT.getObjKey())
         def result = (paramString =~ /$regex/)
         def withDefaultResult = (paramString =~ /$withDefaultRegex/)
 
-        if (withDefaultResult){
-            String output = withDefaultResult[0][4].toString()
-
-            switch(output.toLowerCase()){
-                case(DBObjMapper.PARAM_OUTPUT.getSybaseKey().toLowerCase()):
-                    inOut = DBObjMapper.PARAM_OUTPUT.getObjKey()
-                    break
-
-                case(DBObjMapper.PARAM_INPUT_AND_OUTPUT.getSybaseKey().toLowerCase()):
-                    inOut = DBObjMapper.PARAM_INPUT_AND_OUTPUT.getObjKey()
-                    break
-
-                }
+        if (withDefaultResult) {
+            output = withDefaultResult[0][4].toString()
         }
 
-        else if(result){
-            String output = result[0][3].toString()
-
-            switch(output.toLowerCase()){
-                case(DBObjMapper.PARAM_OUTPUT.getSybaseKey().toLowerCase()):
-                    inOut = DBObjMapper.PARAM_OUTPUT.getObjKey()
-                    break
-
-                case(DBObjMapper.PARAM_INPUT_AND_OUTPUT.getSybaseKey().toLowerCase()):
-                    inOut = DBObjMapper.PARAM_INPUT_AND_OUTPUT.getObjKey()
-                    break
-
-            }
-
+        else if(result) {
+                output = result[0][3].toString()
         }
+        String inOut = util.getParamInOutFromRawString(output)
         return inOut
     }
 
     @Override
     Param parse(File file){
         Param param = new Param()
+
         return param
     }
 
@@ -86,6 +63,7 @@ class ParamParser implements Parser{
         param.setDataType(getDataType(paramString))
         param.setDefaultValue(getDefaultValue(paramString))
         param.setInOut(getInOut(paramString))
+
         return param
     }
 }

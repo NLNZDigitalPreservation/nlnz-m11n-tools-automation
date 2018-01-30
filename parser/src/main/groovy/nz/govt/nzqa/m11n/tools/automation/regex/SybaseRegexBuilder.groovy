@@ -90,11 +90,20 @@ class SybaseRegexBuilder implements RegexBuilder {
 
 
             case(DBObjMapper.REGEX_FIELDS.getObjKey()):case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
-                //(?i)(CREATE|ADD|DROP|ALTER) (\S+) (\S+) \((.*)\)
-                regexString = String.format("(?i)(%s|%s|%s|%s) (\\S+) (\\S+) \\((.*)\\)",
+                //(?i)(CREATE|ADD|DROP) (\S+) (\S+) \((.*)\)
+                regexString = String.format("(?i)(%s|%s|%s) (\\S+) (\\S+) \\((.*)\\)",
                         DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
-                        DBObjMapper.ACTION_DROPONLY.getSybaseKey(), DBObjMapper.ACTION_ALTER.getSybaseKey())
+                        DBObjMapper.ACTION_DROP.getSybaseKey())
                 break
+
+//            case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
+//                //(?i)(ALTER) (\S+) (\S+) ADD CONSTRAINT (.*)|(CREATE|ADD|DROP) (\S+) (\S+) \((.*)\)
+//                regexString = String.format("(?i)%s (\\S+) (\\S+) %s %s (.*)|(%s|ADD|DROP) (\\S+) (\\S+) \\((.*)\\)",
+//                        DBObjMapper.ACTION_ALTER.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
+//                        DBObjMapper.ENTITY_CONSTRAINT.getSybaseKey(),
+//                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
+//                        DBObjMapper.ACTION_DROP.getSybaseKey())
+//                break
 
             case(DBObjMapper.REGEX_LOCKS.getObjKey()):
                 //(?i)LOCK (\S+)
@@ -384,8 +393,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                                 DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                                 DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
-                                DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.NULL.getSybaseKey(),
-                                DBObjMapper.NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
+                                DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.CONSTRAINT_NULL.getSybaseKey(),
+                                DBObjMapper.CONSTRAINT_NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
                         break
 
                     case(DBObjMapper.SPECIAL_OPERATOR_IN):
@@ -399,8 +408,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                                 DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                                 DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
-                                DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.NULL.getSybaseKey(),
-                                DBObjMapper.NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
+                                DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.CONSTRAINT_NULL.getSybaseKey(),
+                                DBObjMapper.CONSTRAINT_NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
                         break
 
                     default:
@@ -418,8 +427,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                                 DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                                 DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                                 DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
-                                DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.NULL.getSybaseKey(),
-                                DBObjMapper.NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
+                                DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.CONSTRAINT_NULL.getSybaseKey(),
+                                DBObjMapper.CONSTRAINT_NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
                         break
 
                     default:
@@ -436,8 +445,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                         DBObjMapper.SPECIAL_OPERATOR_IN, DBObjMapper.SPECIAL_OPERATOR_IS,
                         DBObjMapper.OPERATOR_GREATER_THAN,DBObjMapper.OPERATOR_LESS_THAN,
                         DBObjMapper.OPERATOR_GREATER_OR_EQUAL,DBObjMapper.OPERATOR_LESS_OR_EQAUL,
-                        DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.NULL.getSybaseKey(),
-                        DBObjMapper.NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
+                        DBObjMapper.OPERATOR_EQUAL,DBObjMapper.SPECIAL_OPERATOR_BETWEEN, DBObjMapper.CONSTRAINT_NULL.getSybaseKey(),
+                        DBObjMapper.CONSTRAINT_NOT_NULL.getSybaseKey(), DBObjMapper.OPERATOR_AND)
                 break
 
             case(DBObjMapper.REGEX_JOIN_OPERATOR.getObjKey()):

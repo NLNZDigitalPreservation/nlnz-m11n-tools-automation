@@ -34,6 +34,7 @@ class ParserUtil {
                     statement = line
                 } else {
                     statement += " " + line
+                    statement = statement.trim()
                 }
 
             }
@@ -168,7 +169,6 @@ class ParserUtil {
 
 
     String getWrapperString(String workingSqlStatement) {
-        String wrapperString = ''
         SybaseRegexBuilder regexBuilder = new SybaseRegexBuilder()
         String childCriteriaInOperatorRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
                 DBObjMapper.SPECIAL_OPERATOR_IN)
@@ -191,17 +191,17 @@ class ParserUtil {
                 openBracketFound = true
             }
         }
-        wrapperString = (openBracketFound ? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
+        String wrapperString = (openBracketFound ? workingSqlStatement.substring(openBracketIndex, closeBracketIndex + 1) :
                 workingSqlStatement.substring(0, closeBracketIndex + 1))
 
         return wrapperString
     }
 
-    String getOperatorObjKeyfromRawString(String operatorString){
-        String cleanOperator = operatorString.replaceAll("\\s", "").toUpperCase()
+    String getOperatorObjKeyFromRawString(String operatorString){
+        String cleanOperator = operatorString.trim()
         String key = cleanOperator
 
-        switch(cleanOperator){
+        switch(cleanOperator.toUpperCase()){
             case(DBObjMapper.OPERATOR_OR):
                 key = DBObjMapper.OPERATOR_OR
                 break
@@ -230,12 +230,12 @@ class ParserUtil {
         return key
     }
 
-    String getActionObjKeyfromRawString(String actionString){
+    String getActionObjKeyFromRawString(String actionString){
 
-        String cleanAction = actionString.replaceAll("\\s", "").toUpperCase()
+        String cleanAction = actionString.trim()
         String action = cleanAction
 
-        switch(cleanAction){
+        switch(cleanAction.toUpperCase()){
             case(DBObjMapper.ACTION_DROP.getSybaseKey()):
                 action = DBObjMapper.ACTION_DROPONLY.getObjKey()
                 break
@@ -279,8 +279,152 @@ class ParserUtil {
             case(DBObjMapper.ACTION_REFERENCES.getSybaseKey()):
                 action = DBObjMapper.ACTION_REFERENCES.getObjKey()
                 break
-    }
+        }
         return action
+    }
 
+    String getTypeObjKeyFromRawString(String typeString){
+
+        String cleanType = typeString.trim()
+        String type = cleanType
+
+        switch(cleanType.toUpperCase()){
+
+            //Entity
+            case(DBObjMapper.ENTITY_TABLE.getSybaseKey()):
+                type = DBObjMapper.ENTITY_TABLE.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_VIEW.getSybaseKey()):
+                type = DBObjMapper.ENTITY_VIEW.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_DEFAULT.getSybaseKey()):
+                type = DBObjMapper.ENTITY_DEFAULT.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_DATATYPE.getSybaseKey()):
+                type = DBObjMapper.ENTITY_DATATYPE.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_GROUP.getSybaseKey()):
+                type = DBObjMapper.ENTITY_GROUP.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_USER.getSybaseKey()):
+                type = DBObjMapper.ENTITY_USER.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_RULE.getSybaseKey()):
+                type = DBObjMapper.ENTITY_RULE.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_MESSAGE.getSybaseKey()):
+                type = DBObjMapper.ENTITY_MESSAGE.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_KEY.getSybaseKey()):
+                type = DBObjMapper.ENTITY_KEY.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_CONSTRAINT.getSybaseKey()):
+                type = DBObjMapper.ENTITY_CONSTRAINT.getObjKey()
+                break
+
+            //Attribute
+            case(DBObjMapper.KEY_COLUMN.getSybaseKey()):
+                type = DBObjMapper.KEY_COLUMN.getObjKey()
+                break
+
+            //Index
+            case(DBObjMapper.INDEX_CLUSTERED.getSybaseKey()):
+                type = DBObjMapper.INDEX_CLUSTERED.getObjKey()
+                break
+
+            case(DBObjMapper.INDEX_NONCLUSTERED.getSybaseKey()):
+                type = DBObjMapper.INDEX_NONCLUSTERED.getObjKey()
+                break
+
+            //Constrains
+            case(DBObjMapper.CONSTRAINT_PRIMARYKEY.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_PRIMARYKEY.getObjKey()
+                break
+
+            case(DBObjMapper.CONSTRAINT_FOREIGNKEY.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey()
+                break
+
+            case(DBObjMapper.CONSTRAINT_UNIQUE.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_UNIQUE.getObjKey()
+                break
+
+            case(DBObjMapper.CONSTRAINT_CHECK.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_CHECK.getObjKey()
+                break
+
+            //Constraint - subType
+            case(DBObjMapper.CONSTRAINT_NULL.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_NULL.getObjKey()
+                break
+
+            case(DBObjMapper.CONSTRAINT_NOT_NULL.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_NOT_NULL.getObjKey()
+                break
+
+            case(DBObjMapper.CONSTRAINT_CLUSTERED.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_CLUSTERED.getObjKey()
+                break
+
+            case(DBObjMapper.CONSTRAINT_NONCLUSTERED.getSybaseKey()):
+                type = DBObjMapper.CONSTRAINT_NONCLUSTERED.getObjKey()
+                break
+
+            //Criteria
+            case(DBObjMapper.CRITERIA_CHECK.getObjKey()):
+                type = DBObjMapper.CRITERIA_CHECK.getObjKey()
+                break
+
+            case(DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey()):
+                type = DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey()
+                break
+
+            //Utilities
+            case(DBObjMapper.ENTITY_PROCEDURE.getSybaseKey()):
+                type = DBObjMapper.ENTITY_PROCEDURE.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_TRIGGER.getSybaseKey()):
+                type = DBObjMapper.ENTITY_TRIGGER.getObjKey()
+                break
+
+            case(DBObjMapper.ENTITY_FUNCTION.getSybaseKey()):
+                type = DBObjMapper.ENTITY_FUNCTION.getObjKey()
+                break
+
+            //Relation
+            case(DBObjMapper.KEY_GRANT.getSybaseKey()):
+                type = DBObjMapper.KEY_GRANT.getObjKey()
+                break
+
+        }
+        return type
+    }
+
+    String getParamInOutFromRawString(String output){
+
+        String cleanInOutString = output.replaceAll("\\s", "")
+        String inOut = DBObjMapper.PARAM_INPUT.getObjKey()
+
+        switch(cleanInOutString.toUpperCase()) {
+            case(DBObjMapper.PARAM_OUTPUT.getSybaseKey()):
+                inOut = DBObjMapper.PARAM_OUTPUT.getObjKey()
+                break
+
+            case(DBObjMapper.PARAM_INPUT_AND_OUTPUT.getSybaseKey()):
+                inOut = DBObjMapper.PARAM_INPUT_AND_OUTPUT.getObjKey()
+                break
+        }
+
+        return inOut
     }
 }

@@ -249,7 +249,7 @@ class EntityParserTest {
         entity.setName('wwwaddr')
         entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
         entity.setDataType('varchar(255)')
-        entity.setQueryValue(DBObjMapper.NULL.getSybaseKey())
+        entity.setQueryValue(DBObjMapper.CONSTRAINT_NULL.getSybaseKey())
 
         Entity testEntity = entityParser.parse(sqlStatement)
 

@@ -12,28 +12,14 @@ class ConstraintParser implements Parser {
     ParserUtil util = new ParserUtil()
 
     String getType(String sqlStatement){
+        String typeString = ''
         String regex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_TYPE.getObjKey())
-        String type = ''
         def result = (sqlStatement =~ /$regex/)
+
         if (result){
-            switch(result[0][2]){
-                case(DBObjMapper.CONSTRAINT_FOREIGNKEY.getSybaseKey()):
-                    type = DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey()
-                    break
-
-                case(DBObjMapper.CONSTRAINT_PRIMARYKEY.getSybaseKey()):
-                    type = DBObjMapper.CONSTRAINT_PRIMARYKEY.getObjKey()
-                    break
-
-                case(DBObjMapper.CONSTRAINT_UNIQUE.getSybaseKey()):
-                    type = DBObjMapper.CONSTRAINT_UNIQUE.getObjKey()
-                    break
-
-                case(DBObjMapper.CONSTRAINT_CHECK.getSybaseKey()):
-                    type = DBObjMapper.CONSTRAINT_CHECK.getObjKey()
-                    break
-            }
+            typeString = result[0][2]
         }
+        String type = util.getTypeObjKeyFromRawString(typeString)
         return type
     }
 
@@ -41,33 +27,42 @@ class ConstraintParser implements Parser {
         String regex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_NAME.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         String name = (result? result[0][1] : '')
-
         return name
     }
 
     String getSubType(String sqlStatement){
+        String subTypeString = ''
         String regex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_SUB_TYPE.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        String subType = (result? result[0][3] : '')
 
+        if (result){
+            subTypeString = result[0][3]
+        }
+        String subType = util.getTypeObjKeyFromRawString(subTypeString)
         return subType
     }
 
     String getAction(String sqlStatement){
+        String actionString = ''
         String createTableRegex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_ACTION.getObjKey(), DBObjMapper.ACTION_CREATE.getObjKey())
         String addDropConstraintRegex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_ACTION.getObjKey(), DBObjMapper.ACTION_ADD.getObjKey())
-
         def createResult = (sqlStatement =~ /$createTableRegex/)
-        def result = (sqlStatement =~ /$addDropConstraintRegex/)
-        String action = (createResult? createResult[0][1]: (result? result[0][1] : ''))
+        def addDropConstraintResult = (sqlStatement =~ /$addDropConstraintRegex/)
 
+        if (createResult){
+            actionString = createResult[0][1]
+        }
+
+        else if (addDropConstraintResult){
+            actionString = addDropConstraintResult[0][1]
+        }
+        String action = util.getActionObjKeyFromRawString(actionString)
         return action
     }
 
     List<String> getFields(String sqlStatement){
         String pkUniqueRegex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_FIELDS.getObjKey(), DBObjMapper.CONSTRAINT_PRIMARYKEY.getObjKey())
         String fkRegex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_FIELDS.getObjKey(), DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey())
-
         def result = (sqlStatement =~ /$pkUniqueRegex/)
         def fkResult = (sqlStatement =~ /$fkRegex/)
         List<String> fields = Arrays.asList(result? result[0][4].toString().split(",") :
@@ -81,7 +76,6 @@ class ConstraintParser implements Parser {
         def result = (sqlStatement =~ /$regex/)
         String[] dbTable = (result? result[0][1].toString().split("\\.") : [])
         String tableName = (dbTable.size() == 2? dbTable[1] : '')
-
         return tableName
     }
 
@@ -90,7 +84,6 @@ class ConstraintParser implements Parser {
         def result = (sqlStatement =~ /$regex/)
         String[] dbTable =  (result? result[0][1].toString().split("\\.") : [])
         String referenceTableName = (dbTable.size() == 2? dbTable[1] : '')
-
         return referenceTableName
     }
 
@@ -98,19 +91,18 @@ class ConstraintParser implements Parser {
         String regex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_REFERENCE_FIELDS.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         List<String> referenceFields = Arrays.asList(result? result[0][2].toString().split(",") : [])
-
         return referenceFields
     }
 
     Criteria getCriteria(String constraintString){
         String regex = regexBuilder.buildConstraintRegex(DBObjMapper.REGEX_CRITERIA.getObjKey())
         Criteria criteria = null
+        def checkConstraintResult = constraintString =~ /$regex/
 
-        if (constraintString =~ /$regex/){
+        if (checkConstraintResult){
             CriteriaParser criteriaParser = new CriteriaParser()
             criteria = criteriaParser.parse(constraintString)
         }
-
         return criteria
     }
 
@@ -128,6 +120,7 @@ class ConstraintParser implements Parser {
         constraint.setReferenceTableName(getReferenceTableName(sqlStatement))
         constraint.setReferenceFields(getReferenceFields(sqlStatement))
         constraint.setCriteria(getCriteria(sqlStatement))
+
         return constraint
     }
 
@@ -147,6 +140,7 @@ class ConstraintParser implements Parser {
             constraint.setReferenceFields(getReferenceFields(sqlStatement))
             constraint.setCriteria(getCriteria(sqlStatement))
         }
+
         return constraint
     }
 }

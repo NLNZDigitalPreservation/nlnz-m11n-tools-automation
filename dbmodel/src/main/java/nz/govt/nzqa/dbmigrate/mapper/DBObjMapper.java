@@ -6,8 +6,6 @@ public class DBObjMapper {
     public static ObjMapper USE = new ObjMapper("", "USE", "USE");
     public static ObjMapper GO = new ObjMapper("", "GO", "GO");
     public static ObjMapper AS = new ObjMapper("", "AS", "AS");
-    public static ObjMapper NULL = new ObjMapper("", "NULL", "NULL");
-    public static ObjMapper NOT_NULL = new ObjMapper("", "NOT NULL", "NOT NULL");
 
     public static ObjMapper KEY_COLUMN = new ObjMapper("COLUMN", "Column", "COLUMN");
     public static ObjMapper KEY_CONSTRAINT = new ObjMapper("CONSTRAINT", "CONSTRAINT", "CONSTRAINT");
@@ -61,7 +59,8 @@ public class DBObjMapper {
     public static ObjMapper CONSTRAINT_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper CONSTRAINT_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
     public static ObjMapper CONSTRAINT_REFERENCES = new ObjMapper("REFERENCES", "REFERENCES", "REFERENCES");
-
+    public static ObjMapper CONSTRAINT_NULL = new ObjMapper("NULL", "NULL", "NULL");
+    public static ObjMapper CONSTRAINT_NOT_NULL = new ObjMapper("NOT NULL", "NOT NULL", "NOT NULL");
 
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");

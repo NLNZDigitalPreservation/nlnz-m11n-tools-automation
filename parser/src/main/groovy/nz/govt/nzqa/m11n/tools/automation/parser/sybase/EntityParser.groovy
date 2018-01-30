@@ -33,16 +33,28 @@ class EntityParser implements Parser{
     }
 
     String getType(String sqlStatement){
+        String typeString = ''
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_TYPE.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey(), DBObjMapper.ACTION_ALTER.getObjKey())
         def alterResult = (sqlStatement =~ /$alterRegex/)
-
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
-        String type = (alterResult? DBObjMapper.ENTITY_KEY.getObjKey() : result? result[0][2].toString() : dataTypeResult? dataTypeResult[0][2] : '')
 
+        if (alterResult){
+            typeString = DBObjMapper.ENTITY_KEY.getObjKey()
+        }
+
+        else if (result){
+            typeString = result[0][2]
+        }
+
+        else if (dataTypeResult){
+            typeString = dataTypeResult[0][2]
+
+        }
+        String type = util.getTypeObjKeyFromRawString(typeString)
         return type
     }
 
@@ -53,7 +65,6 @@ class EntityParser implements Parser{
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
                 DBObjMapper.ACTION_ALTER.getObjKey())
-
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
         def alterResult = (sqlStatement =~ /$alterRegex/)
@@ -72,52 +83,47 @@ class EntityParser implements Parser{
             String[] nameTypeValue = dataTypeResult[0][3].toString().replaceAll("'|\\s", "").split(",")
             name = (nameTypeValue.size() == 3? nameTypeValue[0] : '')
         }
-
         return name
     }
 
     String getAction(String sqlStatement){
-        String action = ''
+        String actionString = ''
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(),
                 DBObjMapper.ACTION_ALTER.getObjKey())
-
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
         def alterResult = (sqlStatement =~ /$alterRegex/)
 
-        String actionString = ''
-
         if (alterResult){
-            action = DBObjMapper.ACTION_ALTER.getObjKey()
+            actionString = DBObjMapper.ACTION_ALTER.getObjKey()
         }
 
         else if (result) {
             actionString = result[0][1]
-            action = util.getActionObjKeyfromRawString(actionString)
         }
 
         else if (dataTypeResult){
             actionString = dataTypeResult[0][1]
-            action = util.getActionObjKeyfromRawString(actionString)
         }
-
+        String action = util.getActionObjKeyFromRawString(actionString)
         return action
     }
 
     String getOperationType(String sqlStatement){
-        String operationType = ""
-
+        String operationType = ''
         String createRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_OPERATION_TYPE.getObjKey(), DBObjMapper.ACTION_CREATE.getSybaseKey())
         String defaultRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_OPERATION_TYPE.getObjKey(), DBObjMapper.ENTITY_DEFAULT.getSybaseKey())
+        def createResult = (sqlStatement =~ /$createRegex/)
+        def defaultResult = (sqlStatement =~ /$defaultRegex/)
 
-        if(sqlStatement =~ /$defaultRegex/){
+        if(defaultResult){
             operationType = DBObjMapper.ENTITY_OPERATION_TYP_DEFAULT_VALUE.getObjKey()
         }
 
-        else if (sqlStatement =~ /$createRegex/){
+        else if (createResult){
             if (sqlStatement.toUpperCase().contains(DBObjMapper.ACTION_SELECT.getSybaseKey() + " ")){
                 operationType = DBObjMapper.ENTITY_OPERATION_TYP_DERIVED.getObjKey()
             }
@@ -126,26 +132,26 @@ class EntityParser implements Parser{
                 operationType = DBObjMapper.ENTITY_OPERATION_TYP_DIRECT.getObjKey()
             }
         }
-
         return operationType
     }
 
     Map<String, Attribute> getFields(String sqlStatement){
         AttributeParser attributeParser = new AttributeParser()
         Map<String, Attribute> attributeMap = new HashMap<>()
-
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_FIELDS.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        List<String> attributes = result? (result[0][4].toString().split(", ").toList()) : new ArrayList<String>()
-        Collection<String> attributeStrings = Collections2.filter(attributes, Predicates.not(Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey())))
 
-        for (String attributeString : attributeStrings){
-            Attribute attribute = attributeParser.parse(attributeString)
-            attribute.setType(attributeParser.getType(sqlStatement))
-            attribute.setAction(attributeParser.getAction(sqlStatement))
-            attributeMap.put(attribute.getName(), attribute)
+        if (result){
+            List<String> attributes = result[0][4].toString().split(", ")
+            Collection<String> attributeStrings = Collections2.filter(attributes, Predicates.not(Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey())))
+
+            for (String attributeString : attributeStrings){
+                Attribute attribute = attributeParser.parse(attributeString)
+                attribute.setType(attributeParser.getType(sqlStatement))
+                attribute.setAction(attributeParser.getAction(sqlStatement))
+                attributeMap.put(attribute.getName(), attribute)
+            }
         }
-
         return attributeMap
     }
 
@@ -155,7 +161,6 @@ class EntityParser implements Parser{
                 DBObjMapper.ENTITY_DEFAULT.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
-
         def defaultResult = (sqlStatement =~ /$defaultRegex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
 
@@ -168,7 +173,6 @@ class EntityParser implements Parser{
             String[] nameTypeValue = dataTypeResult[0][3].toString().replaceAll("'|\\s", "").split(",")
             dataType = (nameTypeValue.size() == 3? nameTypeValue[1] : '')
         }
-
         return dataType
     }
 
@@ -177,7 +181,6 @@ class EntityParser implements Parser{
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_QUERY_VALUE.getObjKey())
         String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey(),
                 DBObjMapper.REGEX_DATA_TYPE.getObjKey())
-
         def result = (sqlStatement =~ /$regex/)
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
 
@@ -189,7 +192,6 @@ class EntityParser implements Parser{
             String[] nameTypeValue = dataTypeResult[0][3].toString().replaceAll("'|\\s", "").split(",")
             queryValue = (nameTypeValue.size() == 3? nameTypeValue[2] : '')
         }
-
         return queryValue
     }
 
@@ -197,14 +199,17 @@ class EntityParser implements Parser{
     Map<String, Constraint> getConstraints(String sqlStatement){
         ConstraintParser constraintParser = new ConstraintParser()
         Map<String, Constraint> constraintMap = new HashMap<>()
-
+        List<String> constraintStrings = new ArrayList<>()
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_CONSRTAINTS.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        List<String> attributes = (result? result[0][4].toString().split(", ").toList() : new ArrayList<>())
-        List<String> constraintStrings = (attributes.size() > 0? Collections2.filter
-            (attributes, Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey())).asList() : new ArrayList<>())
 
-        if (constraintStrings.size() == 0) {
+        if (result) {
+            List<String> attributes = result[0][4].toString().split(", ").toList()
+            constraintStrings = (attributes.size() > 0 ? Collections2.filter
+            (attributes, Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey())).asList() : new ArrayList<>())
+        }
+
+        else {
             // Pass the whole SQL statement to constraint parser
             constraintStrings.add(sqlStatement)
         }
@@ -215,7 +220,6 @@ class EntityParser implements Parser{
             constraint.setTableName(constraintParser.getTableName(sqlStatement))
             constraintMap.put(constraint.getName(), constraint)
         }
-
         return constraintMap
     }
 
@@ -233,7 +237,6 @@ class EntityParser implements Parser{
 
     List<String> getLocks(String sqlStatement){
         List<String> locks = new ArrayList<String>()
-
         String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_LOCKS.getObjKey())
         Pattern pattern = Pattern.compile(/$regex/)
         Matcher matcher = pattern.matcher(sqlStatement)
@@ -270,7 +273,6 @@ class EntityParser implements Parser{
                 grantStatements.add(sqlStatement)
             }
         }
-
         entity.setGrants(getGrants(grantStatements))
 
         return entity
@@ -300,8 +302,8 @@ class EntityParser implements Parser{
         else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())){
             grantStatements.add(sqlStatement)
         }
-
         entity.setGrants(getGrants(grantStatements))
+
         return entity
     }
 }

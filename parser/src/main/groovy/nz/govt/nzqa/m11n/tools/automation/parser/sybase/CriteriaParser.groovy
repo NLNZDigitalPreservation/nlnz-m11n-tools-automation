@@ -14,21 +14,28 @@ class CriteriaParser implements Parser {
     ParserUtil util = new ParserUtil()
 
     String getType(String childCriteriaString){
-        String type = ''
+        String typeString = ''
         String regex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_TYPE.getObjKey())
         String childRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_TYPE.getObjKey(), DBObjMapper.SPECIAL_OPERATOR_IN)
         def result = (childCriteriaString =~ /$regex/)
         def childResult = (childCriteriaString =~ /$childRegex/)
-        boolean operatorIsIn = (childResult? childResult[0][2].toString().toLowerCase().equalsIgnoreCase(DBObjMapper.SPECIAL_OPERATOR_IN.toLowerCase()) : null)
+        String operatorString = (childResult? childResult[0][2].toString() : '')
+        String operator = util.getOperatorObjKeyFromRawString(operatorString)
+        boolean operatorIsIn = operator.equalsIgnoreCase(DBObjMapper.SPECIAL_OPERATOR_IN)
+        boolean isFirstWrapper = childCriteriaString.toUpperCase().contains(DBObjMapper.CRITERIA_CHECK.getSybaseKey())
 
-        if (childCriteriaString.toUpperCase().contains(DBObjMapper.CRITERIA_CHECK.getSybaseKey())){
-            type = DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey()
+        if (isFirstWrapper){
+            typeString = DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey()
+        }
+
+        else if (result && !operatorIsIn) {
+            typeString = DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey()
         }
 
         else{
-            type = (result && !operatorIsIn? DBObjMapper.CRITERIA_CHECKWRAPPER.getObjKey() : DBObjMapper.CRITERIA_CHECK.getObjKey())
+            typeString = DBObjMapper.CRITERIA_CHECK.getObjKey()
         }
-
+        String type = util.getTypeObjKeyFromRawString(typeString)
         return type
     }
 
@@ -40,10 +47,14 @@ class CriteriaParser implements Parser {
     }
 
     String getOperation(String childCriteriaString){
+        String operationString = ''
         String regex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_OPERATION.getObjKey())
         def result = (childCriteriaString =~ /$regex/)
-        String operation = (result? result[0][2].toString().toUpperCase() : '')
 
+        if(result){
+            operationString = result[0][2]
+        }
+        String operation = util.getOperatorObjKeyFromRawString(operationString)
         return operation
     }
 
@@ -51,21 +62,22 @@ class CriteriaParser implements Parser {
         String valueType = ''
         String intRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_VALUE_TYPE.getObjKey(), DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         def intResult = (childCriteriaString =~ /$intRegex/)
+        boolean childStringHasQuoteMarks = childCriteriaString.contains('"') || childCriteriaString.contains("'")
+        boolean childStringHasIsOperator = childCriteriaString.toUpperCase().contains(" " + DBObjMapper.SPECIAL_OPERATOR_IS + " ")
 
         if (intResult){
             valueType = DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()
         }
 
         else {
-            if (childCriteriaString.contains('"') || childCriteriaString.contains("'")){
+            if (childStringHasQuoteMarks){
                 valueType = DBObjMapper.CRITERIA_VALUETYPE_CHAR.getDataTypeKey()
             }
 
-            else if (!childCriteriaString.toUpperCase().contains(" " + DBObjMapper.SPECIAL_OPERATOR_IS + " ")) {
+            else if (!childStringHasIsOperator) {
                 valueType = DBObjMapper.CRITERIA_VALUETYPE_FIELD.getDataTypeKey()
             }
         }
-
         return valueType
     }
 
@@ -73,25 +85,25 @@ class CriteriaParser implements Parser {
         List<String> values = new ArrayList<>()
         String regex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_VALUES.getObjKey())
         def result = (childCriteriaString =~ /$regex/)
+
         if(result){
-            String operator = result[0][2].toString().toUpperCase()
+            String operatorString = result[0][2]
+            String operator = util.getOperatorObjKeyFromRawString(operatorString)
+            String valueString = result[0][3]
 
             switch (operator){
                 case(DBObjMapper.SPECIAL_OPERATOR_BETWEEN):
-                    String[] splitValuesUpperCaseAnd = result[0][3].toString().replaceAll("\\s", "")
-                            .split(DBObjMapper.OPERATOR_AND)
-                    String[] splitValuesLowerCaseAnd = result[0][3].toString().replaceAll("\\s", "")
-                            .split(DBObjMapper.OPERATOR_AND.toLowerCase())
-                    values = Arrays.asList((splitValuesUpperCaseAnd.size() == 2? splitValuesUpperCaseAnd :
-                            splitValuesLowerCaseAnd.size() == 2? splitValuesLowerCaseAnd : ''))
+                    boolean useUpperCase = valueString.contains(DBObjMapper.OPERATOR_AND)
+                    String splitOperator = (useUpperCase? DBObjMapper.OPERATOR_AND : DBObjMapper.OPERATOR_AND.toLowerCase())
+                    values = Arrays.asList(valueString.replaceAll("\\s", "").split(splitOperator))
                     break
 
                 case(DBObjMapper.SPECIAL_OPERATOR_IN):
-                    values = Arrays.asList(result[0][3].toString().replaceAll("[()]", "").split(","))
+                    values = Arrays.asList(valueString.replaceAll("[()]", "").split(","))
                     break
 
                 default:
-                    values = Arrays.asList(result[0][3].toString())
+                    values = Arrays.asList(valueString)
             }
         }
         return values
@@ -101,19 +113,23 @@ class CriteriaParser implements Parser {
         String regex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_IS_COMPOSITE.getObjKey(), childCriteriaString)
         def result = (sqlStatement =~ regex)
         boolean isComposite = (result? true : false)
-
         return isComposite
     }
 
     String getJoinOperator(String sqlStatement, String childCriteriaString){
-        String joinOperator = ''
+        String joinOperatorString = ''
         String regex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_JOIN_OPERATOR.getObjKey(), childCriteriaString)
         def sqlResult = (sqlStatement =~ /$regex/)
         def childStringResult = (childCriteriaString =~ /$regex/)
 
-        joinOperator = (sqlResult? sqlResult[0][1].toString().toUpperCase() :
-                childStringResult? childStringResult[0][1].toString().toUpperCase() : '')
+        if(sqlResult){
+            joinOperatorString = sqlResult[0][1]
+        }
 
+        else if (childStringResult){
+            joinOperatorString = childStringResult[0][1]
+        }
+        String joinOperator = util.getOperatorObjKeyFromRawString(joinOperatorString)
         return joinOperator
     }
 
@@ -128,22 +144,20 @@ class CriteriaParser implements Parser {
            Criteria criteriaWrapper = wrapperMap.get(index)
            criteriaLinkedList.add(criteriaWrapper)
        }
-
         return criteriaLinkedList
     }
 
     @Override
     Criteria parse(File file){
         Criteria criteria = new Criteria()
+
         return criteria
     }
 
     @Override
     Criteria parse(String sqlStatement) {
         Criteria criteriaWrapper = new Criteria()
-
         Map<String, Criteria> wrapperMap = new HashMap<>()
-
         String checkConstraintRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey())
         String childCriteriaRegex = regexBuilder.buildCriteriaRegex(DBObjMapper.REGEX_ACTION_CRITERIA.getObjKey(),
                 DBObjMapper.REGEX_CRITERIA.getObjKey())
