@@ -82,9 +82,10 @@ class EntityParser implements Parser{
         else if (dataTypeResult){
             String dropTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_NAME.getObjKey(), DBObjMapper.ACTION_DROP_DATATYPE.getObjKey())
             def dropTypeResult = (dataTypeResult[0][0].toString() =~ /$dropTypeRegex/)
-            String dropName = (dropTypeResult? dropTypeResult[0][2].toString().replaceAll("'|\\s", "") : '')
-            String[] addNameTypeValue = dataTypeResult[0][2].toString().replaceAll("'|\\s", "").split(",")
-            name = (!dropName.isEmpty()? dropName : addNameTypeValue.size() > 0? addNameTypeValue[0] : '')
+            String dropName = (dropTypeResult? dropTypeResult[0][2].toString().trim() : '')
+            String[] addNameTypeValue = dataTypeResult[0][2].toString().trim().split(",")
+            name = (!dropName.isEmpty()? dropName.replaceAll("'", "") :
+                    addNameTypeValue.size() > 0? addNameTypeValue[0].replaceAll("'", "") : '')
         }
         return name
     }
@@ -173,7 +174,7 @@ class EntityParser implements Parser{
         }
 
         else if (dataTypeResult){
-            String[] nameTypeValue = dataTypeResult[0][2].toString().replaceAll("'|\\s", "").split(",")
+            String[] nameTypeValue = dataTypeResult[0][2].toString().trim().replaceAll("'", "").split(",")
             dataType = (nameTypeValue.size() == 3? nameTypeValue[1] : '')
         }
         return dataType
@@ -192,7 +193,7 @@ class EntityParser implements Parser{
         }
 
         else if (dataTypeResult){
-            String[] nameTypeValue = dataTypeResult[0][2].toString().replaceAll("'|\\s", "").split(",")
+            String[] nameTypeValue = dataTypeResult[0][2].toString().trim().replaceAll("'", "").split(",")
             queryValue = (nameTypeValue.size() == 3? nameTypeValue[2] : '')
         }
         return queryValue

@@ -332,25 +332,9 @@ class ParserUtil {
                 type = DBObjMapper.ENTITY_DEFAULT.getObjKey()
                 break
 
-//            case(DBObjMapper.ENTITY_DATATYPE.getSybaseKey()):
-//                type = DBObjMapper.ENTITY_DATATYPE.getObjKey()
-//                break
-
-//            case(DBObjMapper.ENTITY_GROUP.getSybaseKey()):
-//                type = DBObjMapper.ENTITY_GROUP.getObjKey()
-//                break
-
-//            case(DBObjMapper.ENTITY_USER.getSybaseKey()):
-//                type = DBObjMapper.ENTITY_USER.getObjKey()
-//                break
-
             case(DBObjMapper.ENTITY_RULE.getSybaseKey()):
                 type = DBObjMapper.ENTITY_RULE.getObjKey()
                 break
-
-//            case(DBObjMapper.ENTITY_MESSAGE.getSybaseKey()):
-//                type = DBObjMapper.ENTITY_MESSAGE.getObjKey()
-//                break
 
             case(DBObjMapper.ENTITY_KEY.getSybaseKey()):
                 type = DBObjMapper.ENTITY_KEY.getObjKey()

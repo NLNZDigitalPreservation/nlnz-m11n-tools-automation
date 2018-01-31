@@ -393,6 +393,27 @@ class EntityParserTest {
     }
 
     @Test
+    void shouldReturnCreateMessageEntity(){
+        String sqlStatement = "EXEC sp_addmessage 20000,'Duplicate STD Number encountered','us_english'"
+
+        Entity entity = new Entity()
+        entity.setType(DBObjMapper.ENTITY_MESSAGE.getObjKey())
+        entity.setName('20000')
+        entity.setAction(DBObjMapper.ACTION_ADD_MESSAGE.getObjKey())
+        entity.setDataType('Duplicate STD Number encountered')
+        entity.setQueryValue('us_english')
+
+        Entity testEntity = entityParser.parse(sqlStatement)
+
+        assertEquals(entity.getType(), testEntity.getType())
+        assertEquals(entity.getName(), testEntity.getName())
+        assertEquals(entity.getAction(), testEntity.getAction())
+        assertEquals(entity.getDataType(), testEntity.getDataType())
+        assertEquals(entity.getQueryValue(), testEntity.getQueryValue())
+    }
+
+
+    @Test
     void shouldParseChecksCorrectly(){
         Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTables/splitTables-83-dbo.CFN_CATEGORY.sql"))
         assertEquals("CFN_CATEGORY", testEntity.getName())

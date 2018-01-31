@@ -72,8 +72,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                         break
 
                     case (DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()):
-                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (.*?)\s
-                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (.*?)\\s"
+                        //(?i)EXEC (sp_drop\S+) (.*)\s
+                        regexString = "(?i)EXEC (sp_drop\\S+) (.*?)\\s"
                         break
 
                     case(DBObjMapper.ACTION_ALTER.getObjKey()):
