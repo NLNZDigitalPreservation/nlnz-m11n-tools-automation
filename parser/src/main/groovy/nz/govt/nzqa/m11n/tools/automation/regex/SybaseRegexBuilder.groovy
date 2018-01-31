@@ -67,8 +67,13 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey()):
                 switch(parameter) {
                     case (DBObjMapper.ENTITY_DATATYPE.getObjKey()):
-                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (\S+)
-                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (\\S+)"
+                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (.*)
+                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (.*)"
+                        break
+
+                    case (DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()):
+                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (.*?)\s
+                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (.*?)\\s"
                         break
 
                     case(DBObjMapper.ACTION_ALTER.getObjKey()):
@@ -129,8 +134,8 @@ class SybaseRegexBuilder implements RegexBuilder {
                         break
 
                     case(DBObjMapper.ENTITY_DATATYPE.getObjKey()):
-                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (\S+)
-                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (\\S+)"
+                        //(?i)EXEC (sp_add\S+|sp_drop\S+) (.*)
+                        regexString = "(?i)EXEC (sp_add\\S+|sp_drop\\S+) (.*)"
                         break
                 }
 
@@ -194,20 +199,20 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_ACTION_UTILITIES.getObjKey()):
                 //(?i)(CREATE|DROP) (PROCEDURE|TRIGGER|FUNCTION) (\S+)
                 regexString = String.format("(?i)(%s|%s) (%s|%s|%s) (\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
-                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.ENTITY_PROCEDURE.getSybaseKey(),
-                        DBObjMapper.ENTITY_TRIGGER.getSybaseKey(), DBObjMapper.ENTITY_FUNCTION.getSybaseKey())
+                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.UTILITIES_PROC.getSybaseKey(),
+                        DBObjMapper.UTILITIES_TRIGGER.getSybaseKey(), DBObjMapper.UTILITIES_FUNCTION.getSybaseKey())
                 break
 
             case(DBObjMapper.REGEX_TRIGGER_TABLE_NAME.getObjKey()):case(DBObjMapper.REGEX_TRIGGER_OPERATIONS.getObjKey()):
                 //(?i)CREATE TRIGGER (\S+) ON (\S+) FOR (.*) AS (.*)
                 regexString = String.format("(?i)%s %s (\\S+) ON (\\S+) FOR (.*) AS (.*)",
-                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ENTITY_TRIGGER.getSybaseKey())
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.UTILITIES_TRIGGER.getSybaseKey())
                 break
 
             case(DBObjMapper.REGEX_IN_FIELDS.getObjKey()):
                 //(?i)CREATE PROCEDURE (\S+) (.*) AS (.*)
                 regexString = String.format("(?i)%s %s (\\S+) (.*) AS (\\S+)",
-                        DBObjMapper.ACTION_CREATE.getSybaseKey(),DBObjMapper.ENTITY_PROCEDURE.getSybaseKey())
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(),DBObjMapper.UTILITIES_PROC.getSybaseKey())
                 break
 
             case(DBObjMapper.REGEX_SQL.getObjKey()):

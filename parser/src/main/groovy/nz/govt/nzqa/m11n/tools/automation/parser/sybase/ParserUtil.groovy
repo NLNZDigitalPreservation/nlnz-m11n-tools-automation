@@ -234,8 +234,12 @@ class ParserUtil {
 
         String cleanAction = actionString.trim()
         String action = cleanAction
+        List<String> dataTypes = Arrays.asList(DBObjMapper.ACTION_ADD_DATATYPE.getSybaseKey(),
+                DBObjMapper.ACTION_DROP_DATATYPE.getSybaseKey(), DBObjMapper.ACTION_ADD_MESSAGE.getSybaseKey(),
+                DBObjMapper.ACTION_ADD_GROUP.getSybaseKey(), DBObjMapper.ACTION_ADD_USER.getSybaseKey())
+        String actionSwitch = (dataTypes.contains(actionString)? cleanAction : cleanAction.toUpperCase())
 
-        switch(cleanAction.toUpperCase()){
+        switch(actionSwitch){
             case(DBObjMapper.ACTION_DROP.getSybaseKey()):
                 action = DBObjMapper.ACTION_DROPONLY.getObjKey()
                 break
@@ -279,6 +283,27 @@ class ParserUtil {
             case(DBObjMapper.ACTION_REFERENCES.getSybaseKey()):
                 action = DBObjMapper.ACTION_REFERENCES.getObjKey()
                 break
+
+            //Datatypes
+            case(DBObjMapper.ACTION_ADD_DATATYPE.getSybaseKey()):
+                action = DBObjMapper.ACTION_ADD_DATATYPE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_DROP_DATATYPE.getSybaseKey()):
+                action = DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_ADD_USER.getSybaseKey()):
+                action = DBObjMapper.ACTION_ADD_USER.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_ADD_GROUP.getSybaseKey()):
+                action = DBObjMapper.ACTION_ADD_GROUP.getObjKey()
+                break
+
+            case(DBObjMapper.ACTION_ADD_MESSAGE.getSybaseKey()):
+                action = DBObjMapper.ACTION_ADD_MESSAGE.getObjKey()
+                break
         }
         return action
     }
@@ -287,8 +312,12 @@ class ParserUtil {
 
         String cleanType = typeString.trim()
         String type = cleanType
+        List<String> dataTypes = Arrays.asList(DBObjMapper.ACTION_ADD_DATATYPE.getSybaseKey(),
+                DBObjMapper.ACTION_DROP_DATATYPE.getSybaseKey(), DBObjMapper.ACTION_ADD_MESSAGE.getSybaseKey(),
+                DBObjMapper.ACTION_ADD_GROUP.getSybaseKey(), DBObjMapper.ACTION_ADD_USER.getSybaseKey())
+        String typeSwitch = (dataTypes.contains(typeString)? cleanType : cleanType.toUpperCase())
 
-        switch(cleanType.toUpperCase()){
+        switch(typeSwitch){
 
             //Entity
             case(DBObjMapper.ENTITY_TABLE.getSybaseKey()):
@@ -303,25 +332,25 @@ class ParserUtil {
                 type = DBObjMapper.ENTITY_DEFAULT.getObjKey()
                 break
 
-            case(DBObjMapper.ENTITY_DATATYPE.getSybaseKey()):
-                type = DBObjMapper.ENTITY_DATATYPE.getObjKey()
-                break
+//            case(DBObjMapper.ENTITY_DATATYPE.getSybaseKey()):
+//                type = DBObjMapper.ENTITY_DATATYPE.getObjKey()
+//                break
 
-            case(DBObjMapper.ENTITY_GROUP.getSybaseKey()):
-                type = DBObjMapper.ENTITY_GROUP.getObjKey()
-                break
+//            case(DBObjMapper.ENTITY_GROUP.getSybaseKey()):
+//                type = DBObjMapper.ENTITY_GROUP.getObjKey()
+//                break
 
-            case(DBObjMapper.ENTITY_USER.getSybaseKey()):
-                type = DBObjMapper.ENTITY_USER.getObjKey()
-                break
+//            case(DBObjMapper.ENTITY_USER.getSybaseKey()):
+//                type = DBObjMapper.ENTITY_USER.getObjKey()
+//                break
 
             case(DBObjMapper.ENTITY_RULE.getSybaseKey()):
                 type = DBObjMapper.ENTITY_RULE.getObjKey()
                 break
 
-            case(DBObjMapper.ENTITY_MESSAGE.getSybaseKey()):
-                type = DBObjMapper.ENTITY_MESSAGE.getObjKey()
-                break
+//            case(DBObjMapper.ENTITY_MESSAGE.getSybaseKey()):
+//                type = DBObjMapper.ENTITY_MESSAGE.getObjKey()
+//                break
 
             case(DBObjMapper.ENTITY_KEY.getSybaseKey()):
                 type = DBObjMapper.ENTITY_KEY.getObjKey()
@@ -329,30 +358,6 @@ class ParserUtil {
 
             case(DBObjMapper.ENTITY_CONSTRAINT.getSybaseKey()):
                 type = DBObjMapper.ENTITY_CONSTRAINT.getObjKey()
-                break
-
-            //Entity - datatype
-            case(DBObjMapper.ACTION_ADD_DATATYPE.getSybaseKey()):
-                type = DBObjMapper.ACTION_ADD_DATATYPE.getObjKey()
-                break
-
-            case(DBObjMapper.ACTION_DROP_DATATYPE.getSybaseKey()):
-                type = DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()
-                break
-
-            //Entity - message
-            case(DBObjMapper.ACTION_ADD_MESSAGE.getSybaseKey()):
-                type = DBObjMapper.ACTION_ADD_MESSAGE.getObjKey()
-                break
-
-            //Entity - user
-            case(DBObjMapper.ACTION_ADD_USER.getSybaseKey()):
-                type = DBObjMapper.ACTION_ADD_USER.getObjKey()
-                break
-
-            //Entity - group
-            case(DBObjMapper.ACTION_ADD_GROUP.getSybaseKey()):
-                type = DBObjMapper.ACTION_ADD_GROUP.getObjKey()
                 break
 
             //Attribute
@@ -413,21 +418,40 @@ class ParserUtil {
                 break
 
             //Utilities
-            case(DBObjMapper.ENTITY_PROCEDURE.getSybaseKey()):
-                type = DBObjMapper.ENTITY_PROCEDURE.getObjKey()
+            case(DBObjMapper.UTILITIES_PROC.getSybaseKey()):
+                type = DBObjMapper.UTILITIES_PROC.getObjKey()
                 break
 
-            case(DBObjMapper.ENTITY_TRIGGER.getSybaseKey()):
-                type = DBObjMapper.ENTITY_TRIGGER.getObjKey()
+            case(DBObjMapper.UTILITIES_TRIGGER.getSybaseKey()):
+                type = DBObjMapper.UTILITIES_TRIGGER.getObjKey()
                 break
 
-            case(DBObjMapper.ENTITY_FUNCTION.getSybaseKey()):
-                type = DBObjMapper.ENTITY_FUNCTION.getObjKey()
+            case(DBObjMapper.UTILITIES_FUNCTION.getSybaseKey()):
+                type = DBObjMapper.UTILITIES_FUNCTION.getObjKey()
                 break
 
             //Relation
             case(DBObjMapper.KEY_GRANT.getSybaseKey()):
                 type = DBObjMapper.KEY_GRANT.getObjKey()
+                break
+
+            default:
+                if (typeSwitch.matches(DBObjMapper.ENTITY_USER.getSybaseKey())) {
+                    type = DBObjMapper.ENTITY_USER.getObjKey()
+                }
+
+                else if (typeSwitch.matches(DBObjMapper.ENTITY_DATATYPE.getSybaseKey())){
+                    type = DBObjMapper.ENTITY_DATATYPE.getObjKey()
+                }
+
+                else if (typeSwitch.matches(DBObjMapper.ENTITY_MESSAGE.getSybaseKey())){
+                    type = DBObjMapper.ENTITY_MESSAGE.getObjKey()
+                }
+
+                else if (typeSwitch.matches(DBObjMapper.ENTITY_GROUP.getSybaseKey())){
+                    type = DBObjMapper.ENTITY_GROUP.getObjKey()
+                }
+
                 break
 
         }

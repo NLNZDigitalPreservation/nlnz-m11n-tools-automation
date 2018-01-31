@@ -43,11 +43,11 @@ public class DBObjMapper {
     public static ObjMapper ENTITY_CONSTRAINT = new ObjMapper("CONSTRAINT", "TABLE", "TABLE");
     public static ObjMapper ENTITY_VIEW = new ObjMapper("VIEW", "VIEW", "VIEW");
     public static ObjMapper ENTITY_DEFAULT = new ObjMapper("DEFAULT", "DEFAULT", "DEFAULT");
-    public static ObjMapper ENTITY_DATATYPE = new ObjMapper("DATATYPE", "sp_addtype", "TYPE");
-    public static ObjMapper ENTITY_GROUP = new ObjMapper("GROUP", "sp_addgroup", "GROUP");
-    public static ObjMapper ENTITY_USER = new ObjMapper("USER", "sp_adduser", "USER");
+    public static ObjMapper ENTITY_DATATYPE = new ObjMapper("DATATYPE", "sp_..*type", "TYPE");
+    public static ObjMapper ENTITY_GROUP = new ObjMapper("GROUP", "sp_..*group", "GROUP");
+    public static ObjMapper ENTITY_USER = new ObjMapper("USER", "sp_..*user", "USER");
     public static ObjMapper ENTITY_RULE = new ObjMapper("RULE", "RULE", "RULE");
-    public static ObjMapper ENTITY_MESSAGE = new ObjMapper("MESSAGE", "MESSAGE", "MESSAGE");
+    public static ObjMapper ENTITY_MESSAGE = new ObjMapper("MESSAGE", "sp_..*message", "MESSAGE");
     public static ObjMapper ENTITY_INDEX= new ObjMapper("INDEX", "INDEX", "INDEX");
 
     public static ObjMapper CONSTRAINT_PRIMARYKEY = new ObjMapper("PK", "PRIMARY KEY", "PRIMARY KEY");

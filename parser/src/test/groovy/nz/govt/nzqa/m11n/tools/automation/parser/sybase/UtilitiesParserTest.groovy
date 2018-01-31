@@ -34,7 +34,7 @@ class UtilitiesParserTest {
         // @ErrorMessage varchar(255) output as ..."
 
         assertEquals("dbo", testUtilities.getDatabaseName())
-        assertEquals(DBObjMapper.ENTITY_PROCEDURE.getObjKey(), testUtilities.getType())
+        assertEquals(DBObjMapper.UTILITIES_PROC.getObjKey(), testUtilities.getType())
         assertEquals("ContactsMergeCopyName", testUtilities.getName())
         assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), testUtilities.getAction())
         assertEquals(4, testUtilities.getInFields().size())
@@ -65,7 +65,7 @@ class UtilitiesParserTest {
         Utilities testUtilities = utilitiesParser.parse(new File(
                 'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTriggers/testFile.sql'))
 
-        assertEquals(DBObjMapper.ENTITY_TRIGGER.getObjKey(), testUtilities.getType())
+        assertEquals(DBObjMapper.UTILITIES_TRIGGER.getObjKey(), testUtilities.getType())
         assertEquals("du_ACCREDITATION", testUtilities.getName())
         assertEquals(DBObjMapper.ACTION_CREATE.getObjKey(), testUtilities.getAction())
 //        assertEquals(sql, testUtilities.getSql())

@@ -125,14 +125,12 @@ class EntityParserTest {
                 'CONSTRAINT PK_ACADEMIC_YEAR PRIMARY KEY CLUSTERED (academic_year)) ' +
                 'LOCK DATAROWS'
 
-        String opTypeCreate = 'Direct'
         String testOpTypeCreate = entityParser.getOperationType(createStatement)
-        assertEquals(opTypeCreate, testOpTypeCreate)
+        assertEquals(DBObjMapper.OPERATION_DIRECT.getObjKey(), testOpTypeCreate)
 
         String defaultStatement = 'CREATE DEFAULT dbo.Yes AS 1'
-        String opTypeDefault= 'DefaultValue'
         String testOpTypeDefault = entityParser.getOperationType(defaultStatement)
-        assertEquals(opTypeDefault, testOpTypeDefault)
+        assertEquals(DBObjMapper.OPERATION_DEFAULT.getObjKey(), testOpTypeDefault)
 
         String deriveStatement = 'CREATE VIEW dbo.VW_PEOPLE' +
                 'AS ' +
@@ -171,9 +169,8 @@ class EntityParserTest {
                 '    n.preferred_ind    = 1           and ' +
                 '    n.active_ind       = 1'
 
-        String opTypeDerive= 'Derived'
         String testOpTypeDerive = entityParser.getOperationType(deriveStatement)
-        assertEquals(opTypeDerive, testOpTypeDerive)
+        assertEquals(DBObjMapper.OPERATION_DERIEVED.getObjKey(), testOpTypeDerive)
     }
 
     @Test
@@ -201,7 +198,7 @@ class EntityParserTest {
         entity.setType(DBObjMapper.ENTITY_DEFAULT.getObjKey())
         entity.setName('default_y')
         entity.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
-        entity.setOperationType('DefaultValue')
+        entity.setOperationType(DBObjMapper.OPERATION_DEFAULT.getObjKey())
         entity.setDataType(DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey())
         entity.setQueryValue('1')
 
@@ -226,7 +223,7 @@ class EntityParserTest {
         entity.setType(DBObjMapper.ENTITY_VIEW.getObjKey())
         entity.setName('w_providers_all_names')
         entity.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
-        entity.setOperationType('Derived')
+        entity.setOperationType(DBObjMapper.OPERATION_DERIEVED.getObjKey())
         entity.setQueryValue('SELECT p.provider_id,  pr.end_date FROM  PROVIDER p WHERE  p.provider_id = pr.perorg_role_id')
 
         Entity testEntity = entityParser.parse(sqlStatement)
@@ -245,9 +242,9 @@ class EntityParserTest {
         String sqlStatement = "EXEC sp_addtype 'wwwaddr','varchar(255)','NULL'"
 
         Entity entity = new Entity()
-        entity.setType(DBObjMapper.ACTION_ADD_DATATYPE.getObjKey())
+        entity.setType(DBObjMapper.ENTITY_DATATYPE.getObjKey())
         entity.setName('wwwaddr')
-        entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
+        entity.setAction(DBObjMapper.ACTION_ADD_DATATYPE.getObjKey())
         entity.setDataType('varchar(255)')
         entity.setQueryValue(DBObjMapper.CONSTRAINT_NULL.getSybaseKey())
 
@@ -380,9 +377,9 @@ class EntityParserTest {
         String sqlStatement = "EXEC sp_adduser 'batch_user','batch_user','public'"
 
         Entity entity = new Entity()
-        entity.setType(DBObjMapper.ACTION_ADD_USER.getObjKey())
+        entity.setType(DBObjMapper.ENTITY_USER.getObjKey())
         entity.setName('batch_user')
-        entity.setAction(DBObjMapper.ACTION_ADD.getObjKey())
+        entity.setAction(DBObjMapper.ACTION_ADD_USER.getObjKey())
         entity.setDataType('batch_user')
         entity.setQueryValue('public')
 
@@ -407,8 +404,8 @@ class EntityParserTest {
     void shouldParseUserDataTypeCorrectly(){
         Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitUserDatatypes/splitUserDatatypes-43-COUNT_1-drop.sql"))
         assertEquals("COUNT_1", testEntity.getName())
-        assertEquals(DBObjMapper.ACTION_DROP_DATATYPE.getObjKey(), testEntity.getType())
-        assertEquals(DBObjMapper.ACTION_DROPONLY.getObjKey(), testEntity.getAction())
+        assertEquals(DBObjMapper.ENTITY_DATATYPE.getObjKey(), testEntity.getType())
+        assertEquals(DBObjMapper.ACTION_DROP_DATATYPE.getObjKey(), testEntity.getAction())
     }
 
     @Test
