@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals
 /**
  * Tests the {@link MssqlOperator}.
  */
+
 @Ignore
 @Slf4j
 class MssqlOperatorTest {
@@ -52,6 +53,11 @@ class MssqlOperatorTest {
             String[] sqlList = ['splitTables-0-dbo.ACADEMIC_YEAR.sql', 'splitTables-1-dbo.ACADEMIC_YEAR_TYPE.sql']
             mssqlMapperTestObj."$methodToCall"(sqlList, destinationDir)
         }
+    }
+
+    @Test
+    void testLogger(){
+        mssqlMapperTestObj.testLogger()
     }
 
     @Test

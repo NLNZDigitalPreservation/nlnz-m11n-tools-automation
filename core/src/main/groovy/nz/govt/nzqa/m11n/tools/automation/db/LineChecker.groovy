@@ -10,18 +10,21 @@ class LineChecker {
     // Generic
     boolean lineStartsWith(String line, String prefix) {
 
-//        System.out.println("Line before:" + line)
-        // Remove unecessary comments and overhead etc
-        def regex = '.*(?i)' + prefix + " "
+        // Remove unnecessary comments and overhead etc
+        def regex = '.*(?i)' + prefix + ' '
+        def dropRegex = '.*(?i)' + prefix
+
         def result = (line =~ /$regex/)
-//        System.out.println("regex:" + regex)
+        def dropResult = (line =~ /$dropRegex/)
 
 
         if(result){
-//            System.out.println("Line after:" + result[0])
             return true
         }
-        else{
+        else if (prefix.startsWith('if object_id') && dropResult) {
+                return true
+        }
+        else {
             return false
         }
     }
@@ -45,7 +48,7 @@ class LineChecker {
 
     String getTypeFromLine(String line) {
 
-        if(lineContains(line, "addtype") || lineContains(line, "create ")){
+        if(line =~ /(?i)sp_add(type|message|user|group)|create |add /){
             return "add"
         }
 
@@ -105,7 +108,7 @@ class LineChecker {
 //                System.out.println("Result[0]: " + result[0])
 
                 // Return full match and strip away single quote
-                name = result[0][resultIndex].replace("'", "")
+                name = result[0][resultIndex].toString().replace("'", "")
                 break mainloop
             }
         }
@@ -184,6 +187,23 @@ class LineChecker {
 
         // check name in ints, check name between val1 and val2, check multiple conditions separated by brackets
         def regexFilterList = [/(?i)check (.*)/]
+
+
+        for (def regexFilter : regexFilterList) {
+            def result = (line =~ /$regexFilter/)
+
+            if (result) {
+                return result[0][1]
+            }
+        }
+
+        return ''
+    }
+
+    String getObjectIdFromIndexLine(String line) {
+
+        // check name in ints, check name between val1 and val2, check multiple conditions separated by brackets
+        def regexFilterList = [/(?i)id=OBJECT_ID\('(\w+.*)'\) and name='(\w+)/, /(?i)on (\S+)\((\S+)\)/]
 
 
         for (def regexFilter : regexFilterList) {

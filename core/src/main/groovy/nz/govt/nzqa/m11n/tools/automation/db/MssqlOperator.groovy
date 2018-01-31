@@ -12,27 +12,6 @@ import java.util.stream.Collectors
 
 @Slf4j
 class MssqlOperator {
-//    // Commands
-//    String USE= "USE []"
-//    String GO = "GO "
-//    String CREATE = "CREATE "
-//    String DROP = "DROP "
-//    String EXEC = "EXEC "
-//    String IF = "IF "
-//    String IF_OBJECT_ID = "IF OBJECT_ID"
-//    String ALTER = "ALTER "
-//
-//    // Entity types
-//    String TABLE = "TABLE "
-//    String PROCEDURE = "PROCEDURE "
-//    String TRIGGER = "TRIGGER "
-//
-//    // Settings
-//    String SET_ANSI_NULL_ON = "SET ANSI_NULLS ON"
-//    String SET_QUOTED_IDENTIFIER_ON = "SET QUOTED_IDENTIFIER ON"
-//    String SET_ANSI_PADDING_ON = "SET ANSI_PADDING ON"
-
-
     LineChecker lineChecker = new LineChecker()
     FilenameExtractor filenameExtractor = new FilenameExtractor()
 
@@ -44,6 +23,10 @@ class MssqlOperator {
 
     String camelCase(String word) {
         return word.substring(0, 1).toUpperCase() + word.substring(1)
+    }
+
+    void testLogger(){
+        log.info("it works!")
     }
 
     /**

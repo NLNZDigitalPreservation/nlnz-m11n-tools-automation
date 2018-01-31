@@ -10,7 +10,7 @@ import  static org.junit.Assert.assertTrue
 /**
  * Tests the {@link nz.govt.nzqa.m11n.tools.automation.db.SybaseOperator}.
  */
-@Ignore
+//@Ignore
 class SybaseOperatorTest {
 
     SybaseOperator SybaseOperatorTestObj
@@ -94,7 +94,7 @@ class SybaseOperatorTest {
     }
 
     /**
-     * Expect 676 tables and alter table statements (in splitForeignKey folder)
+     * Expect 676 tables and 1088 alter table statements (in splitForeignKey folder)
      */
     @Test
     void testSplitTables() {
@@ -105,7 +105,7 @@ class SybaseOperatorTest {
     }
 
     /**
-     * Expect 598 indices
+     * Expect 598 drop and add indices (20 proxy indices, 579 normal indices)
      * */
     @Test
     void testSplitIndices() {
@@ -114,8 +114,6 @@ class SybaseOperatorTest {
         String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
         sybaseOperatorTestObj.splitIndices(testFile, testDestDir)
     }
-
-
 
     /**
      * Expect 311 drop and create triggers
@@ -178,230 +176,230 @@ class SybaseOperatorTest {
      * Expect 1924 drop and 1941 create procedures
      */
     @Test
-    void testSplitSP() {
+    void testSplitSPs() {
         String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
         File testFile = new File(testFileName)
         String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        sybaseOperatorTestObj.splitSP(testFile, testDestDir)
+        sybaseOperatorTestObj.splitSPs(testFile, testDestDir)
     }
 
-    /**
-     * Split big Sybase script into 11 smaller sqls
-     */
-    @Test
-    void testSplitSybase() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/sybase_eqa_prod_161205_test.sql"
-        File testFile = new File(testFileName)
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        sybaseOperatorTestObj.splitSybase(testFile, testDestDir)
-    }
-
-    /**
-     * Testing files generated are the same as the original
-     */
-
-    @Test
-    void testSplitDefaultsCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitDefaults(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitDefaults"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitDefaults() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitUserDatatypesCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitUserDatatypes(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitUserDatatypes"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitUserDatatypes() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitGroupsCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitGroups(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitGroups"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitGroups() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitUsersCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitUsers(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitUsers"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitUsers() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitRulesCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitRules(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitRules"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitRules() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitUserMessagesCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitUserMessages(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitUserMessages"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitUserMessages() is identical to the original", linesDifferent.size()==0)
-    }
-
-
-    @Test
-    void testSplitTablesCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitTables(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitTables"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitTables() is identical to the original", linesDifferent.size()==0)
-    }
-
-
-    @Test
-    void testSplitTriggersCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-//        sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitTriggers"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitTriggers() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitUniqueKeysCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitUniqueKeys(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitUniqueKeys"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitUniqueKeys() is identical to the original", linesDifferent.size()==0)
-    }
-
-
-     @Test
-    void testSplitCheckConstraintsCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
-         String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-         File testFile = new File(testFileName)
-         sybaseOperatorTestObj.splitCheckConstraints(testFile, testDestDir)
-
-         String reconstructedFilePath =  testDestDir +  File.separator + "splitCheckConstraints"
-         String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-         sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-         int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-         assertTrue("Reconstructed file from splitCheckConstraints() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitForeignKeysCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitForeignKeys(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitForeignKeys"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitForeignKeys() is identical to the original", linesDifferent.size()==0)
-    }
-
-
-    @Test
-    void testSplitViewsCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-        File testFile = new File(testFileName)
-        sybaseOperatorTestObj.splitViews(testFile, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitViews"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitView() is identical to the original", linesDifferent.size()==0)
-    }
-
-    @Test
-    void testSplitSPCanReconstructToTheOriginal() {
-        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
-        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
-
-// The code below encodes the original file (ISO-8859-1) in UTF 8
-//        def testFile = new File(testFileName).getText('ISO-8859-1')
-//        String encodedTestFileName = testDestDir + File.separator + '/13-eqa_prod_SP_171106.sql'
-//        new File(encodedTestFileName).write(testFile,'utf-8')
-
-        File encodedTestFile = new File(testFileName)
-        sybaseOperatorTestObj.splitSP(testFileName, testDestDir)
-
-        String reconstructedFilePath =  testDestDir +  File.separator + "splitSP"
-        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
-        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
-
-        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
-        assertTrue("Reconstructed file from splitSP() is identical to the original", linesDifferent.size()==0)
-    }
+//    /**
+//     * Split big Sybase script into 11 smaller sqls
+//     */
+//    @Test
+//    void testSplitSybase() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/sybase_eqa_prod_161205_test.sql"
+//        File testFile = new File(testFileName)
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        sybaseOperatorTestObj.splitSybase(testFile, testDestDir)
+//    }
+//
+//    /**
+//     * Testing files generated are the same as the original
+//     */
+//
+//    @Test
+//    void testSplitDefaultsCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/00-eqa_prod_defaults_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitDefaults(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitDefaults"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitDefaults() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitUserDatatypesCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/01-eqa_prod_user_datatypes_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitUserDatatypes(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitUserDatatypes"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitUserDatatypes() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitGroupsCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/03-eqa_prod_groups_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitGroups(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitGroups"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitGroups() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitUsersCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/04-eqa_prod_users_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitUsers(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitUsers"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitUsers() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitRulesCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/05-eqa_prod_rules_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitRules(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitRules"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitRules() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitUserMessagesCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/06-eqa_prod_user_messages_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitUserMessages(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitUserMessages"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitUserMessages() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//
+//    @Test
+//    void testSplitTablesCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/07-eqa_prod_tables_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitTables(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitTables"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitTables() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//
+//    @Test
+//    void testSplitTriggersCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/08-eqa_prod_triggers_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+////        sybaseOperatorTestObj.splitTriggers(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitTriggers"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitTriggers() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitUniqueKeysCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/09-eqa_prod_unique_keys_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitUniqueKeys(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitUniqueKeys"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitUniqueKeys() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//
+//     @Test
+//    void testSplitCheckConstraintsCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/10-eqa_prod_check_constraints_171106.sql"
+//         String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//         File testFile = new File(testFileName)
+//         sybaseOperatorTestObj.splitCheckConstraints(testFile, testDestDir)
+//
+//         String reconstructedFilePath =  testDestDir +  File.separator + "splitCheckConstraints"
+//         String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//         sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//         int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//         assertTrue("Reconstructed file from splitCheckConstraints() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitForeignKeysCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/11-eqa_prod_foreign_keys_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitForeignKeys(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitForeignKeys"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitForeignKeys() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//
+//    @Test
+//    void testSplitViewsCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/12-eqa_prod_views_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//        File testFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitViews(testFile, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitViews"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitView() is identical to the original", linesDifferent.size()==0)
+//    }
+//
+//    @Test
+//    void testSplitSPCanReconstructToTheOriginal() {
+//        String testFileName = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts/13-eqa_prod_SP_171106.sql"
+//        String testDestDir = "src/test/groovy/nz/govt/nzqa/m11n/tools/automation/db/resource/sybaseScripts"
+//
+//// The code below encodes the original file (ISO-8859-1) in UTF 8
+////        def testFile = new File(testFileName).getText('ISO-8859-1')
+////        String encodedTestFileName = testDestDir + File.separator + '/13-eqa_prod_SP_171106.sql'
+////        new File(encodedTestFileName).write(testFile,'utf-8')
+//
+//        File encodedTestFile = new File(testFileName)
+//        sybaseOperatorTestObj.splitSP(testFileName, testDestDir)
+//
+//        String reconstructedFilePath =  testDestDir +  File.separator + "splitSP"
+//        String reconstructedFileName = reconstructedFilePath +  File.separator + "reconstructed.sql"
+//        sybaseOperatorTestObj.reconstruct(reconstructedFilePath)
+//
+//        int[] linesDifferent = sybaseOperatorTestObj.getLinesWhereReconstructedFileDiffersFromOriginal(testFileName, reconstructedFileName)
+//        assertTrue("Reconstructed file from splitSP() is identical to the original", linesDifferent.size()==0)
+//    }
 }
