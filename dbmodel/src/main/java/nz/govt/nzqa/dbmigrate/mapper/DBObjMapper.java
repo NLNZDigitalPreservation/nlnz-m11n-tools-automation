@@ -36,7 +36,7 @@ public class DBObjMapper {
 
     public static ObjMapper OPERATION_DIRECT = new ObjMapper("DIRECT", "", "");
     public static ObjMapper OPERATION_DERIEVED = new ObjMapper("DERIEVED", "", "");
-    public static ObjMapper OPERATION_DEFAULT = new ObjMapper("DEFAULT", "", "");
+    public static ObjMapper OPERATION_DEFAULT = new ObjMapper("DEFAULTVALE", "", "");
 
     public static ObjMapper ENTITY_TABLE = new ObjMapper("TABLE", "TABLE", "TABLE");
     public static ObjMapper ENTITY_KEY = new ObjMapper("KEY", "TABLE", "TABLE");
@@ -49,9 +49,6 @@ public class DBObjMapper {
     public static ObjMapper ENTITY_RULE = new ObjMapper("RULE", "RULE", "RULE");
     public static ObjMapper ENTITY_MESSAGE = new ObjMapper("MESSAGE", "MESSAGE", "MESSAGE");
     public static ObjMapper ENTITY_INDEX= new ObjMapper("INDEX", "INDEX", "INDEX");
-    public static ObjMapper ENTITY_PROCEDURE = new ObjMapper("PROCEDURE", "PROCEDURE", "PROCEDURE");
-    public static ObjMapper ENTITY_FUNCTION = new ObjMapper("FUNCTION", "FUNCTION", "FUNCTION");
-    public static ObjMapper ENTITY_TRIGGER= new ObjMapper("TRIGGER", "TRIGGER", "TRIGGER");
 
     public static ObjMapper CONSTRAINT_PRIMARYKEY = new ObjMapper("PK", "PRIMARY KEY", "PRIMARY KEY");
     public static ObjMapper CONSTRAINT_UNIQUE = new ObjMapper("UNIQUE", "UNIQUE", "UNIQUE");
@@ -66,9 +63,6 @@ public class DBObjMapper {
 
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");
-    public static ObjMapper PARAM_INPUT_AND_OUTPUT = new ObjMapper("BOTH", "INOUT", "");
-    public static ObjMapper PARAM_OUTPUT = new ObjMapper("OUTPUT", "OUTPUT", "");
-    public static ObjMapper PARAM_INPUT = new ObjMapper("INPUT", "", "");
 
     public static String OPERATOR_OR = "OR";
     public static String OPERATOR_AND = "AND";
@@ -93,12 +87,13 @@ public class DBObjMapper {
     public static ObjMapper INDEX_CLUSTERED = new ObjMapper("CLUSTERED", "CLUSTERED", "CLUSTERED");
     public static ObjMapper INDEX_NONCLUSTERED = new ObjMapper("NONCLUSTERED", "NONCLUSTERED", "NONCLUSTERED");
 
-    public static ObjMapper PARAM_IN = new ObjMapper("IN", "","");
-    public static ObjMapper PARAM_OUT = new ObjMapper("OUT", "OUTPUT", "OUTPUT");
+    public static ObjMapper PARAM_INPUT = new ObjMapper("INPUT", "","");
+    public static ObjMapper PARAM_OUTPUT = new ObjMapper("OUTPUT", "OUTPUT", "OUTPUT");
+    public static ObjMapper PARAM_INPUT_AND_OUTPUT = new ObjMapper("BOTH", "INOUT", ""); //TODO check for usage of this
 
-    public static ObjMapper UTILITIES_PROC = new ObjMapper("PROC", "PROCEDURE", "PROCEDURE");
-    public static ObjMapper UTILITIES_FUNCTION = new ObjMapper("FN", "FUNCTION", "FUNCTION");
-    public static ObjMapper UTILITIES_TRIGGER = new ObjMapper("TRIG", "TRIGGER", "TRIGGER");
+    public static ObjMapper UTILITIES_PROC = new ObjMapper("PROCEDURE", "PROCEDURE", "PROCEDURE");
+    public static ObjMapper UTILITIES_FUNCTION = new ObjMapper("FUNCTION", "FUNCTION", "FUNCTION");
+    public static ObjMapper UTILITIES_TRIGGER = new ObjMapper("TRIGGER\"", "TRIGGER", "TRIGGER");
 
     public static ObjMapper FOLDER_FIELD_DEFAULT = new ObjMapper("Defaults", "splitDefaults", "splitDefaults");
     public static ObjMapper FOLDER_FIELD_USERDATATYPE = new ObjMapper("CustomDataTypes", "splitUserDatatypes", "splitUserDatatypes");
@@ -160,10 +155,6 @@ public class DBObjMapper {
     public static ObjMapper REGEX_TRIGGER_OPERATIONS = new ObjMapper("TriggerOperations", "", "");
     public static ObjMapper REGEX_WITH_CLAUSE = new ObjMapper("WithClause", "", "");
     public static ObjMapper REGEX_CHECK_WRAPPER_WITH_CHILD_CRITERIA = new ObjMapper("CheckWrapperWithChildCriteria", "", "");
-
-    public static ObjMapper ENTITY_OPERATION_TYP_DIRECT = new ObjMapper("Direct", "", "");
-    public static ObjMapper ENTITY_OPERATION_TYP_DERIVED = new ObjMapper("Derived", "", "");
-    public static ObjMapper ENTITY_OPERATION_TYP_DEFAULT_VALUE = new ObjMapper("DefaultValue", "", "");
 
 //    public List<String> OPERATORS
 
