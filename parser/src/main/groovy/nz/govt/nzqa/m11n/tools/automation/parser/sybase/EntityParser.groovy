@@ -44,7 +44,7 @@ class EntityParser implements Parser{
 
         if (alterResult){
             typeString = ((sqlStatement.contains(DBObjMapper.CONSTRAINT_CHECK.getSybaseKey()))?
-                    DBObjMapper.CONSTRAINT_CHECK.getObjKey() : DBObjMapper.ENTITY_KEY.getObjKey())
+                    DBObjMapper.ENTITY_CONSTRAINT.getObjKey() : DBObjMapper.ENTITY_KEY.getObjKey())
         }
 
         else if (result){
