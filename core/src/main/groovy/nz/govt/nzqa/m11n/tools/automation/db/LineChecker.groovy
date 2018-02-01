@@ -76,6 +76,11 @@ class LineChecker {
                 resultIndex = 2
                 break
 
+            case 'create existing table':
+                regexFilterList =[/(?i)CREATE EXISTING TABLE (\S+)/]
+                resultIndex = 1
+                break
+
             case 'create index':
                 regexFilterList =[/.*(?i)index (\w+)/]
                 resultIndex = 1

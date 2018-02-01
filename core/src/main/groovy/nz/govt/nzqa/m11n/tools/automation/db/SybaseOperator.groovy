@@ -40,8 +40,8 @@ class SybaseOperator {
         return word.substring(0, 1).toUpperCase() + word.substring(1)
     }
 
-    void writeLineBufferIntoFile(File sqlFile, String[] lineBufferForFirstFile) {
-        for (String line : lineBufferForFirstFile) {
+    void writeLineBufferIntoFile(File sqlFile, String[] schemaStatement) {
+        for (String line : schemaStatement) {
             sqlFile << line + '\r\n'
         }
     }
@@ -68,7 +68,7 @@ class SybaseOperator {
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
         boolean doneDropping = false
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if"
 
         String sqlFileName = ''
@@ -86,33 +86,25 @@ class SybaseOperator {
                     isFirstCreateStatement = false
                     lineType = "create"
                 }
-
                 if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create")) {
-
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitDefaults-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -142,7 +134,7 @@ class SybaseOperator {
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
         boolean doneDropping = false
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if exists"
 
         String sqlFileName = ''
@@ -154,37 +146,30 @@ class SybaseOperator {
                 line = line.trim().replaceAll(/\s\s+/, "\\s")
                 if (lineChecker.lineStartsWith(line, "exec sp_addtype") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
-
                     doneDropping = true
                     currentEntityName = ''
                     isFirstCreateStatement = false
                     lineType = "exec"
                 }
-
                 if ((lineChecker.lineStartsWith(line, "if exists") && !doneDropping) || lineChecker.lineStartsWith(line, "exec sp_addtype")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitUserDatatypes-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -212,7 +197,7 @@ class SybaseOperator {
         int counter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -225,26 +210,21 @@ class SybaseOperator {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitGroups-" + counter + "-" + currentEntityName + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -272,7 +252,7 @@ class SybaseOperator {
         int counter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -285,26 +265,21 @@ class SybaseOperator {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitUsers-" + counter + "-" + currentEntityName + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -334,7 +309,7 @@ class SybaseOperator {
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
         boolean doneDropping = false
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if"
 
         String sqlFileName = ''
@@ -346,37 +321,31 @@ class SybaseOperator {
                 line = line.trim().replaceAll(/\s\s+/, "\\s")
                 if (lineChecker.lineStartsWith(line, "create rule") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
-
                     doneDropping = true
                     currentEntityName = ''
                     isFirstCreateStatement = false
                     lineType = "create"
                 }
-
                 if ((lineChecker.lineStartsWith(line, "if") && !doneDropping) || lineChecker.lineStartsWith(line, "create rule")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitRules-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
 
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -403,7 +372,7 @@ class SybaseOperator {
 
         int counter = 0
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -419,17 +388,15 @@ class SybaseOperator {
                     new File(sqlFileName).createNewFile()
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
-
                     counter++
-
-                    if (firstFileNotCreated) {
-                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                        firstFileNotCreated = false
-                    }
+                    writeLineBufferIntoFile(sqlFile, schemaStatement)
+                    firstFileNotCreated = false
                     sqlFile << line + '\r\n'
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -451,19 +418,24 @@ class SybaseOperator {
 
         String outputDir = destinationDir + File.separator + "splitTables"
         String fkOutputDir = destinationDir + File.separator + "splitForeignKeys"
+        String proxyTableOutputDir = outputDir + File.separator + "proxyTables"
         new File(outputDir).mkdir()
         new File(fkOutputDir).mkdir()
+        new File(proxyTableOutputDir).mkdir()
         log.info("New directory '${outputDir}' created")
         log.info("New directory '${fkOutputDir}' created")
+        log.info("New directory '${proxyTableOutputDir}' created")
 
         LineChecker lineChecker = new LineChecker()
 
         int counter = 0
         int fkCounter = 0
+        int proxyCounter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
         boolean isAlterTable = false
-        String[] lineBufferForFirstFile = []
+        boolean isProxyTable = false
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -477,42 +449,60 @@ class SybaseOperator {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, "create")
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitTables-" + counter + "-" + currentEntityName + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
                     sqlFile << line + '\r\n'
-                } else if (lineChecker.lineStartsWith(line, "alter table")){
+                }
+                else if (lineChecker.lineStartsWith(line, "alter table")){
                     isAlterTable = true
-
                     // Create a new file for new entity
                     String sqlAlterTableFileName = fkOutputDir + File.separator + "splitTables-" + fkCounter + "-alter-" + currentEntityName + ".sql"
                     new File(sqlAlterTableFileName).createNewFile()
                     alterTableFile = new File(sqlAlterTableFileName)
                     log.info("File '${sqlAlterTableFileName}' created")
-
                     fkCounter ++
-
+                    writeLineBufferIntoFile(alterTableFile, schemaStatement)
+                    firstFileNotCreated = false
                     alterTableFile << line + '\r\n'
-                } else if (isAlterTable){
+                }
+                else if (lineChecker.lineStartsWith(line, "create existing table")){
+                    String newEntityName = lineChecker.getEntityNameFromLine(line, "create existing table")
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
+                        currentEntityName = newEntityName
+                        sqlFileName = proxyTableOutputDir + File.separator + "splitTables-" + proxyCounter + "-" + currentEntityName + ".sql"
+                        new File(sqlFileName).createNewFile()
+                        sqlFile = new File(sqlFileName)
+                        log.info("File '${sqlFileName}' created")
+                        proxyCounter++
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
+                        isProxyTable = true
+                    }
+                    sqlFile << line + '\r\n'
+                }
+                else if (isAlterTable){
                     if (line.startsWith("go")){
                         isAlterTable = false
                     }
                     alterTableFile << line + '\r\n'
                 }
+                else if (isProxyTable){
+                    if (line.startsWith("go")){
+                        isProxyTable = false
+                    }
+                    sqlFile << line + '\r\n'
+                }
                 else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -545,7 +535,7 @@ class SybaseOperator {
         int proxyCounter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if index"
 
         String sqlFileName = ''
@@ -557,50 +547,40 @@ class SybaseOperator {
                 line = line.trim().replaceAll(/\s\s+/, "\\s")
                 if (lineChecker.lineStartsWith(line, "create")) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
-
                     currentEntityName = ''
                     lineType = "create index"
                 }
-
                 else if (lineChecker.lineStartsWith(line, "if")) {
                     lineType = "if index"
                 }
-
                 if (lineChecker.lineStartsWith(line, "if") || lineChecker.lineStartsWith(line, "create")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)){
+                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         if (line.contains("dba_pxy_")) {
                             String proxySqlFileName = proxyIndicesOutputDir + File.separator + "splitIndices-" + proxyCounter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
                             new File(proxySqlFileName).createNewFile()
                             sqlFile = new File(proxySqlFileName)
                             log.info("File '${proxySqlFileName}' created")
-
-                            proxyCounter ++
+                            proxyCounter++
                         }
-
                         else {
                             // Create a new file for new entity
                             sqlFileName = outputDir + File.separator + "splitIndices-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
                             new File(sqlFileName).createNewFile()
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
-
                             counter++
                         }
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -630,7 +610,7 @@ class SybaseOperator {
         String currentEntityName = ''
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if object_id"
 
         String sqlFileName = ''
@@ -642,41 +622,33 @@ class SybaseOperator {
                 line = line.trim().replaceAll(/\s\s+/, "\\s")
                 if (line.toLowerCase().startsWith("create trigger")) {
                     lineType = "create trigger"
-
                     if (isFirstCreateStatement) {
                         log.info("Dropping completed. Current entity name reset and start creating...")
                         currentEntityName = ''
                         isFirstCreateStatement = false
                     }
-
                 } else if (line.toLowerCase().startsWith( "if object_id")) {
                     lineType = "if object_id"
                 }
-
                 if (line.toLowerCase().startsWith("if object_id") || line.toLowerCase().startsWith("create trigger")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitTriggers-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(lineType) + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -703,7 +675,7 @@ class SybaseOperator {
 
         int counter = 0
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -719,19 +691,15 @@ class SybaseOperator {
                     new File(sqlFileName).createNewFile()
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
-
                     counter++
-
-                    if (firstFileNotCreated) {
-                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                        firstFileNotCreated = false
-                    }
-
+                    writeLineBufferIntoFile(sqlFile, schemaStatement)
+                    firstFileNotCreated = false
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -758,7 +726,7 @@ class SybaseOperator {
 
         int counter = 0
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -774,19 +742,15 @@ class SybaseOperator {
                     new File(sqlFileName).createNewFile()
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
-
                     counter++
-
-                    if (firstFileNotCreated) {
-                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                        firstFileNotCreated = false
-                    }
-
+                    writeLineBufferIntoFile(sqlFile, schemaStatement)
+                    firstFileNotCreated = false
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -813,7 +777,7 @@ class SybaseOperator {
 
         int counter = 0
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
 
         String sqlFileName = ''
         def sqlFile
@@ -829,19 +793,15 @@ class SybaseOperator {
                     new File(sqlFileName).createNewFile()
                     sqlFile = new File(sqlFileName)
                     log.info("File '${sqlFileName}' created")
-
                     counter++
-
-                    if (firstFileNotCreated) {
-                        writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                        firstFileNotCreated = false
-                    }
-
+                    writeLineBufferIntoFile(sqlFile, schemaStatement)
+                    firstFileNotCreated = false
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -871,7 +831,7 @@ class SybaseOperator {
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
         boolean doneDropping = false
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if"
 
         String sqlFileName = ''
@@ -894,26 +854,21 @@ class SybaseOperator {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
                         currentEntityName = newEntityName
-
                         // Create a new file for new entity
                         sqlFileName = outputDir + File.separator + "splitViews-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromStatus(doneDropping) + ".sql"
                         new File(sqlFileName).createNewFile()
                         sqlFile = new File(sqlFileName)
                         log.info("File '${sqlFileName}' created")
-
                         counter++
-
-                        if (firstFileNotCreated) {
-                            writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                            firstFileNotCreated = false
-                        }
+                        writeLineBufferIntoFile(sqlFile, schemaStatement)
+                        firstFileNotCreated = false
                     }
-
                     sqlFile << line + '\r\n'
-
-                } else if (firstFileNotCreated) {
-                    lineBufferForFirstFile += line
-                } else {
+                }
+                else if (firstFileNotCreated) {
+                    schemaStatement += line
+                }
+                else {
                     sqlFile << line + '\r\n'
                 }
             }
@@ -943,7 +898,7 @@ class SybaseOperator {
         String currentEntityName = ''
         boolean firstFileNotCreated = true
         boolean isFirstCreateStatement = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "if object_id"
 
         String sqlFileName = ''
@@ -955,42 +910,34 @@ class SybaseOperator {
                     line = line.trim().replaceAll(/\s\s+/, "\\s")
                     if (lineChecker.lineStartsWith(line, "create procedure")) {
                         lineType = "create"
-
                         if (isFirstCreateStatement) {
                             log.info("Dropping completed. Current entity name reset and start creating...")
                             currentEntityName = ''
                             isFirstCreateStatement = false
                         }
                     }
-
                     else if (lineChecker.lineStartsWith(line, "if object_id")) {
                         lineType = "if object_id"
                     }
-
                     if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create procedure") || lineChecker.lineStartsWith(line, "create proc")) {
                         String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
                         if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName) && !line.contains("--")) {
                             currentEntityName = newEntityName
-
                             // Create a new file for new entity
                             sqlFileName = outputDir + File.separator + "splitSPs-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
                             new File(sqlFileName).createNewFile()
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
-
                             counter++
-
-                            if (firstFileNotCreated) {
-                                writeLineBufferIntoFile(sqlFile, lineBufferForFirstFile)
-                                firstFileNotCreated = false
-                            }
+                            writeLineBufferIntoFile(sqlFile, schemaStatement)
+                            firstFileNotCreated = false
                         }
-
                         sqlFile << line + '\r\n'
-
-                    } else if (firstFileNotCreated) {
-                        lineBufferForFirstFile += line
-                    } else {
+                    }
+                    else if (firstFileNotCreated) {
+                        schemaStatement += line
+                    }
+                    else {
                         sqlFile << line + '\r\n'
                     }
                 }
@@ -1020,7 +967,7 @@ class SybaseOperator {
         int counter = 0
         String currentEntityName = ''
         boolean firstFileNotCreated = true
-        String[] lineBufferForFirstFile = []
+        String[] schemaStatement = []
         String lineType = "create"
 
         Map<String, String> typeAndFilenameLookup = new HashMap<String, String>()

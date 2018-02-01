@@ -10,7 +10,7 @@ import  static org.junit.Assert.assertTrue
 /**
  * Tests the {@link nz.govt.nzqa.m11n.tools.automation.db.SybaseOperator}.
  */
-//@Ignore
+@Ignore
 class SybaseOperatorTest {
 
     SybaseOperator SybaseOperatorTestObj
@@ -94,7 +94,7 @@ class SybaseOperatorTest {
     }
 
     /**
-     * Expect 676 tables and 1088 alter table statements (in splitForeignKey folder)
+     * Expect 676 tables (17 proxy tables) and 1088 alter table statements (in splitForeignKey folder)
      */
     @Test
     void testSplitTables() {
