@@ -77,7 +77,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "create") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
 
@@ -143,7 +143,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "exec sp_addtype") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
                     doneDropping = true
@@ -205,7 +205,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "exec")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
@@ -260,7 +260,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "exec")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, "exec")
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
@@ -318,7 +318,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "create rule") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
                     doneDropping = true
@@ -380,7 +380,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "exec")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "exec")
                     // Create a new file for new entity
@@ -444,7 +444,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "create table")) {
                     String newEntityName = lineChecker.getEntityNameFromLine(line, "create")
                     if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
@@ -544,7 +544,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "create")) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
                     currentEntityName = ''
@@ -619,7 +619,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (line.toLowerCase().startsWith("create trigger")) {
                     lineType = "create trigger"
                     if (isFirstCreateStatement) {
@@ -683,7 +683,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
                 // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "alter table")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "alter table")
                     // Create a new file for new entity
@@ -734,7 +734,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
                 // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "alter table")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "alter table")
                     // Create a new file for new entity
@@ -785,7 +785,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "alter table")) {
                     String currentEntityName = lineChecker.getEntityNameFromLine(line, "alter table")
                     // Create a new file for new entity
@@ -840,7 +840,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
             // If line not blank
             if (line.trim()) {
-                line = line.trim().replaceAll(/\s\s+/, "\\s")
+                line = line.trim().replaceAll("( )+", " ")
                 if (lineChecker.lineStartsWith(line, "create view") && isFirstCreateStatement) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
 
@@ -907,7 +907,7 @@ class SybaseOperator {
         sybaseSqlFile.eachLine { String line ->
                 // If line not blank
                 if (line.trim()) {
-                    line = line.trim().replaceAll(/\s\s+/, "\\s")
+                    line = line.trim().replaceAll("( )+", " ")
                     if (lineChecker.lineStartsWith(line, "create procedure")) {
                         lineType = "create"
                         if (isFirstCreateStatement) {
@@ -1022,10 +1022,12 @@ class SybaseOperator {
         String[] splitFileNameList = new FilenameExtractor().getListOfSplitSqlScriptsInDir(splitFileDir, "default")
 
         for (String splitFileName : splitFileNameList){
+
             List<String> lines = Files.readAllLines(Paths.get(splitFileDir + File.separator + splitFileName),  StandardCharsets.UTF_8)
             for(String line : lines){
                 reconstructedFile << line + '\r\n'
             }
+            reconstructedFile << "=========================================================================================================="
         }
     }
 
