@@ -43,7 +43,8 @@ class EntityParser implements Parser{
         def dataTypeResult = (sqlStatement =~ /$dataTypeRegex/)
 
         if (alterResult){
-            typeString = DBObjMapper.ENTITY_KEY.getObjKey()
+            typeString = ((sqlStatement.contains(DBObjMapper.CONSTRAINT_CHECK.getSybaseKey()))?
+                    DBObjMapper.CONSTRAINT_CHECK.getObjKey() : DBObjMapper.ENTITY_KEY.getObjKey())
         }
 
         else if (result){

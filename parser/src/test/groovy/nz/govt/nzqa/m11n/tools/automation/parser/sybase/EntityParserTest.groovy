@@ -430,6 +430,14 @@ class EntityParserTest {
     }
 
     @Test
+    void checkConstraintShouldHaveTypeCheck(){
+        String checkString = "ALTER TABLE dbo.MARKER_CODE ADD CONSTRAINT MARKER_COD_assign_233413220 CHECK (assigned_marker_code between 1000 and 9999)"
+        Entity testEntity = entityParser.parse(checkString)
+        assertEquals("MARKER_CODE", testEntity.getName())
+        assertEquals(DBObjMapper.CONSTRAINT_CHECK.getObjKey(), testEntity.getType())
+    }
+
+    @Test
     void shouldExtractCorrectDatatypeForSysType(){
         String sqlStatement = "EXEC sp_addtype 'dt','datetime','NULL'"
         String dataType = 'datetime'
