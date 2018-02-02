@@ -55,7 +55,7 @@ class LineChecker {
         return "drop"
     }
 
-    String getEntityNameFromLine(String line, String lineType) {
+    String getEntityNameFromLine(String line, String lineType, String parameter) {
 
         def regexFilterList = []
         int resultIndex = 0
@@ -81,14 +81,14 @@ class LineChecker {
                 resultIndex = 1
                 break
 
-            case 'create index':
-                regexFilterList =[/.*(?i)index (\w+)/]
-                resultIndex = 1
+            case 'drop index':
+                regexFilterList =[/.*(?i)id=OBJECT_ID\('(\w+.*)'\) and name='(\w+)'/]
+                resultIndex = (parameter == "objectId"? 1 : 2)
                 break
 
-            case 'if index':
-                regexFilterList =[/.*(?i)id=OBJECT_ID\('(\w+.*)'\) and name='(\w+)'/]
-                resultIndex = 2
+            case "create index":
+                regexFilterList =[/(?i)create .* index (\S+) on (\S+)\(.*\)/]
+                resultIndex = (parameter == "objectId"? 2 : 1)
                 break
 
             case 'constraint':
@@ -118,6 +118,10 @@ class LineChecker {
             }
         }
         return name
+    }
+
+    String getEntityNameFromLine(String line, String lineType) {
+        return getEntityNameFromLine(line, lineType, null)
     }
 
     String getValueFromLine (String line){

@@ -1,6 +1,7 @@
 package nz.govt.nzqa.m11n.tools.automation.db
 
 import groovy.util.logging.Slf4j
+import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.m11n.tools.automation.file.FilenameExtractor
 
 import java.nio.charset.StandardCharsets
@@ -10,6 +11,35 @@ import java.util.stream.Collectors
 
 @Slf4j
 class SybaseOperator {
+
+    List<String> getStatementsFromFile(File file) {
+
+        List<String> statements = new ArrayList<String>()
+        boolean newStatement = false
+        String statement = ''
+
+        file.eachLine { String line ->
+            if (line.trim()) {
+                line = line.trim().replaceAll(/\s\s+/, ' ')
+                if (line.equalsIgnoreCase(DBObjMapper.GO.getSybaseKey())) {
+                    statements.add(statement)
+                    statements.add(DBObjMapper.GO.getSybaseKey())
+                    newStatement = true
+                } else if (line.startsWith(DBObjMapper.USE.getSybaseKey())) {
+                    statement = line
+                } else if (newStatement) {
+                    newStatement = false
+                    statement = line
+                } else {
+                    statement += " " + line
+                    statement = statement.trim()
+                }
+
+            }
+        }
+
+        return statements
+    }
 
     String getSqlTypeFromSybaseSqlName(String sybaseSqlName) {
 
@@ -533,32 +563,35 @@ class SybaseOperator {
 
         int counter = 0
         int proxyCounter = 0
-        String currentEntityName = ''
+        String currentFullEntityName = ''
+        String newEntityName = ''
+        String newObjectId = ''
         boolean firstFileNotCreated = true
         String[] schemaStatement = []
-        String lineType = "if index"
+        String lineType = "index"
 
         String sqlFileName = ''
         def sqlFile
 
-        sybaseSqlFile.eachLine { String line ->
-            // If line not blank
-            if (line.trim()) {
-                line = line.trim().replaceAll("( )+", " ")
-                if (lineChecker.lineStartsWith(line, "create")) {
+        List<String> statements = getStatementsFromFile(sybaseSqlFile)
+
+        for (String line : statements){
+            if (lineChecker.lineStartsWith(line, "create")) {
                     log.info("Dropping completed. Current entity name reset and start creating...")
-                    currentEntityName = ''
                     lineType = "create index"
                 }
                 else if (lineChecker.lineStartsWith(line, "if")) {
-                    lineType = "if index"
+                    lineType = "drop index"
                 }
+
                 if (lineChecker.lineStartsWith(line, "if") || lineChecker.lineStartsWith(line, "create")) {
-                    String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                    if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName)) {
-                        currentEntityName = newEntityName
+                    newEntityName = lineChecker.getEntityNameFromLine(line, lineType, "entity")
+                    newObjectId = lineChecker.getEntityNameFromLine(line, lineType, "objectId")
+                    String newFullEntityName = newObjectId + '-' + newEntityName
+                    if (lineChecker.entityNameHasChanged(newFullEntityName, currentFullEntityName)) {
+                        currentFullEntityName = newFullEntityName
                         if (line.contains("dba_pxy_")) {
-                            String proxySqlFileName = proxyIndicesOutputDir + File.separator + "splitIndices-" + proxyCounter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
+                            String proxySqlFileName = proxyIndicesOutputDir + File.separator + "splitIndices-" + proxyCounter + "-" + currentFullEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
                             new File(proxySqlFileName).createNewFile()
                             sqlFile = new File(proxySqlFileName)
                             log.info("File '${proxySqlFileName}' created")
@@ -566,7 +599,7 @@ class SybaseOperator {
                         }
                         else {
                             // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitIndices-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
+                            sqlFileName = outputDir + File.separator + "splitIndices-" + counter + "-" + currentFullEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
                             new File(sqlFileName).createNewFile()
                             sqlFile = new File(sqlFileName)
                             log.info("File '${sqlFileName}' created")
@@ -584,8 +617,6 @@ class SybaseOperator {
                     sqlFile << line + '\r\n'
                 }
             }
-
-        }
         log.info("=============== End of 'splitIndices' Generated ${counter} files =============== ")
     }
 
