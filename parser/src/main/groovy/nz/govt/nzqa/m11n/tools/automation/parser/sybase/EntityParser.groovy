@@ -223,7 +223,10 @@ class EntityParser implements Parser{
             Constraint constraint = constraintParser.parse(constraintString)
             constraint.setAction(constraintParser.getAction(sqlStatement))
             constraint.setTableName(constraintParser.getTableName(sqlStatement))
-            constraintMap.put(constraint.getName(), constraint)
+
+            if (constraint.getName() != null && !constraint.getName().isEmpty() && constraint.getName() != '') {
+                constraintMap.put(constraint.getName(), constraint)
+            }
         }
         return constraintMap
     }
