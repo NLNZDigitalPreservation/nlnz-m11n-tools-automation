@@ -459,4 +459,16 @@ class ParserUtil {
 
         return inOut
     }
+
+    boolean fileIsInSameSchema(List<String> statements, String schema){
+        String checkSchemaRegex = String.format("(?i)%s (\\S+)", DBObjMapper.USE.getSybaseKey())
+        for (String statement : statements){
+            def checkSchemaResult = statement =~ /$checkSchemaRegex/
+            if(checkSchemaResult){
+                String fileSchema = checkSchemaResult[0][1]
+                return (fileSchema == schema)
+            }
+        }
+        return null
+    }
 }

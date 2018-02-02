@@ -254,33 +254,35 @@ class EntityParser implements Parser{
     }
 
     @Override
-    Entity parse(File file){
-        Entity entity = new Entity()
+    Entity parse(File file, String schema){
+        Entity entity = null
         List<String> grantStatements = new ArrayList<>()
         List<String> sqlStatements = util.getStatementsFromFile(file)
-        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
-        String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey(),
-                DBObjMapper.ENTITY_DATATYPE.getObjKey())
 
-        for(String sqlStatement : sqlStatements){
-            if ((sqlStatement =~ /$regex/) || (sqlStatement =~ /$dataTypeRegex/)) {
-                entity.setDatabaseName(getDatabaseName(sqlStatement))
-                entity.setType(getType(sqlStatement))
-                entity.setName(getName(sqlStatement))
-                entity.setAction(getAction(sqlStatement))
-                entity.setOperationType(getOperationType(sqlStatement))
-                entity.setFields(getFields(sqlStatement))
-                entity.setDataType(getDataType(sqlStatement))
-                entity.setQueryValue(getQueryValue(sqlStatement))
-                entity.setConstraints(getConstraints(sqlStatement))
-                entity.setLocks(getLocks(sqlStatement))
-            }
+        if (util.fileIsInSameSchema(sqlStatements, schema)) {
+            String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey())
+            String dataTypeRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_ACTION_ENTITY.getObjKey(),
+                    DBObjMapper.ENTITY_DATATYPE.getObjKey())
 
-            else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())){
-                grantStatements.add(sqlStatement)
+            for (String sqlStatement : sqlStatements) {
+                if ((sqlStatement =~ /$regex/) || (sqlStatement =~ /$dataTypeRegex/)) {
+                    entity = new Entity()
+                    entity.setDatabaseName(getDatabaseName(sqlStatement))
+                    entity.setType(getType(sqlStatement))
+                    entity.setName(getName(sqlStatement))
+                    entity.setAction(getAction(sqlStatement))
+                    entity.setOperationType(getOperationType(sqlStatement))
+                    entity.setFields(getFields(sqlStatement))
+                    entity.setDataType(getDataType(sqlStatement))
+                    entity.setQueryValue(getQueryValue(sqlStatement))
+                    entity.setConstraints(getConstraints(sqlStatement))
+                    entity.setLocks(getLocks(sqlStatement))
+                } else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())) {
+                    grantStatements.add(sqlStatement)
+                }
             }
+            entity.setGrants(getGrants(grantStatements))
         }
-        entity.setGrants(getGrants(grantStatements))
 
         return entity
     }

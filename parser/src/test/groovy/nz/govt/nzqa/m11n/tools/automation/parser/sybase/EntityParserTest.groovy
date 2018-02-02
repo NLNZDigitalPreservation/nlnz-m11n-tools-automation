@@ -19,6 +19,7 @@ class EntityParserTest {
     AttributeParser attributeParser
     ConstraintParser constraintParser
     RelationParser relationParser
+    private static final String SCHEMA = 'eqa_prod'
 
     @Before
     void setup() {
@@ -64,7 +65,7 @@ class EntityParserTest {
         entity.setAction(DBObjMapper.ACTION_CREATE.getObjKey())
         entity.setLocks(Arrays.asList('DATAROWS'))
 
-        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileCreateTable.sql"))
+        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/parserUtilTestFileCreateTable.sql"), SCHEMA)
         assertEquals(entity.getDatabaseName(), testEntity.getDatabaseName())
         assertEquals(entity.getType(), testEntity.getType())
         assertEquals(entity.getName(), testEntity.getName())
@@ -415,7 +416,7 @@ class EntityParserTest {
 
     @Test
     void shouldParseChecksCorrectly(){
-        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTables/splitTables-83-dbo.CFN_CATEGORY.sql"))
+        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTables/splitTables-83-dbo.CFN_CATEGORY.sql"), SCHEMA)
         assertEquals("CFN_CATEGORY", testEntity.getName())
         assertEquals("dbo", testEntity.getDatabaseName())
         assertEquals(3, testEntity.getConstraints().keySet().size())
@@ -423,7 +424,7 @@ class EntityParserTest {
 
     @Test
     void shouldParseUserDataTypeCorrectly(){
-        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitUserDatatypes/splitUserDatatypes-43-COUNT_1-drop.sql"))
+        Entity testEntity = entityParser.parse(new File("src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitUserDatatypes/splitUserDatatypes-43-COUNT_1-drop.sql"), SCHEMA)
         assertEquals("COUNT_1", testEntity.getName())
         assertEquals(DBObjMapper.ENTITY_DATATYPE.getObjKey(), testEntity.getType())
         assertEquals(DBObjMapper.ACTION_DROP_DATATYPE.getObjKey(), testEntity.getAction())

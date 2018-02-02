@@ -15,6 +15,7 @@ class UtilitiesParserTest {
 
     UtilitiesParser utilitiesParser
     ParamParser paramParser
+    String SCHEMA = 'eqa_prod'
 
     @Before
     void setup() {
@@ -25,7 +26,7 @@ class UtilitiesParserTest {
     @Test
     void shouldReturnSPUtilitiesWithCorrectParameters(){
         Utilities testUtilities = utilitiesParser.parse(new File(
-                'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitSPs/testFile.sql'))
+                'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitSPs/testFile.sql'), SCHEMA)
 
         // create procedure dbo.ContactsMergeCopyName
         // @ContactMergeRunId object_id,
@@ -63,7 +64,7 @@ class UtilitiesParserTest {
     @Test
     void shouldReturnTriggerUtilities(){
         Utilities testUtilities = utilitiesParser.parse(new File(
-                'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTriggers/testFile.sql'))
+                'src/test/groovy/nz/govt/nzqa/m11n/tools/automation/parser/sybase/resource/splitTriggers/testFile.sql'), SCHEMA)
 
         assertEquals(DBObjMapper.UTILITIES_TRIGGER.getObjKey(), testUtilities.getType())
         assertEquals("du_ACCREDITATION", testUtilities.getName())

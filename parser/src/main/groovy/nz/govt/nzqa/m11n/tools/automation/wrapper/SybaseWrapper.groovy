@@ -3,8 +3,6 @@ package nz.govt.nzqa.m11n.tools.automation.wrapper
 import nz.govt.nzqa.dbmigrate.model.MigrateWrapper
 import nz.govt.nzqa.m11n.tools.automation.parser.Parser
 import nz.govt.nzqa.m11n.tools.automation.parser.sybase.ParserUtil
-import nz.govt.nzqa.m11n.tools.automation.wrapper.Wrapper
-import nz.govt.nzqa.m11n.tools.automation.wrapper.WrapperUtil
 
 /**
  * Assume files in each split folder are of the same schema. New split folders should be created for files from a different schema
@@ -15,12 +13,14 @@ class SybaseWrapper implements Wrapper {
     WrapperUtil wrapperUtil = new WrapperUtil()
 
     @Override
-    MigrateWrapper parse(String splitFoldersDir) {
+    List<MigrateWrapper> parse (String splitFoldersDir) {
+        Map<String, MigrateWrapper> migrateWrapperMap = new HashMap<>()
         MigrateWrapper migrateWrapper = new MigrateWrapper()
-
+        String schema = ''
+        migrateWrapper.setSchema(schema)
         List<String> splitFolderNames = parserUtil.getAllFolderNames(splitFoldersDir)
-        for (String splitFolderName : splitFolderNames) {
 
+        for (String splitFolderName : splitFolderNames) {
             String splitFolderPath = splitFoldersDir + File.separator + splitFolderName
             List<String> splitFileNames = parserUtil.getSqlFilesInDir(splitFolderPath)
             Map<String, Object> fieldMap = new HashMap<>()
@@ -29,18 +29,44 @@ class SybaseWrapper implements Wrapper {
             for (String splitFileName : splitFileNames) {
                 String splitFilePath = splitFolderPath + File.separator + splitFileName
                 Parser parser = parserUtil.getParser(splitFolderName)
-                if (migrateWrapper.getSchema() == null || migrateWrapper.getSchema().isEmpty()) {
-                    migrateWrapper.setSchema(parserUtil.getSchema(new File(splitFilePath)))
+                String newSchema = parserUtil.getSchema(new File(splitFilePath))
+
+                if (!schema.equalsIgnoreCase(newSchema)) {
+                    schema = newSchema
+                    MigrateWrapper existingMigrateWrapper = migrateWrapperMap.get(schema)
+
+                    if (existingMigrateWrapper == null) {
+                        if (!fieldMap.isEmpty()){
+                            wrapperUtil.setField(migrateWrapper, fieldMap, fieldName)
+                        }
+                        migrateWrapper = new MigrateWrapper()
+                        migrateWrapper.setSchema(schema)
+                        fieldMap = new HashMap<>()
+                        migrateWrapperMap.put(schema, migrateWrapper)
+                    }
+
+                    else {
+                        if (!fieldMap.isEmpty()){
+                            wrapperUtil.setField(migrateWrapper, fieldMap, fieldName)
+                        }
+                        migrateWrapper = existingMigrateWrapper
+                        fieldMap = (Map<String, Object>)wrapperUtil.getMapFromDataModel(migrateWrapper, fieldName)
+                    }
                 }
 
-                Object dataModelObj = parser.parse(new File(splitFilePath))
+                Object dataModelObj = parser.parse(new File(splitFilePath), schema)
                 String dataModelName = wrapperUtil.getDataModelName(dataModelObj)
-
                 fieldMap = wrapperUtil.putDataModelInMap(fieldMap, dataModelObj, dataModelName)
             }
             wrapperUtil.setField(migrateWrapper, fieldMap, fieldName)
         }
 
-        return migrateWrapper
+        List<MigrateWrapper> migrateWrappers = new ArrayList<>()
+
+        for (String schemaName : migrateWrapperMap.keySet()){
+            migrateWrappers.add(migrateWrapperMap.get(schemaName))
+        }
+
+        return migrateWrappers
     }
 }

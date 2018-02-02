@@ -1,3 +1,5 @@
+USE eqa_prod
+GO
 CREATE TABLE dbo.CFN_CATEGORY
 (
     cfn_catg_id              OBJECT_ID     NOT NULL,

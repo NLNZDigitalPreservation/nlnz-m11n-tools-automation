@@ -104,7 +104,7 @@ class AttributeParser implements Parser{
     }
 
     @Override
-    Attribute parse(File file){
+    Attribute parse(File file, String schema){
         Attribute attribute = new Attribute()
 
         return attribute

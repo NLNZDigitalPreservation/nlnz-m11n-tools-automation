@@ -125,22 +125,24 @@ class ConstraintParser implements Parser {
     }
 
     @Override
-    Constraint parse(File file) {
-        Constraint constraint = new Constraint()
+    Constraint parse(File file, String schema) {
+        Constraint constraint = null
         List<String> sqlStatements = util.getStatementsFromFile(file)
 
-        for(String sqlStatement : sqlStatements){
-            constraint.setType(getType(sqlStatement))
-            constraint.setName(getName(sqlStatement))
-            constraint.setSubType(getSubType(sqlStatement))
-            constraint.setAction(getAction(sqlStatement))
-            constraint.setFields(getFields(sqlStatement))
-            constraint.setTableName(getTableName(sqlStatement))
-            constraint.setReferenceTableName(getReferenceTableName(sqlStatement))
-            constraint.setReferenceFields(getReferenceFields(sqlStatement))
-            constraint.setCriteria(getCriteria(sqlStatement))
+        if (util.fileIsInSameSchema(sqlStatements, schema)){
+            for(String sqlStatement : sqlStatements){
+                constraint = new Constraint()
+                constraint.setType(getType(sqlStatement))
+                constraint.setName(getName(sqlStatement))
+                constraint.setSubType(getSubType(sqlStatement))
+                constraint.setAction(getAction(sqlStatement))
+                constraint.setFields(getFields(sqlStatement))
+                constraint.setTableName(getTableName(sqlStatement))
+                constraint.setReferenceTableName(getReferenceTableName(sqlStatement))
+                constraint.setReferenceFields(getReferenceFields(sqlStatement))
+                constraint.setCriteria(getCriteria(sqlStatement))
+            }
         }
-
         return constraint
     }
 }

@@ -50,7 +50,7 @@ class ParamParser implements Parser{
     }
 
     @Override
-    Param parse(File file){
+    Param parse(File file, String schema){
         Param param = new Param()
 
         return param

@@ -4,5 +4,5 @@ import nz.govt.nzqa.dbmigrate.model.MigrateWrapper
 
 interface Wrapper {
 
-    MigrateWrapper parse(String splitFoldersDir)
+    List <MigrateWrapper> parse(String splitFolderDir)
 }

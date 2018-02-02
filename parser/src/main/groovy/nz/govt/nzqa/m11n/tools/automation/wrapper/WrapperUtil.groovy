@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.wrapper
 
+import groovy.util.logging.Slf4j
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Index
@@ -8,24 +9,35 @@ import nz.govt.nzqa.dbmigrate.model.Utilities
 
 import java.beans.PropertyDescriptor
 
+@Slf4j
 class WrapperUtil {
 
     void setField(MigrateWrapper migrateWrapper, Map<String, Object> fieldMap, String fieldName) {
-        PropertyDescriptor descriptor = new PropertyDescriptor(fieldName, migrateWrapper.getClass())
-        descriptor.getWriteMethod().invoke(migrateWrapper, fieldMap)
+        if (fieldName == null || fieldName.isEmpty()) {
+            log.warn("Field name is undefined. Nothing is assigned to migrate wrapper.")
+        }
+
+        else{
+            PropertyDescriptor descriptor = new PropertyDescriptor(fieldName, migrateWrapper.getClass())
+            descriptor.getWriteMethod().invoke(migrateWrapper, fieldMap)
+        }
     }
 
     String getDataModelName(Object dataModelObj) {
         String name = ''
         if (dataModelObj instanceof Entity) {
+
             if (dataModelObj.getAction() != null && dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_ALTER.getSybaseKey())) {
                 name = (((Entity) dataModelObj).getConstraints().keySet().toArray()[0])
-            } else {
+            }
+            else {
                 name = ((Entity) dataModelObj).getName()
             }
-        } else if (dataModelObj instanceof Utilities) {
+        }
+        else if (dataModelObj instanceof Utilities) {
             name = ((Utilities) dataModelObj).getName()
-        } else if (dataModelObj instanceof Index) {
+        }
+        else if (dataModelObj instanceof Index) {
             name = ((Index) dataModelObj).getName()
         }
 
@@ -34,14 +46,17 @@ class WrapperUtil {
 
     Map<String, Object> putDataModelInMap(Map<String, Object> fieldMap, Object dataModelObj, String dataModelName) {
 
-        if (fieldMap.get(dataModelName) == null) {
+        if (dataModelObj == null){
+            return fieldMap
+        }
+        else if (fieldMap.get(dataModelName) == null) {
             fieldMap.put(dataModelName, dataModelObj)
         }
-
         else {
             //Avoid replace create statement
             if (dataModelObj instanceof Entity) {
                 Entity existingDataModelObj = fieldMap.get(dataModelName)
+
                 if (existingDataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getObjKey())
                         && dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_DROPONLY.getObjKey())) {
                     return fieldMap
@@ -54,11 +69,11 @@ class WrapperUtil {
 
             else if (dataModelObj instanceof Utilities) {
                 Utilities existingDataModelObj = fieldMap.get(dataModelName)
+
                 if (existingDataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getObjKey())
                         && dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_DROPONLY.getObjKey())) {
                     return fieldMap
                 }
-
                 else {
                     fieldMap.put(dataModelName, dataModelObj)
                 }
@@ -66,11 +81,11 @@ class WrapperUtil {
 
             else if (dataModelObj instanceof Index) {
                     Index existingDataModelObj = fieldMap.get(dataModelName)
+
                 if (existingDataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_CREATE.getObjKey())
                         && dataModelObj.getAction().equalsIgnoreCase(DBObjMapper.ACTION_DROP.getObjKey())) {
                     return fieldMap
                 }
-
                 else {
                     fieldMap.put(dataModelName, dataModelObj)
                 }
@@ -79,4 +94,11 @@ class WrapperUtil {
         }
         return fieldMap
     }
+
+    Object getMapFromDataModel(MigrateWrapper migrateWrapper, String fieldName) {
+        PropertyDescriptor descriptor = new PropertyDescriptor(fieldName, migrateWrapper.getClass())
+        return descriptor.getReadMethod().invoke(migrateWrapper)
+    }
+
+
 }

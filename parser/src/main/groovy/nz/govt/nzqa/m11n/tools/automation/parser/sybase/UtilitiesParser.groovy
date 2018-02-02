@@ -96,30 +96,31 @@ class UtilitiesParser implements Parser {
     }
 
     @Override
-    Utilities parse(File file){
-        Utilities utilities = new Utilities()
+    Utilities parse(File file, String schema){
+        Utilities utilities = null
         List<String> grantStatements = new ArrayList<>()
         List<String> sqlStatements = util.getStatementsFromFile(file)
-        String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_ACTION_UTILITIES.getObjKey())
+        if (util.fileIsInSameSchema(sqlStatements, schema)) {
+            String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_ACTION_UTILITIES.getObjKey())
 
-        for(String sqlStatement : sqlStatements) {
-            if (sqlStatement =~ /$regex/) {
-                utilities.setDatabaseName(getDatabaseName(sqlStatement))
-                utilities.setType(getType(sqlStatement))
-                utilities.setName(getName(sqlStatement))
-                utilities.setAction(getAction(sqlStatement))
-                utilities.setInFields(getInFields(sqlStatement))
-                utilities.setReturnType(getReturnType(sqlStatement))
-                utilities.setSql(getSql(sqlStatement))
-                utilities.setTriggerTableName(getTriggerTableName(sqlStatement))
-                utilities.setTriggerOperations(getTriggerOperations(sqlStatement))
+            for (String sqlStatement : sqlStatements) {
+                if (sqlStatement =~ /$regex/) {
+                    utilities = new Utilities()
+                    utilities.setDatabaseName(getDatabaseName(sqlStatement))
+                    utilities.setType(getType(sqlStatement))
+                    utilities.setName(getName(sqlStatement))
+                    utilities.setAction(getAction(sqlStatement))
+                    utilities.setInFields(getInFields(sqlStatement))
+                    utilities.setReturnType(getReturnType(sqlStatement))
+                    utilities.setSql(getSql(sqlStatement))
+                    utilities.setTriggerTableName(getTriggerTableName(sqlStatement))
+                    utilities.setTriggerOperations(getTriggerOperations(sqlStatement))
+                } else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())) {
+                    grantStatements.add(sqlStatement)
+                }
             }
-
-            else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())){
-                grantStatements.add(sqlStatement)
-            }
+            utilities.setGrants(getGrants(grantStatements))
         }
-        utilities.setGrants(getGrants(grantStatements))
 
         return utilities
     }

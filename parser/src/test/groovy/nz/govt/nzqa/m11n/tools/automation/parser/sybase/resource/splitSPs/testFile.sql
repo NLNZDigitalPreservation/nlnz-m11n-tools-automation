@@ -1,3 +1,5 @@
+USE eqa_prod
+go
 create procedure dbo.ContactsMergeCopyName
 	@ContactMergeRunId		object_id
 	,@NameId		object_id

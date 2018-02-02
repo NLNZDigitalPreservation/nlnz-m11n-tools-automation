@@ -148,7 +148,7 @@ class CriteriaParser implements Parser {
     }
 
     @Override
-    Criteria parse(File file){
+    Criteria parse(File file, String schema){
         Criteria criteria = new Criteria()
 
         return criteria

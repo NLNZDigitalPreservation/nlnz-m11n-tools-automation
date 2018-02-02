@@ -1,3 +1,5 @@
+USE eqa_prod
+go
 EXEC sp_addtype 'COUNT_1','int','NULL'
 go
 IF EXISTS (SELECT * FROM systypes WHERE name='COUNT_1')

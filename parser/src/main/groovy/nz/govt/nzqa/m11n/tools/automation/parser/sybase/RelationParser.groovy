@@ -67,7 +67,7 @@ class RelationParser implements Parser{
     }
 
     @Override
-    Relation parse(File file){
+    Relation parse(File file, String schema){
         Relation relation = new Relation()
 
         return relation
