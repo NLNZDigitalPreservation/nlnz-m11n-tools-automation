@@ -47,7 +47,7 @@ class UtilitiesParser implements Parser {
         Map<String, Param> paramMap = new HashMap<>()
         String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_IN_FIELDS.getObjKey())
         def result = (sqlStatement =~ /$regex/)
-        List<String> paramStrings = (result? result[0][2].toString().split(",").toList() :
+        List<String> paramStrings = (result? result[0][3].toString().split(",").toList() :
                 new ArrayList<String>())
 
         for (String paramString : paramStrings){
@@ -99,7 +99,7 @@ class UtilitiesParser implements Parser {
     Utilities parse(File file, String schema){
         Utilities utilities = null
         List<String> grantStatements = new ArrayList<>()
-        List<String> sqlStatements = util.getStatementsFromFile(file)
+        List<String> sqlStatements = util.getStatementsFromFile(file, true)
         if (util.fileIsInSameSchema(sqlStatements, schema)) {
             String regex = regexBuilder.buildUtilitiesRegex(DBObjMapper.REGEX_ACTION_UTILITIES.getObjKey())
 

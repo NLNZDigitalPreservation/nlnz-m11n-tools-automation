@@ -11,11 +11,20 @@ class ParserUtil {
     private static final OPEN_BRACKET = "("
 
     /**
-     * Read the file line by line and extract lines between 'go' as a statement
+     * invoke getStatementsFromFile with default EOL inclusion as false
      * @param file
      * @return
      */
     List<String> getStatementsFromFile(File file) {
+        return getStatementsFromFile(file, false)
+    }
+
+    /**
+     * Read the file line by line and extract lines between 'go' as a statement
+     * @param file
+     * @return
+     */
+    List<String> getStatementsFromFile(File file, boolean includeEOL) {
 
         List<String> statements = new ArrayList<String>()
         boolean newStatement = false
@@ -27,17 +36,30 @@ class ParserUtil {
                 if (line.equalsIgnoreCase(DBObjMapper.GO.getSybaseKey())) {
                     statements.add(statement)
                     newStatement = true
-                } else if (line.startsWith(DBObjMapper.USE.getSybaseKey())) {
+                //Search for the USE keyword along with space trailer to identify the USE-statements.
+                //This helps to avoid any words starting with USE being reported USE-Statement. Eg: USER, USED columns
+                //Error identified on splitTables-254-dbo.JBM_ROLE.sql
+                } else if (line.startsWith(DBObjMapper.USE.getSybaseKey() + " ")) {
                     statement = line
                 } else if (newStatement) {
                     newStatement = false
                     statement = line
                 } else {
-                    statement += " " + line
+                    if (includeEOL) {
+                        statement += " " + DBObjMapper.END_OF_LINE_MAPPER + line
+                    } else {
+                        statement += " " + line
+                    }
                     statement = statement.trim()
                 }
 
             }
+        }
+
+        //Fix to add the last statement to Statements List, if there is no End of Line statement ("GO") on the last of file.
+        //Refer - splitSPs-1960-dbo.p_pay_get_last_recon_run-add.sql
+        if (!newStatement && statement != null && statement.trim().length()>0) {
+            statements.add(statement)
         }
 
         return statements
@@ -157,12 +179,17 @@ class ParserUtil {
         String schema = ''
 
         firstFile.eachLine { String line ->
-            def result = (line.trim() =~ /(?i)USE (\S+)/)
-            if (result) {
-                schema = result[0][1]
-                return schema
+            //Regex modified to check "USE " as starting word followed by another word
+            //Do this search only for first occurance of "USE [schemaname]"
+            //It is possible to have the same pattern inside sql / comments which mich break the code. So stopping at first occurance.
+            //Refer splitSPs-268-dbo.DistChaserHubLabels-add.sql - has second occurance
+            if (schema != null && schema.isEmpty()) {
+                def result = (line.trim() =~ /(?:^|\W)(?i)USE (\S+)(?:$|\W)/)
+                if (result) {
+                    schema = result[0][1]
+                    return schema
+                }
             }
-
         }
         return schema
     }
@@ -403,7 +430,8 @@ class ParserUtil {
 
             //Utilities
             case(DBObjMapper.UTILITIES_PROC.getSybaseKey()):
-                type = DBObjMapper.UTILITIES_PROC.getObjKey()
+            case(DBObjMapper.UTILITIES_PROCEDURE.getSybaseKey()):
+                type = DBObjMapper.UTILITIES_PROCEDURE.getObjKey()
                 break
 
             case(DBObjMapper.UTILITIES_TRIGGER.getSybaseKey()):

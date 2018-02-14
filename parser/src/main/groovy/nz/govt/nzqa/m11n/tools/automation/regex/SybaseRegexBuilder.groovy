@@ -197,10 +197,10 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_DATABASE_NAME.getObjKey()):case(DBObjMapper.REGEX_TYPE.getObjKey()):
             case(DBObjMapper.REGEX_NAME.getObjKey()):case(DBObjMapper.REGEX_ACTION.getObjKey()):
             case(DBObjMapper.REGEX_ACTION_UTILITIES.getObjKey()):
-                //(?i)(CREATE|DROP) (PROCEDURE|TRIGGER|FUNCTION) (\S+)
-                regexString = String.format("(?i)(%s|%s) (%s|%s|%s) (\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
-                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.UTILITIES_PROC.getSybaseKey(),
-                        DBObjMapper.UTILITIES_TRIGGER.getSybaseKey(), DBObjMapper.UTILITIES_FUNCTION.getSybaseKey())
+                //(?i)(CREATE|DROP) (PROCEDURE|TRIGGER|FUNCTION|PROC) (\S+)
+                regexString = String.format("(?i)(%s|%s) (%s|%s|%s|%s) (\\S+)", DBObjMapper.ACTION_CREATE.getSybaseKey(),
+                        DBObjMapper.ACTION_DROP.getSybaseKey(), DBObjMapper.UTILITIES_PROCEDURE.getSybaseKey(),
+                        DBObjMapper.UTILITIES_TRIGGER.getSybaseKey(), DBObjMapper.UTILITIES_FUNCTION.getSybaseKey(), DBObjMapper.UTILITIES_PROC.getSybaseKey())
                 break
 
             case(DBObjMapper.REGEX_TRIGGER_TABLE_NAME.getObjKey()):case(DBObjMapper.REGEX_TRIGGER_OPERATIONS.getObjKey()):
@@ -210,14 +210,16 @@ class SybaseRegexBuilder implements RegexBuilder {
                 break
 
             case(DBObjMapper.REGEX_IN_FIELDS.getObjKey()):
-                //(?i)CREATE PROCEDURE (\S+) (.*) AS (.*)
-                regexString = String.format("(?i)%s %s (\\S+) (.*) AS (\\S+)",
-                        DBObjMapper.ACTION_CREATE.getSybaseKey(),DBObjMapper.UTILITIES_PROC.getSybaseKey())
+                //(?i)CREATE (PROCEDURE|PROC) (\S+) (.*) AS (.*)
+                regexString = String.format("(?i)%s (%s|%s) (\\S+) (.*) AS (\\S+)",
+                        DBObjMapper.ACTION_CREATE.getSybaseKey(),DBObjMapper.UTILITIES_PROCEDURE.getSybaseKey(), DBObjMapper.UTILITIES_PROC.getSybaseKey())
                 break
 
             case(DBObjMapper.REGEX_SQL.getObjKey()):
-                //(?i)CREATE .* AS (.*)
-                regexString = String.format("(?i)%s .* AS (.*)", DBObjMapper.ACTION_CREATE.getSybaseKey())
+                //Fix to match first create - refer dbo.proc_examGetMrkSheets - for multiple create pattern matching issue...
+                //(?i)CREATE .*? AS (.*)  -- ? after .* is added to get short match of "Create .. as" pattern
+                //(?:^|\\W)(?i)%s .* AS (?:\$|\\W)(.*)  --> not working
+                regexString = String.format("(?i)CREATE .*? AS (.*)", DBObjMapper.ACTION_CREATE.getSybaseKey())
                 break
 
         }
