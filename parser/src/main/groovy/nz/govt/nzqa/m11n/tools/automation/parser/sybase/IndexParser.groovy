@@ -94,15 +94,20 @@ class IndexParser implements Parser{
         Index index = null
         List<String> sqlStatements = util.getStatementsFromFile(file)
         if (util.fileIsInSameSchema(sqlStatements, schema)) {
+            String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey())
+
             for (String sqlStatement : sqlStatements) {
-                index = new Index()
-                index.setType(getType(sqlStatement))
-                index.setName(getName(sqlStatement))
-                index.setAction(getAction(sqlStatement))
-                index.setDatabaseName(getDatabaseName(sqlStatement))
-                index.setTableName(getTableName(sqlStatement))
-                index.setFieldNames(getFieldNames(sqlStatement))
-                index.setWithClause(getWithClause(sqlStatement))
+                //Create the index object only when the line contains "CREATE [CLUSTERED / NONCLUSTERED] INDEX.."
+                if (sqlStatement =~ /$regex/) {
+                    index = new Index()
+                    index.setType(getType(sqlStatement))
+                    index.setName(getName(sqlStatement))
+                    index.setAction(getAction(sqlStatement))
+                    index.setDatabaseName(getDatabaseName(sqlStatement))
+                    index.setTableName(getTableName(sqlStatement))
+                    index.setFieldNames(getFieldNames(sqlStatement))
+                    index.setWithClause(getWithClause(sqlStatement))
+                }
             }
         }
 
@@ -112,14 +117,18 @@ class IndexParser implements Parser{
     @Override
     Index parse(String sqlStatement) {
         Index index = new Index()
+        String regex = regexBuilder.buildIndexRegex(DBObjMapper.REGEX_ACTION.getObjKey())
 
-        index.setType(getType(sqlStatement))
-        index.setName(getName(sqlStatement))
-        index.setAction(getAction(sqlStatement))
-        index.setDatabaseName(getDatabaseName(sqlStatement))
-        index.setTableName(getTableName(sqlStatement))
-        index.setFieldNames(getFieldNames(sqlStatement))
-        index.setWithClause(getWithClause(sqlStatement))
+        //Create the index object only when the line contains "CREATE [CLUSTERED / NONCLUSTERED] INDEX.."
+        if (sqlStatement =~ /$regex/) {
+            index.setType(getType(sqlStatement))
+            index.setName(getName(sqlStatement))
+            index.setAction(getAction(sqlStatement))
+            index.setDatabaseName(getDatabaseName(sqlStatement))
+            index.setTableName(getTableName(sqlStatement))
+            index.setFieldNames(getFieldNames(sqlStatement))
+            index.setWithClause(getWithClause(sqlStatement))
+        }
 
         return index
     }
