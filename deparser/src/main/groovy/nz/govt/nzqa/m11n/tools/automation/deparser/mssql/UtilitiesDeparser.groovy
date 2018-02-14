@@ -55,8 +55,10 @@ class UtilitiesDeparser extends WritableDeparser{
                         break
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        buff.append(dropProc())
-                        buff.append("\n")
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropProc())
+                            buff.append("\n")
+                        }
                         buff.append(createProc())
                         break
                 }
@@ -67,7 +69,7 @@ class UtilitiesDeparser extends WritableDeparser{
                     case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
                         action = DBObjMapper.ACTION_DROPONLY.getObjKey()
                         buff.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.UTILITIES_FUNCTION.getMssqlKey() + " ")
-                        if (utility.getDatabaseName()!=null ){
+                        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
                             buff.append("[$utility.databaseName].")
                         }
                         buff.append("[$utility.name] ")
@@ -87,9 +89,11 @@ class UtilitiesDeparser extends WritableDeparser{
                         break
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        buff.append(dropTrigger())
-                        buff.append("\n")
-                        buff.append(createTrigger())
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropTrigger())
+                            buff.append("\n")
+                            buff.append(createTrigger())
+                        }
                         break
 //                    case (DBObjMapper.ACTION_ALTER.getObjKey()):
 //                        action = DBObjMapper.ACTION_ALTER.getObjKey()
@@ -105,16 +109,16 @@ class UtilitiesDeparser extends WritableDeparser{
     String dropProc() {
         String checkDrop = MSSQLConstants.CHECK_DROP_PROCEDURE
         StringBuffer bf = new StringBuffer()
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             checkDrop = checkDrop.replaceAll('@DB@', utility.getDatabaseName())
         } else {
-            checkDrop = checkDrop.replaceAll('[@DB@].', '')
+            checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
         }
         checkDrop = checkDrop.replaceAll('@PROCNAME@',utility.getName())
         bf.append(checkDrop + "\n")
 
         bf.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.UTILITIES_PROC.getMssqlKey() + " ")
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             bf.append("[$utility.databaseName].")
         }
         bf.append("[$utility.name] ")
@@ -126,28 +130,29 @@ class UtilitiesDeparser extends WritableDeparser{
     String createProc() {
         StringBuffer bf = new StringBuffer()
         String checkCreate = MSSQLConstants.CHECK_CREATE_PROCEDURE
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             checkCreate = checkCreate.replaceAll('@DB@', utility.getDatabaseName())
         } else {
-            checkCreate = checkCreate.replaceAll('[@DB@].', '')
+            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
         }
         checkCreate = checkCreate.replaceAll('@PROCNAME@',utility.getName())
         bf.append(checkCreate + "\n")
 
         bf.append(" EXEC dbo.sp_executesql @statement = N'$DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.UTILITIES_PROC.mssqlKey ")
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             bf.append("[$utility.databaseName].")
         }
         bf.append("[$utility.name] AS'")
         bf.append(MSSQLConstants.CLOSE_BLOCK)
 
         bf.append("$DBObjMapper.ACTION_ALTER.mssqlKey $DBObjMapper.UTILITIES_PROC.mssqlKey ")
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             bf.append("[$utility.databaseName].")
         }
         bf.append("[$utility.name] ")
 
         if (utility.getInFields() != null && utility.getInFields().size()>0) {
+            bf.append("( ")
             ParamDeparser pd
             boolean firstCall = true
             for (param in utility.getInFields().values()) {
@@ -161,10 +166,15 @@ class UtilitiesDeparser extends WritableDeparser{
                 bf.append(pd.deParse())
                 bf.append("\n")
             }
+            bf.append(") ")
         }
 
         bf.append("AS \n")
-        bf.append(" $utility.sql ")
+        String sqlTemp = utility.sql
+        if (DBObjMapper.END_OF_LINE_MAPPER != null && DBObjMapper.END_OF_LINE_MAPPER.trim().length()>0) {
+            sqlTemp = sqlTemp.replaceAll(DBObjMapper.END_OF_LINE_MAPPER, "\n")
+        }
+        bf.append(" $sqlTemp ")
         bf.append(MSSQLConstants.CLOSE_BLOCK)
 
         if (utility.getGrants() != null && utility.getGrants().size()>0) {
@@ -182,16 +192,16 @@ class UtilitiesDeparser extends WritableDeparser{
     String dropTrigger() {
         String checkDrop = MSSQLConstants.CHECK_DROP_TRIGGER
         StringBuffer bf = new StringBuffer()
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             checkDrop = checkDrop.replaceAll('@DB@', utility.getDatabaseName())
         } else {
-            checkDrop = checkDrop.replaceAll('[@DB@].', '')
+            checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
         }
         checkDrop = checkDrop.replaceAll('@TRIGGERNAME@',utility.getName())
         bf.append(checkDrop + "\n")
 
         bf.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.UTILITIES_TRIGGER.getMssqlKey() + " ")
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             bf.append("[$utility.databaseName].")
         }
         bf.append("[$utility.name] ")
@@ -204,20 +214,20 @@ class UtilitiesDeparser extends WritableDeparser{
         StringBuffer bf = new StringBuffer()
 
         String checkCreate = MSSQLConstants.CHECK_CREATE_TRIGGER
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             checkCreate = checkCreate.replaceAll('@DB@', utility.getDatabaseName())
         } else {
-            checkCreate = checkCreate.replaceAll('[@DB@].', '')
+            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
         }
         checkCreate = checkCreate.replaceAll('@TRIGGERNAME@',utility.getName())
         bf.append(checkCreate + "\n")
 
         bf.append(" EXEC dbo.sp_executesql @statement = N'$DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.UTILITIES_TRIGGER.mssqlKey ")
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             bf.append("[$utility.databaseName].")
         }
         bf.append("[$utility.name] ON ")
-        if (utility.getDatabaseName()!=null ){
+        if (utility.getDatabaseName()!=null && utility.getDatabaseName().trim().length()>0 ){
             bf.append("[$utility.databaseName].")
         }
         bf.append(utility.getTriggerTableName() + " ")

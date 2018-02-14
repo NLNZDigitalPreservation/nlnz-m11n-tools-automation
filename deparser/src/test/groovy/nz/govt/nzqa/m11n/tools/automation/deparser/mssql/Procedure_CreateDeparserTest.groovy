@@ -244,25 +244,25 @@ class Procedure_CreateDeparserTest {
         param1.setName("@sequencename")
         param1.setDataType("name")
         param1.setDefaultValue("'OID'")
-        param1.setInOut(DBObjMapper.PARAM_IN.getObjKey())
+        param1.setInOut(DBObjMapper.PARAM_INPUT.getObjKey())
 
         Param param2 = new Param()
         param2.setName("@allocation")
         param2.setDataType("object_id")
         param2.setDefaultValue("1000")
-        param2.setInOut(DBObjMapper.PARAM_IN.getObjKey())
+        param2.setInOut(DBObjMapper.PARAM_INPUT.getObjKey())
 
         Param param3 = new Param()
         param3.setName("@next_id")
         param3.setDataType("object_id")
         param3.setDefaultValue("null")
-        param3.setInOut(DBObjMapper.PARAM_OUT.getObjKey())
+        param3.setInOut(DBObjMapper.PARAM_OUTPUT.getObjKey())
 
         Param param4 = new Param()
         param4.setName("@select")
         param4.setDataType("int")
         param4.setDefaultValue("1")
-        param4.setInOut(DBObjMapper.PARAM_IN.getObjKey())
+        param4.setInOut(DBObjMapper.PARAM_INPUT.getObjKey())
 
 
         def paramMap = ['@sequencename': param1, '@allocation': param2, '@next_id': param3, '@select': param4,]

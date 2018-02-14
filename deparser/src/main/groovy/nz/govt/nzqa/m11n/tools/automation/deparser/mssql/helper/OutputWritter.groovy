@@ -20,6 +20,7 @@ class OutputWritter {
     String mssqlProcedurePath
     String mssqlFunctionPath
     String mssqlTriggerPath
+    String mssqlEntireSchema
 
 
     OutputWritter (String basePath1, String schema1) {
@@ -36,7 +37,7 @@ class OutputWritter {
         mssqlViewPath = mssqlBasePath + File.separator + "View"
         mssqlDefaultPath = mssqlBasePath + File.separator + "Default"
         mssqlDataTypePath = mssqlBasePath + File.separator + "CustomDataType"
-        mssqlGroupPath = mssqlBasePath + File.separator + "Group"
+        mssqlGroupPath = mssqlBasePath + File.separator + "Role"
         mssqlUserPath = mssqlBasePath + File.separator + "User"
         mssqlRulePath = mssqlBasePath + File.separator + "Rule"
         mssqlMessagePath = mssqlBasePath + File.separator + "Message"
@@ -44,6 +45,7 @@ class OutputWritter {
         mssqlFunctionPath = mssqlBasePath + File.separator + "Function"
         mssqlTriggerPath = mssqlBasePath + File.separator + "Trigger"
         mssqlIndexPath = mssqlBasePath + File.separator + "Index"
+        mssqlEntireSchema = mssqlBasePath + File.separator + "EntireSchema"
 
         file = new File(basePath)
         if (file.exists()) {
@@ -61,26 +63,35 @@ class OutputWritter {
         }
     }
 
-    void createFile(String fileName) {
+    boolean createFile(String fileName) {
         file = new File(fileName)
         if (!file.exists()) {
             file.createNewFile()
+            return true
         }
+
+        return !MSSQLConstants.OVERRIDE_FILE
     }
 
     private void createObjFile(String folderPath, String fileNamePart, String action, String content) {
         String fileName = folderPath + File.separator + schema + "-" + fileNamePart + "_" + action + ".sql"
 
         createFolder(folderPath)
-        createFile(fileName)
 
-        file.write content
-        //println file.text
+        String content2Write = "USE [$schema] " + MSSQLConstants.CLOSE_BLOCK + "\n" + content
+
+        if (createFile(fileName)) {
+            file.write content2Write
+            //println file.text
+        } else {
+            file.append "\n\n---------------------------------------------\n\n"
+            file.append content2Write
+        }
 
     }
 
-    public void createWholeFile(String fileNamePart, String action, String content) {
-        createObjFile(mssqlBasePath, fileNamePart, action, content)
+    public void createConsolidatedSchema(String fileNamePart, String action, String content) {
+        createObjFile(mssqlEntireSchema, fileNamePart, action, content)
     }
 
     public void createTableFile(String fileNamePart, String action, String content) {

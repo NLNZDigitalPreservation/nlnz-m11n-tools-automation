@@ -1,5 +1,6 @@
 package nz.govt.nzqa.m11n.tools.automation.deparser.mssql
 
+import com.sun.org.apache.bcel.internal.generic.SWITCH
 import nz.govt.nzqa.dbmigrate.mapper.DBObjMapper
 import nz.govt.nzqa.dbmigrate.model.Entity
 import nz.govt.nzqa.dbmigrate.model.Relation
@@ -98,31 +99,53 @@ class EntityDeparser extends WritableDeparser{
                         break
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        buff.append(dropTable())
-                        buff.append("\n")
-                        buff.append(createTable(DBObjMapper.ACTION_CREATE))
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE){
+                            buff.append(dropTable())
+                            buff.append("\n")
+                        }
+                        buff.append(createTable(DBObjMapper.ENTITY_TABLE, DBObjMapper.ACTION_CREATE))
                         break
                     case (DBObjMapper.ACTION_ALTER.getObjKey()):
                         action = DBObjMapper.ACTION_ALTER.getObjKey()
-                        buff.append(createTable(DBObjMapper.ACTION_ALTER))
+                        buff.append(createTable(DBObjMapper.ENTITY_TABLE, DBObjMapper.ACTION_ALTER))
                         break
                 }
                 break
             case(DBObjMapper.ENTITY_KEY.getObjKey()):
+                //Overrided with constraint specific name
+                //Assumption one constraint only available for the individual key alter
+                outputFileName = entity.getDatabaseName() + "-" + entity.getConstraints().values().first().getName() + "-" + entity.getType()
                 switch (entity.getAction()) {
+                    case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
+                        action = DBObjMapper.ACTION_DROPONLY.getObjKey()
+                        buff.append(dropKey())
+                        break
                     case (DBObjMapper.ACTION_ALTER.getObjKey()):
                         action = DBObjMapper.ACTION_ALTER.getObjKey()
-                        //buff.append(dropKey())
-                        buff.append(createTable(DBObjMapper.ACTION_ALTER))
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropKey())
+                            buff.append("\n")
+                        }
+                        buff.append(createTable(DBObjMapper.ENTITY_KEY, DBObjMapper.ACTION_ALTER))
                         break
                 }
                 break
             case(DBObjMapper.ENTITY_CONSTRAINT.getObjKey()):
+                //Overrided with constraint specific name
+                //Assumption one constraint only available for the individual constraint alter
+                outputFileName = entity.getDatabaseName() + "-" + entity.getConstraints().values().first().getName() + "-" + entity.getType()
                 switch (entity.getAction()) {
+                    case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
+                        action = DBObjMapper.ACTION_DROPONLY.getObjKey()
+                        buff.append(dropConstraint())
+                        break
                     case (DBObjMapper.ACTION_ALTER.getObjKey()):
                         action = DBObjMapper.ACTION_ALTER.getObjKey()
-                        //buff.append(dropConstraint())
-                        buff.append(createTable(DBObjMapper.ACTION_ALTER))
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropConstraint())
+                            buff.append("\n")
+                        }
+                        buff.append(createTable(DBObjMapper.ENTITY_CONSTRAINT, DBObjMapper.ACTION_ALTER))
                         break
                 }
                 break
@@ -135,8 +158,10 @@ class EntityDeparser extends WritableDeparser{
 
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        buff.append(dropView())
-                        buff.append("\n")
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropView())
+                            buff.append("\n")
+                        }
                         buff.append(createView())
                         break
                 }
@@ -146,15 +171,15 @@ class EntityDeparser extends WritableDeparser{
                 switch (entity.getAction()) {
                     case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
                         action = DBObjMapper.ACTION_DROPONLY.getObjKey()
-                        buff.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_DEFAULT.getMssqlKey() + " ")
-                        if (entity.getDatabaseName()!=null ){
-                            buff.append("[$entity.databaseName].")
-                        }
-                        buff.append("[$entity.name] ")
+                        buff.append(dropDefault())
                         break
 
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropDefault())
+                            buff.append("\n")
+                        }
                         buff.append(createDefault())
                         break
                 }
@@ -164,8 +189,9 @@ class EntityDeparser extends WritableDeparser{
                 switch (entity.getAction()) {
                     case (DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()):
                         action = DBObjMapper.ACTION_DROP_DATATYPE.getObjKey()
+                        buff.append(dropCustomDataType())
                         buff.append(DBObjMapper.ACTION_DROP_DATATYPE.getMssqlKey() + " " + DBObjMapper.ENTITY_DATATYPE.getMssqlKey() + " ")
-                        if (entity.getDatabaseName()!=null ){
+                        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
                             buff.append("[$entity.databaseName].")
                         }
                         buff.append("[$entity.name] ")
@@ -173,7 +199,29 @@ class EntityDeparser extends WritableDeparser{
 
                     case (DBObjMapper.ACTION_ADD_DATATYPE.getObjKey()):
                         action = DBObjMapper.ACTION_ADD_DATATYPE.getObjKey()
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropCustomDataType())
+                            buff.append("\n")
+                        }
                         buff.append(createCustomDataType())
+                        break
+                }
+                break
+
+            case(DBObjMapper.ENTITY_RULE.getObjKey()):
+                switch (entity.getAction()) {
+                    case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
+                        action = DBObjMapper.ACTION_DROPONLY.getObjKey()
+                        buff.append(dropRule())
+                        break
+
+                    case (DBObjMapper.ACTION_CREATE.getObjKey()):
+                        action = DBObjMapper.ACTION_CREATE.getObjKey()
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropRule())
+                            buff.append("\n")
+                        }
+                        buff.append(createRule())
                         break
                 }
                 break
@@ -183,7 +231,7 @@ class EntityDeparser extends WritableDeparser{
                     case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
                         action = DBObjMapper.ACTION_DROPONLY.getObjKey()
                         buff.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_USER.getMssqlKey() + " ")
-                        if (entity.getDatabaseName()!=null ){
+                        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
                             buff.append("[$entity.databaseName].")
                         }
                         buff.append("[$entity.name] ")
@@ -196,20 +244,50 @@ class EntityDeparser extends WritableDeparser{
                 }
                 break
 
-            case(DBObjMapper.ENTITY_RULE.getObjKey()):
+            case(DBObjMapper.ENTITY_MESSAGE.getObjKey()):
                 switch (entity.getAction()) {
                     case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
                         action = DBObjMapper.ACTION_DROPONLY.getObjKey()
-                        buff.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_RULE.getMssqlKey() + " ")
-                        if (entity.getDatabaseName()!=null ){
+                        buff.append(dropMessage())
+                        break
+
+                    case (DBObjMapper.ACTION_ADD_MESSAGE.getObjKey()):
+                        action = DBObjMapper.ACTION_ADD_MESSAGE.getObjKey()
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                            buff.append(dropMessage())
+                            buff.append("\n")
+                        }
+                        buff.append(createMessage())
+                        break
+                }
+                break
+
+            case(DBObjMapper.ENTITY_GROUP.getObjKey()):
+                switch (entity.getAction()) {
+                    case (DBObjMapper.ACTION_DROPONLY.getObjKey()):
+                        action = DBObjMapper.ACTION_DROPONLY.getObjKey()
+
+                        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+                            String checkDrop = MSSQLConstants.CHECK_DROP_GROUP
+//                            if (entity.getDatabaseName() != null) {
+//                                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+//                            } else {
+//                                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+//                            }
+                            checkDrop = checkDrop.replaceAll('@ROLENAME@', entity.getName())
+                            buff.append(checkDrop + "\n")
+                        }
+
+                        buff.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_GROUP.getMssqlKey() + " ")
+                        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
                             buff.append("[$entity.databaseName].")
                         }
                         buff.append("[$entity.name] ")
                         break
 
-                    case (DBObjMapper.ACTION_CREATE.getObjKey()):
-                        action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        buff.append(createRule())
+                    case (DBObjMapper.ACTION_ADD_GROUP.getObjKey()):
+                        action = DBObjMapper.ACTION_ADD_GROUP.getObjKey()
+                        buff.append(createGroup())
                         break
                 }
                 break
@@ -220,17 +298,19 @@ class EntityDeparser extends WritableDeparser{
     }
 
     String dropTable() {
-        String checkDrop = MSSQLConstants.CHECK_DROP_TABLE
         StringBuffer bf = new StringBuffer()
-        if (entity.getDatabaseName()!=null ){
-            checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
-        } else {
-            checkDrop = checkDrop.replaceAll('[@DB@].', '')
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_TABLE
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@TABLENAME@', entity.getName())
+            bf.append(checkDrop + "\n")
         }
-        checkDrop = checkDrop.replaceAll('@TABLENAME@',entity.getName())
-        bf.append(checkDrop + "\n")
-        bf.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_TABLE.getMssqlKey() + " ")
-        if (entity.getDatabaseName()!=null ){
+        bf.append("\t" + DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_TABLE.getMssqlKey() + " ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
         bf.append("[$entity.name] ")
@@ -238,50 +318,258 @@ class EntityDeparser extends WritableDeparser{
         return bf.toString()
     }
 
-    String createTable(DBObjMapper.ObjMapper obj) {
+    String dropKey() {
+        StringBuffer bf = new StringBuffer()
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop
+            switch (entity.getConstraints().values().first().getType()) {
+                case(DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey()):
+                    checkDrop = MSSQLConstants.CHECK_DROP_KEY_FOREIGN
+                    break
+                case(DBObjMapper.CONSTRAINT_UNIQUE.getObjKey()):
+                    checkDrop = MSSQLConstants.CHECK_DROP_KEY_UNIQUE
+                    break
+            }
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@TABLENAME@', entity.getName())
+            // Below value will be obtained from first constraint object.
+            // It is assumed that for KEY type, only one constraint object will be available for easier identification of single Key
+            checkDrop = checkDrop.replaceAll('@KEY@', entity.getConstraints().values().first().getName())
+            bf.append(checkDrop + "\n")
+        }
+        bf.append("\t" + "$DBObjMapper.ACTION_ALTER.mssqlKey $DBObjMapper.ENTITY_TABLE.mssqlKey ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+            bf.append("[$entity.databaseName].")
+        }
+        bf.append("[$entity.name] $DBObjMapper.ACTION_DROPONLY.mssqlKey $DBObjMapper.KEY_CONSTRAINT.mssqlKey ")
+        bf.append("["+ entity.constraints.values().first().getName() + "]")
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+        return bf.toString()
+
+    }
+
+    String dropConstraint() {
+        // It is assumed that for CONSTRAINT type, only one constraint object will be available for easier identification of single Constraint
+        StringBuffer bf = new StringBuffer()
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_CONSTRAINT_CHECK
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@TABLENAME@', entity.getName())
+            if (entity.getConstraints().values().first().getType() == DBObjMapper.CONSTRAINT_CHECK.getObjKey()) {
+                //Other constraints - PK, FK & Unique are expected to be of type KEY
+                checkDrop = checkDrop.replaceAll('@CONSTRAINTNAME@', entity.getConstraints().values().first().getName())
+            }
+
+            bf.append(checkDrop + "\n")
+        }
+        bf.append("\t $DBObjMapper.ACTION_ALTER.mssqlKey $DBObjMapper.ENTITY_TABLE.mssqlKey ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+            bf.append("[$entity.databaseName].")
+        }
+        bf.append("[$entity.name] $DBObjMapper.ACTION_DROPONLY.mssqlKey $DBObjMapper.KEY_CONSTRAINT.mssqlKey ")
+        bf.append("["+ entity.constraints.values().first().getName() + "]")
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+        return bf.toString()
+
+    }
+
+    String createTable(DBObjMapper.ObjMapper type, DBObjMapper.ObjMapper action) {
         StringBuffer bf = new StringBuffer()
 
-        if (DBObjMapper.ACTION_CREATE.getObjKey() == obj.getObjKey()) {
-            String checkCreate = MSSQLConstants.CHECK_CREATE_TABLE
-            if (entity.getDatabaseName()!=null ){
-                checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
-            } else {
-                checkCreate = checkCreate.replaceAll('[@DB@].', '')
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            //Add object availability check
+            switch (type.getObjKey()) {
+                case (DBObjMapper.ENTITY_TABLE.getObjKey()):
+                    if (DBObjMapper.ACTION_CREATE.getObjKey() == action.getObjKey()) {
+                        String checkCreate = MSSQLConstants.CHECK_CREATE_TABLE
+                        if (entity.getDatabaseName() != null) {
+                            checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+                        } else {
+                            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+                        }
+                        checkCreate = checkCreate.replaceAll('@TABLENAME@', entity.getName())
+                        bf.append(checkCreate + "\n")
+                    }
+                    break
+                case (DBObjMapper.ENTITY_KEY.getObjKey()):
+                    if (DBObjMapper.ACTION_ALTER.getObjKey() == action.getObjKey()) {
+                        String checkCreate
+                        switch (entity.getConstraints().values().first().getType()) {
+                            case(DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey()):
+                                checkCreate = MSSQLConstants.CHECK_CREATE_KEY_FOREIGN
+                                break
+                            case(DBObjMapper.CONSTRAINT_UNIQUE.getObjKey()):
+                                checkCreate = MSSQLConstants.CHECK_CREATE_KEY_UNIQUE
+                                break
+                        }
+                        if (entity.getDatabaseName() != null) {
+                            checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+                        } else {
+                            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+                        }
+                        // Below value will be obtained from first constraint object.
+                        // It is assumed that for KEY type, only one constraint object will be available for easier identification of single Key
+                        checkCreate = checkCreate.replaceAll('@KEY@', entity.getConstraints().values().first().getName())
+                        //checkCreate = checkCreate.replaceAll('@TABLENAME@',entity.getConstraints().values().first().getTableName())
+                        checkCreate = checkCreate.replaceAll('@TABLENAME@', entity.getName())
+
+                        bf.append(checkCreate + "\n")
+                    }
+                    break
+                case (DBObjMapper.ENTITY_CONSTRAINT.getObjKey()):
+                    if (DBObjMapper.ACTION_ALTER.getObjKey() == action.getObjKey()) {
+                        // It is assumed that for CONSTRAINT type, only one constraint object will be available for easier identification of single Constraint
+                        String checkCreate = MSSQLConstants.CHECK_CREATE_CONSTRAINT_CHECK
+                        if (entity.getConstraints().values().first().getType() == DBObjMapper.CONSTRAINT_CHECK.getObjKey()) {
+                            //Other constraints - PK, FK & Unique are expected to be of type KEY
+                            checkCreate = checkCreate.replaceAll('@CONSTRAINTNAME@', entity.getConstraints().values().first().getName())
+                            //checkCreate = checkCreate.replaceAll('@TABLENAME@',entity.getConstraints().values().first().getTableName())
+                        }
+
+                        if (entity.getDatabaseName() != null) {
+                            checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+                        } else {
+                            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+                        }
+                        checkCreate = checkCreate.replaceAll('@TABLENAME@', entity.getName())
+                        bf.append(checkCreate + "\n")
+                    }
+                    break
             }
-            checkCreate = checkCreate.replaceAll('@TABLENAME@',entity.getName())
-            bf.append(checkCreate + "\n")
         }
 
-        bf.append(obj.getMssqlKey() + " " + DBObjMapper.ENTITY_TABLE.getMssqlKey() + " ")
-        if (entity.getDatabaseName()!=null ){
+        //Add statement for create object
+        bf.append("\t" + action.getMssqlKey() + " " + DBObjMapper.ENTITY_TABLE.getMssqlKey() + " ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
         if (entity.operationType == DBObjMapper.OPERATION_DERIEVED.getObjKey()) {
             bf.append("[$entity.name] AS \n $entity.queryValue ")
         } else { //Direct
             bf.append("[$entity.name] (")
+            boolean firstCall = true
             if (entity.getFields() != null && entity.getFields().size()>0) {
                 AttributeDeparser ad
                 for (field in entity.getFields().values()) {
+                    if (!firstCall) {
+                        bf.append(", ")
+                    } else {
+                        firstCall = false
+                    }
                     ad = new AttributeDeparser(field)
                     bf.append(ad.deParse())
                 }
             }
 
             if (entity.getConstraints() != null && entity.getConstraints().size()>0) {
+
+                if (!firstCall) {
+                    bf.append(", ")
+                    firstCall = true
+                }
+
                 ConstraintDeparser cd
                 for (constraint in entity.getConstraints().values()) {
+                    if (!firstCall) {
+                        bf.append(", ")
+                    } else {
+                        firstCall = false
+                    }
                     cd = new ConstraintDeparser(constraint)
                     bf.append(cd.deParse())
                 }
+
             }
-            bf.append(")")
+            bf.append("\n)")
         }
 
-        if (DBObjMapper.ACTION_CREATE.getObjKey() == obj.getObjKey()) {
-            bf.append(MSSQLConstants.END_BLOCK)
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            if (DBObjMapper.ACTION_CREATE.getObjKey() == action.getObjKey()) {
+                if (MSSQLConstants.INCLUDE_FILEGROUP) {
+                    String fg = MSSQLConstants.END_WITH_FILEGROUP
+                    fg = fg.replaceAll(MSSQLConstants.PATTERN_FILEGROUP, MSSQLConstants.DEFAULT_FILEGROUP)
+                    bf.append(fg)
+                }
+                bf.append(MSSQLConstants.END_BLOCK_TABLE)
+            }
         }
         bf.append(MSSQLConstants.CLOSE_BLOCK)
+
+        //Add check constraint to enable the ADD constraint
+        //This is not required drop constraint
+        //Assumption: one constraint only available for the individual key/constraint alter
+        if ( (DBObjMapper.ENTITY_KEY.getObjKey() == type.getObjKey() || DBObjMapper.ENTITY_CONSTRAINT.getObjKey() == type.getObjKey()) &&
+                (DBObjMapper.ACTION_ALTER.getObjKey() == action.getObjKey()) &&
+                entity.getConstraints().size() >0 &&
+                DBObjMapper.ACTION_ADD.getObjKey() == entity.getConstraints().values().first().getAction()
+        ) {
+
+            switch (type.getObjKey()) {
+                case (DBObjMapper.ENTITY_KEY.getObjKey()):
+                    if (DBObjMapper.ACTION_ALTER.getObjKey() == action.getObjKey()) {
+                        String checkCreate
+                        switch (entity.getConstraints().values().first().getType()) {
+                            case(DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey()):
+                                checkCreate = MSSQLConstants.CHECK_CREATE_KEY_FOREIGN
+                                break
+                            case(DBObjMapper.CONSTRAINT_UNIQUE.getObjKey()):
+                                checkCreate = MSSQLConstants.CHECK_CREATE_KEY_UNIQUE
+                                break
+                        }
+
+                        if (entity.getDatabaseName() != null) {
+                            checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+                        } else {
+                            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+                        }
+                        // Below value will be obtained from first constraint object.
+                        // It is assumed that for KEY type, only one constraint object will be available for easier identification of single Key
+                        checkCreate = checkCreate.replaceAll('@KEY@', entity.getConstraints().values().first().getName())
+                        //checkCreate = checkCreate.replaceAll('@TABLENAME@',entity.getConstraints().values().first().getTableName())
+                        checkCreate = checkCreate.replaceAll('@TABLENAME@', entity.getName())
+
+                        bf.append(checkCreate + "\n")
+                    }
+                    break
+                case (DBObjMapper.ENTITY_CONSTRAINT.getObjKey()):
+                    if (DBObjMapper.ACTION_ALTER.getObjKey() == action.getObjKey()) {
+                        // It is assumed that for CONSTRAINT type, only one constraint object will be available for easier identification of single Constraint
+                        String checkCreate = MSSQLConstants.CHECK_DROP_CONSTRAINT_CHECK
+                        if (entity.getConstraints().values().first().getType() == DBObjMapper.CONSTRAINT_CHECK.getObjKey()) {
+                            //Other constraints - PK, FK & Unique are expected to be of type KEY
+                            checkCreate = checkCreate.replaceAll('@CONSTRAINTNAME@', entity.getConstraints().values().first().getName())
+                            //checkCreate = checkCreate.replaceAll('@TABLENAME@',entity.getConstraints().values().first().getTableName())
+                        }
+
+                        if (entity.getDatabaseName() != null) {
+                            checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+                        } else {
+                            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+                        }
+                        checkCreate = checkCreate.replaceAll('@TABLENAME@', entity.getName())
+                        bf.append(checkCreate + "\n")
+                    }
+                    break
+            }
+
+            bf.append(action.getMssqlKey() + " " + DBObjMapper.ENTITY_TABLE.getMssqlKey() + " ")
+            if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+                bf.append("[$entity.databaseName].")
+            }
+            bf.append("[$entity.name] $DBObjMapper.ACTION_ADD_ENABLE.mssqlKey [" + entity.getConstraints().values().first().getName() + "] ")
+            bf.append(MSSQLConstants.CLOSE_BLOCK)
+
+        }
+
+        ///bf = new StringBuffer(bf.toString().replaceAll("\n", "\n\t"))
 
         if (entity.getGrants() != null && entity.getGrants().size()>0) {
             RelationDeparser rd
@@ -296,18 +584,20 @@ class EntityDeparser extends WritableDeparser{
     }
 
     String dropView() {
-        String checkDrop = MSSQLConstants.CHECK_DROP_VIEW
         StringBuffer bf = new StringBuffer()
-        if (entity.getDatabaseName()!=null ){
-            checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
-        } else {
-            checkDrop = checkDrop.replaceAll('[@DB@].', '')
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_VIEW
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@VIEWNAME@', entity.getName())
+            bf.append(checkDrop + "\n")
         }
-        checkDrop = checkDrop.replaceAll('@VIEWNAME@',entity.getName())
-        bf.append(checkDrop + "\n")
 
-        bf.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_VIEW.getMssqlKey() + " ")
-        if (entity.getDatabaseName()!=null ){
+        bf.append("\t" + DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_VIEW.getMssqlKey() + " ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
         bf.append("[$entity.name] ")
@@ -320,22 +610,24 @@ class EntityDeparser extends WritableDeparser{
     String createView() {
         StringBuffer bf = new StringBuffer()
 
-        String checkCreate = MSSQLConstants.CHECK_CREATE_VIEW
-        if (entity.getDatabaseName()!=null ){
-            checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
-        } else {
-            checkCreate = checkCreate.replaceAll('[@DB@].', '')
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            String checkCreate = MSSQLConstants.CHECK_CREATE_VIEW
+            if (entity.getDatabaseName() != null) {
+                checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkCreate = checkCreate.replaceAll('@VIEWNAME@', entity.getName())
+            bf.append(checkCreate + "\n")
         }
-        checkCreate = checkCreate.replaceAll('@VIEWNAME@',entity.getName())
-        bf.append(checkCreate + "\n")
 
-        bf.append("EXEC ")
-        if (entity.getDatabaseName()!=null ){
+        bf.append("\t EXEC ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("$entity.databaseName.")
         }
         bf.append("sp_executesql @statement = N'")
         bf.append("$DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.ENTITY_VIEW.mssqlKey ")
-        if (entity.getDatabaseName()!=null ){
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
 
@@ -354,15 +646,50 @@ class EntityDeparser extends WritableDeparser{
         return bf.toString()
     }
 
+    String dropDefault() {
+        StringBuffer bf = new StringBuffer()
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_DEFAULT
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@DEFAULTNAME@', entity.getName())
+            bf.append(checkDrop + "\n")
+        }
+
+        bf.append("\t" + DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_DEFAULT.getMssqlKey() + " ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+            bf.append("[$entity.databaseName].")
+        }
+        bf.append("[$entity.name] ")
+
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+        return bf.toString()
+    }
+
     String createDefault() {
         StringBuffer bf = new StringBuffer()
-        bf.append("EXEC ")
-        if (entity.getDatabaseName()!=null ){
+
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            String checkCreate = MSSQLConstants.CHECK_CREATE_DEFAULT
+            if (entity.getDatabaseName() != null) {
+                checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkCreate = checkCreate.replaceAll('@DEFAULTNAME@', entity.getName())
+            bf.append(checkCreate + "\n")
+        }
+
+        bf.append("\t EXEC ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("$entity.databaseName.")
         }
         bf.append("sp_executesql @statement N'")
         bf.append("$DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.ENTITY_DEFAULT.mssqlKey ")
-        if (entity.getDatabaseName()!=null ){
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
 
@@ -373,10 +700,45 @@ class EntityDeparser extends WritableDeparser{
         return bf.toString()
     }
 
+    String dropCustomDataType() {
+        StringBuffer bf = new StringBuffer()
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_CUSTOMDATATYPE
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@TYPENAME@', entity.getName())
+            bf.append(checkDrop + "\n")
+        }
+
+        bf.append("\t" + DBObjMapper.ACTION_DROP_DATATYPE.getMssqlKey() + " " + DBObjMapper.ENTITY_DATATYPE.getMssqlKey() + " ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0){
+            bf.append("[$entity.databaseName].")
+        }
+        bf.append("[$entity.name] ")
+
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+        return bf.toString()
+    }
+
     String createCustomDataType() {
         StringBuffer bf = new StringBuffer()
-        bf.append("$DBObjMapper.ACTION_ADD_DATATYPE.mssqlKey $DBObjMapper.ENTITY_DATATYPE.mssqlKey ")
-        if (entity.getDatabaseName()!=null ){
+
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            String checkCreate = MSSQLConstants.CHECK_CREATE_CUSTOMDATATYPE
+            if (entity.getDatabaseName() != null) {
+                checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkCreate = checkCreate.replaceAll('@TYPENAME@', entity.getName())
+            bf.append(checkCreate + "\n")
+        }
+
+        bf.append("\t $DBObjMapper.ACTION_ADD_DATATYPE.mssqlKey $DBObjMapper.ENTITY_DATATYPE.mssqlKey ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
 
@@ -406,7 +768,7 @@ class EntityDeparser extends WritableDeparser{
         relation.setName('defaultGrant2Public')
         relation.setType(DBObjMapper.KEY_GRANT.getObjKey())
         relation.setAction(DBObjMapper.ACTION_REFERENCES.getObjKey())
-        if (entity.getDatabaseName()!=null ){
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             relation.setGrantObjectDB(entity.getDatabaseName())
         }
         relation.setGrantObjectName(entity.getName())
@@ -422,7 +784,8 @@ class EntityDeparser extends WritableDeparser{
 
     String createUser() {
         StringBuffer bf = new StringBuffer()
-        bf.append("$DBObjMapper.ACTION_ADD_USER.mssqlKey $DBObjMapper.ENTITY_USER.mssqlKey [$entity.name] FOR LOGIN [$entity.name] WITH DEFAULT_SCHEMA=[$entity.name]")
+        //Create user [username] for login [username] with default_schema=[username]
+        bf.append("\t $DBObjMapper.ACTION_ADD_USER.mssqlKey $DBObjMapper.ENTITY_USER.mssqlKey [$entity.name] FOR LOGIN [$entity.name] WITH DEFAULT_SCHEMA=[$entity.name]")
         bf.append(MSSQLConstants.CLOSE_BLOCK)
 
         //For MSSQL, it is required to create the default grant with CONNECT to database
@@ -430,11 +793,11 @@ class EntityDeparser extends WritableDeparser{
         defRelation.setName('defaultUserGrant2DB')
         defRelation.setType(DBObjMapper.KEY_GRANT.getObjKey())
         defRelation.setAction(DBObjMapper.ACTION_CONNECT.getObjKey())
-        if (entity.getDatabaseName()!=null ){
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             defRelation.setGrantObjectDB(entity.getDatabaseName())
         }
         defRelation.setGrantObjectName(entity.getName())
-        if (entity.getDatabaseName()!=null ){
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             defRelation.setGrantTo(entity.getName())
         }
         //defRelation.setTypeReference(true)
@@ -454,17 +817,52 @@ class EntityDeparser extends WritableDeparser{
         return bf.toString()
     }
 
+    String dropRule() {
+        StringBuffer bf = new StringBuffer()
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_RULE
+            if (entity.getDatabaseName() != null) {
+                checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkDrop = checkDrop.replaceAll('@RULENAME@', entity.getName())
+            bf.append(checkDrop + "\n")
+        }
+
+        bf.append("\t" + DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.ENTITY_RULE.getMssqlKey() + " ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+            bf.append("[$entity.databaseName].")
+        }
+        bf.append("[$entity.name] ")
+
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+        return bf.toString()
+    }
+
     String createRule() {
         StringBuffer bf = new StringBuffer()
-        bf.append("EXEC ")
-        if (entity.getDatabaseName()!=null ){
+
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            String checkCreate = MSSQLConstants.CHECK_CREATE_RULE
+            if (entity.getDatabaseName() != null) {
+                checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+            } else {
+                checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+            }
+            checkCreate = checkCreate.replaceAll('@RULENAME@', entity.getName())
+            bf.append(checkCreate + "\n")
+        }
+
+        bf.append("\t EXEC ")
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("$entity.databaseName.")
         }
         bf.append("sp_executesql N'")
         //bf.append("$DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.ENTITY_DEFAULT.mssqlKey ")
 
         bf.append("$DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.ENTITY_RULE.mssqlKey ")
-        if (entity.getDatabaseName()!=null ){
+        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
             bf.append("[$entity.databaseName].")
         }
 
@@ -474,15 +872,84 @@ class EntityDeparser extends WritableDeparser{
         return bf.toString()
     }
 
-    String createMessage() {
+    String dropMessage() {
         StringBuffer bf = new StringBuffer()
-        bf.append("$DBObjMapper.ACTION_ADD_MESSAGE.mssqlKey $DBObjMapper.ENTITY_MESSAGE.mssqlKey ")
-        if (entity.getDatabaseName()!=null ){
-            bf.append("[$entity.databaseName].")
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+            String checkDrop = MSSQLConstants.CHECK_DROP_MESSAGE
+            checkDrop = checkDrop.replaceAll('@MSGID@', entity.getName())
+            bf.append(checkDrop + "\n")
         }
 
-        bf.append("[$entity.name] AS [$entity.queryValue] '")
+        // ??  EXEC sp_dropmessage  @msgnum = 60000, @lang = 'all';
+        bf.append("\t EXEC $DBObjMapper.ACTION_DROP_MESSAGE.mssqlKey [$entity.name]")
         bf.append(MSSQLConstants.CLOSE_BLOCK)
+
+        return bf.toString()
+    }
+
+    String createMessage() {
+        StringBuffer bf = new StringBuffer()
+
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            String checkCreate = MSSQLConstants.CHECK_CREATE_MESSAGE
+            checkCreate = checkCreate.replaceAll('@MSGID@', entity.getName())
+            bf.append(checkCreate + "\n")
+        }
+
+        //EXEC sp_addmessage @msgnum = 60000, @severity = 16, @msgtext = N'L''élément nommé %1! existe déjà dans %2!', @lang = 'French';
+        bf.append("\t EXEC $DBObjMapper.ACTION_ADD_MESSAGE.mssqlKey [$entity.name], $MSSQLConstants.DEFAULT_MESSAGE_SEVERITY, '$entity.queryValue', '$entity.dataType' ")
+
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+
+        return bf.toString()
+    }
+
+    String createGroup() {
+        StringBuffer bf = new StringBuffer()
+
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+            String checkCreate = MSSQLConstants.CHECK_CREATE_GROUP
+//            if (entity.getDatabaseName() != null) {
+//                checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
+//            } else {
+//                checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
+//            }
+            checkCreate = checkCreate.replaceAll('@ROLENAME@', entity.getName())
+            bf.append(checkCreate + "\n")
+        }
+
+
+        //Create ROLE [groupname]
+        bf.append("\t $DBObjMapper.ACTION_ADD_GROUP.mssqlKey $DBObjMapper.ENTITY_GROUP.mssqlKey [$entity.name] ")
+        bf.append(MSSQLConstants.CLOSE_BLOCK)
+
+        //For MSSQL, it is required to create the default grant with CONNECT to database
+//        Relation defRelation = new Relation()
+//        defRelation.setName('defaultUserGrant2DB')
+//        defRelation.setType(DBObjMapper.KEY_GRANT.getObjKey())
+//        defRelation.setAction(DBObjMapper.ACTION_CONNECT.getObjKey())
+//        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+//            defRelation.setGrantObjectDB(entity.getDatabaseName())
+//        }
+//        defRelation.setGrantObjectName(entity.getName())
+//        if (entity.getDatabaseName()!=null && entity.getDatabaseName().trim().length()>0 ){
+//            defRelation.setGrantTo(entity.getName())
+//        }
+//        //defRelation.setTypeReference(true)
+
+//        RelationDeparser rd = new RelationDeparser(defRelation)
+//        bf.append(rd.deParse())
+//        bf.append(MSSQLConstants.CLOSE_BLOCK)
+
+        RelationDeparser rd
+
+        if (entity.getGrants() != null && entity.getGrants().size()>0) {
+            for (relation in entity.getGrants().values()) {
+                rd = new RelationDeparser(relation)
+                bf.append(rd.deParse())
+                bf.append(MSSQLConstants.CLOSE_BLOCK)
+            }
+        }
 
         return bf.toString()
     }

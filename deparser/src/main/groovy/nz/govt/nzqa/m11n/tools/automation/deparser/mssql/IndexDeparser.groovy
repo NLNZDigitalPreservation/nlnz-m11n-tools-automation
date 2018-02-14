@@ -50,18 +50,24 @@ class IndexDeparser extends WritableDeparser{
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
                         switch (index.getType()) {
                             case (DBObjMapper.INDEX_CLUSTERED.getObjKey()):
-                                buff.append(dropIndex())
-                                buff.append("\n")
+                                if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                                    buff.append(dropIndex())
+                                    buff.append("\n")
+                                }
                                 buff.append(frameCreateIndex(DBObjMapper.INDEX_CLUSTERED))
                                 break
                             case (DBObjMapper.INDEX_NONCLUSTERED.getObjKey()):
-                                buff.append(dropIndex())
-                                buff.append("\n")
+                                if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                                    buff.append(dropIndex())
+                                    buff.append("\n")
+                                }
                                 buff.append(frameCreateIndex(DBObjMapper.INDEX_NONCLUSTERED))
                                 break
                             default:
-                                buff.append(dropIndex())
-                                buff.append("\n")
+                                if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                                    buff.append(dropIndex())
+                                    buff.append("\n")
+                                }
                                 buff.append(frameCreateIndex(null))
                                 break
                         }
@@ -74,21 +80,21 @@ class IndexDeparser extends WritableDeparser{
     String dropIndex() {
         String checkDrop = MSSQLConstants.CHECK_DROP_INDEX
         StringBuffer bf = new StringBuffer()
-        if (index.getDatabaseName()!=null ){
+        if (index.getDatabaseName()!=null && index.getDatabaseName().trim().length()>0){
             checkDrop = checkDrop.replaceAll('@DB@', index.getDatabaseName())
         } else {
-            checkDrop = checkDrop.replaceAll('[@DB@].', '')
+            checkDrop = checkDrop.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
         }
         checkDrop = checkDrop.replaceAll('@TABLENAME@',index.getTableName())
         checkDrop = checkDrop.replaceAll('@INDEXNAME@',index.getName())
         bf.append(checkDrop + "\n")
 
         bf.append(DBObjMapper.ACTION_DROPONLY.getMssqlKey() + " " + DBObjMapper.KEY_INDEX.getMssqlKey() + " ")
-        if (index.getDatabaseName()!=null ){
+        if (index.getDatabaseName()!=null  && index.getDatabaseName().trim().length()>0){
             bf.append("[$index.databaseName].")
         }
         bf.append("[$index.name] ON ")
-        if (index.getDatabaseName()!=null ){
+        if (index.getDatabaseName()!=null  && index.getDatabaseName().trim().length()>0){
             bf.append("[$index.databaseName].")
         }
         bf.append("[$index.tableName] ")
@@ -101,10 +107,10 @@ class IndexDeparser extends WritableDeparser{
         StringBuffer bf = new StringBuffer()
 
         String checkCreate = MSSQLConstants.CHECK_CREATE_INDEX
-        if (index.getDatabaseName()!=null ){
+        if (index.getDatabaseName()!=null  && index.getDatabaseName().trim().length()>0){
             checkCreate = checkCreate.replaceAll('@DB@', index.getDatabaseName())
         } else {
-            checkCreate = checkCreate.replaceAll('[@DB@].', '')
+            checkCreate = checkCreate.replaceAll(MSSQLConstants.REGEX_BLANK_DB, '')
         }
         checkCreate = checkCreate.replaceAll('@TABLENAME@',index.getTableName())
         checkCreate = checkCreate.replaceAll('@INDEXNAME@',index.getName())
@@ -115,11 +121,11 @@ class IndexDeparser extends WritableDeparser{
         } else  {
             bf.append(" $DBObjMapper.ACTION_CREATE.mssqlKey $DBObjMapper.KEY_INDEX.mssqlKey ")
         }
-        if (index.getDatabaseName()!=null ){
+        if (index.getDatabaseName()!=null  && index.getDatabaseName().trim().length()>0){
             bf.append("[$index.databaseName].")
         }
         bf.append("[$index.name] ON ")
-        if (index.getDatabaseName()!=null ){
+        if (index.getDatabaseName()!=null  && index.getDatabaseName().trim().length()>0){
             bf.append("[$index.databaseName].")
         }
         bf.append("[$index.tableName] ( ")
@@ -136,6 +142,14 @@ class IndexDeparser extends WritableDeparser{
             }
         }
         bf.append("\n ) ")
+        String fg = MSSQLConstants.END_BLOCK_INDEX
+        fg = fg.replaceAll(MSSQLConstants.PATTERN_ALLOWDUPROW, index.isDuplicateAllowed() ? "ON" : "OFF")
+        bf.append(fg)
+        if (MSSQLConstants.INCLUDE_FILEGROUP) {
+            fg = MSSQLConstants.END_WITH_FILEGROUP
+            fg = fg.replaceAll(MSSQLConstants.PATTERN_FILEGROUP, MSSQLConstants.DEFAULT_FILEGROUP)
+            bf.append(fg)
+        }
         bf.append(MSSQLConstants.CLOSE_BLOCK)
 
         return bf.toString()

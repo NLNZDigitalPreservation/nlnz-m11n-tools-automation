@@ -17,6 +17,7 @@ class RelationDeparserTest {
         relation.setAction(DBObjMapper.ACTION_SELECT.getObjKey())
         relation.setGrantObjectDB('dbo')
         relation.setGrantObjectName('ALLOCATION_METHOD')
+        relation.setGrantSubObjects(Arrays.asList('name','id','uid','type'))
         relation.setGrantTo('eqa_user')
 
         deparser = new RelationDeparser(relation)

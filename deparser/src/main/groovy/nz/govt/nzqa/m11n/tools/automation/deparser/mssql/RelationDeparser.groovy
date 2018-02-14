@@ -27,7 +27,7 @@ class RelationDeparser implements Deparser{
 
                 switch (relation.getAction()) {
                     case (DBObjMapper.ACTION_CONNECT.getObjKey()):
-                        buff.append("\n ")
+                        buff.append("\n")
                         buff.append(DBObjMapper.KEY_GRANT.getMssqlKey())
                         buff.append(" $relation.action TO ")
                         buff.append("[$relation.grantTo] ")
@@ -36,7 +36,7 @@ class RelationDeparser implements Deparser{
                         }
                         break
                     default:
-                        buff.append("\n ")
+                        buff.append("\n")
                         buff.append(DBObjMapper.KEY_GRANT.getMssqlKey())
                         buff.append(" $relation.action ")
                         buff.append("ON ")
@@ -46,7 +46,21 @@ class RelationDeparser implements Deparser{
                         if (relation.getGrantObjectDB() != null) {
                             buff.append("[$relation.grantObjectDB].")
                         }
-                        buff.append("[$relation.grantObjectName] TO ")
+                        buff.append("[$relation.grantObjectName]")
+                        if (relation.getGrantSubObjects() != null && relation.getGrantSubObjects().size()>0) {
+                            boolean firstCall = true
+                            buff.append("(")
+                            for (subObj in relation.getGrantSubObjects()){
+                                if (!firstCall) {
+                                    buff.append(", [$subObj]")
+                                } else {
+                                    firstCall = false
+                                    buff.append("[$subObj]")
+                                }
+                            }
+                            buff.append(")")
+                        }
+                        buff.append(" TO ")
                         buff.append("[$relation.grantTo] ")
                         if (relation.getGrantObjectDB() != null) {
                             buff.append("AS [$relation.grantObjectDB]")

@@ -29,8 +29,8 @@ class ParamDeparser implements Deparser{
         }
 
         switch (param.getInOut()) {
-            case (DBObjMapper.PARAM_OUT.getObjKey()) :
-                buff.append(" " + DBObjMapper.PARAM_OUT.getMssqlKey())
+            case (DBObjMapper.PARAM_OUTPUT.getObjKey()) :
+                buff.append(" " + DBObjMapper.PARAM_OUTPUT.getMssqlKey())
                 break
         }
 

@@ -33,7 +33,7 @@ class CriteriaDeparser implements Deparser{
                     for (c in criteria.getJoinCriteria()) {
                         bf.append(recursiveCriteriaParse(c))
                     }
-                    bf.append(") ")
+                    bf.append(")")
                 } else
                 {
                     //process criteria vallue for CheckWrapper cases, irrespective of criteria.isComposite()
@@ -54,8 +54,7 @@ class CriteriaDeparser implements Deparser{
 
                         switch (criteria.getOperation()) {
                             case (DBObjMapper.OPERATORS):
-                                bf.append(" [$criteria.fieldName] ")
-                                bf.append(" $criteria.operation ")
+                                bf.append(" [$criteria.fieldName]$criteria.operation")
                                 switch (criteria.getValueType()) {
                                     case (DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()):
                                         bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_INT))
@@ -72,12 +71,12 @@ class CriteriaDeparser implements Deparser{
                                 break
                             case (DBObjMapper.SPECIAL_OPERATOR_IN):
 
-                                bf.append(" ([$criteria.fieldName] ")
-                                bf.append(" = ")
+                                bf.append("([$criteria.fieldName]")
+                                bf.append("=")
                                 boolean firstCal = true
                                 for (val in criteria.values) {
                                     if (!firstCal) {
-                                        bf.append(" OR [$criteria.fieldName] = ")
+                                        bf.append(" OR [$criteria.fieldName]=")
                                     }
                                     firstCal = false
                                     switch (criteria.getValueType()) {
@@ -93,7 +92,7 @@ class CriteriaDeparser implements Deparser{
                                             break
                                     }
                                 }
-                                bf.append(" ) ")
+                                bf.append(")")
 
                                 break
                             case (DBObjMapper.SPECIAL_OPERATOR_IS):
@@ -102,7 +101,7 @@ class CriteriaDeparser implements Deparser{
                                 break
                             case (DBObjMapper.SPECIAL_OPERATOR_BETWEEN):
 
-                                bf.append(" ([$criteria.fieldName] >= " )
+                                bf.append(" ([$criteria.fieldName]>=" )
                                 switch (criteria.getValueType()) {
                                     case (DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()):
                                         bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_INT))
@@ -116,7 +115,7 @@ class CriteriaDeparser implements Deparser{
                                         bf.append(addValue( criteria.getValues().get(0), DBObjMapper.CRITERIA_VALUETYPE_FIELD))
                                         break
                                 }
-                                bf.append(" AND [$criteria.fieldName] <= " )
+                                bf.append(" AND [$criteria.fieldName]<=" )
                                 switch (criteria.getValueType()) {
                                     case (DBObjMapper.CRITERIA_VALUETYPE_INT.getDataTypeKey()):
                                         bf.append(addValue( criteria.getValues().get(1), DBObjMapper.CRITERIA_VALUETYPE_INT))
@@ -131,7 +130,7 @@ class CriteriaDeparser implements Deparser{
                                         break
                                 }
 
-                                bf.append(" ) " )
+                                bf.append(")" )
                                 break
                         }
                         if (criteria.isComposite()) {
@@ -149,8 +148,19 @@ class CriteriaDeparser implements Deparser{
 
     private String addValue(String value, DBObjMapper.DataTypeMapper valueType) {
         StringBuffer bf = new StringBuffer("")
-        bf.append(" " + valueType.getMssqlOpenQuote())
+        bf.append(valueType.getMssqlOpenQuote())
+        if (valueType == DBObjMapper.CRITERIA_VALUETYPE_CHAR) {
+            value = handleStringValueForDB(value)
+        }
         bf.append(value)
-        bf.append(valueType.getMssqlCloseQuote() + " ")
+        bf.append(valueType.getMssqlCloseQuote())
+    }
+
+    private String handleStringValueForDB (String value) {
+        String val = value
+        //val = val.replaceAll('^\\s+|\\s+$', "'")
+        val = val.replaceAll('(^\')|(\'$)', "")
+        val = val.replaceAll("'", "''")
+        return val
     }
 }

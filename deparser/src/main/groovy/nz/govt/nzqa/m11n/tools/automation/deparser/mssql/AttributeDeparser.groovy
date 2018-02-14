@@ -44,12 +44,12 @@ class AttributeDeparser implements Deparser{
         if (action.getObjKey() == DBObjMapper.ACTION_ADD.getObjKey()) {
             buff.append(DBObjMapper.ACTION_ADD.getMssqlKey() + " ")
         }
-        buff.append("[$attribute.name] [" + DBObjMapper.SYBASE_MSSQL_DATATYPE_CONVERSION_MAP.getMssqlForSybaseType(attribute.getDataType()) + "] ")
-        if (attribute.length != null) {
-            if (attribute.fraction != null) {
-                buff.append(" ($attribute.length, $attribute.length) ")
+        buff.append("[$attribute.name] [" + DBObjMapper.SYBASE_MSSQL_DATATYPE_CONVERSION_MAP.getMssqlForSybaseType(attribute.getDataType()) + "]")
+        if (attribute.length != null && attribute.length.trim().length() > 0) {
+            if (attribute.fraction != null  && attribute.fraction.trim().length() > 0) {
+                buff.append("($attribute.length, $attribute.fraction)")
             } else {
-                buff.append(" ($attribute.length) ")
+                buff.append("($attribute.length)")
             }
         }
         if (attribute.isNull()) {
