@@ -21,7 +21,7 @@ public class DBObjMapper {
     public static ObjMapper ACTION_ADD_DATATYPE = new ObjMapper("ADDTYPE", "sp_addtype", "CREATE");
     public static ObjMapper ACTION_DROP_DATATYPE = new ObjMapper("DROPTYPE", "sp_droptype", "DROP");
     public static ObjMapper ACTION_ADD_USER = new ObjMapper("ADDUSER", "sp_adduser", "CREATE");
-    public static ObjMapper ACTION_ADD_MESSAGE = new ObjMapper("ADDMSG", "sp_addmessage", "CREATE");
+    public static ObjMapper ACTION_ADD_MESSAGE = new ObjMapper("ADDMSG", "sp_addmessage", "sp_addmessage");
     public static ObjMapper ACTION_DROP_MESSAGE = new ObjMapper("DROPMSG", "sp_dropmessage", "sp_dropmessage");
     public static ObjMapper ACTION_ADD_GROUP = new ObjMapper("ADDGROUP", "sp_addgroup", "CREATE");
     public static ObjMapper ACTION_SELECT = new ObjMapper("SELECT", "SELECT", "SELECT");
@@ -34,6 +34,9 @@ public class DBObjMapper {
     public static ObjMapper ACTION_EXECUTE = new ObjMapper("EXECUTE", "EXECUTE", "EXECUTE");
     public static ObjMapper ACTION_CONNECT = new ObjMapper("CONNECT", "CONNECT", "CONNECT");
 
+    //This action is not required for parser
+    public static ObjMapper ACTION_ADD_ENABLE = new ObjMapper("", "", "CHECK CONSTRAINT");
+
     public static ObjMapper OPERATION_DIRECT = new ObjMapper("DIRECT", "", "");
     public static ObjMapper OPERATION_DERIEVED = new ObjMapper("DERIEVED", "", "");
     public static ObjMapper OPERATION_DEFAULT = new ObjMapper("DEFAULTVALE", "", "");
@@ -44,7 +47,7 @@ public class DBObjMapper {
     public static ObjMapper ENTITY_VIEW = new ObjMapper("VIEW", "VIEW", "VIEW");
     public static ObjMapper ENTITY_DEFAULT = new ObjMapper("DEFAULT", "DEFAULT", "DEFAULT");
     public static ObjMapper ENTITY_DATATYPE = new ObjMapper("DATATYPE", "sp_..*type", "TYPE");
-    public static ObjMapper ENTITY_GROUP = new ObjMapper("GROUP", "sp_..*group", "GROUP");
+    public static ObjMapper ENTITY_GROUP = new ObjMapper("GROUP", "sp_..*group", "ROLE");
     public static ObjMapper ENTITY_USER = new ObjMapper("USER", "sp_..*user", "USER");
     public static ObjMapper ENTITY_RULE = new ObjMapper("RULE", "RULE", "RULE");
     public static ObjMapper ENTITY_MESSAGE = new ObjMapper("MESSAGE", "sp_..*message", "MESSAGE");
@@ -91,9 +94,10 @@ public class DBObjMapper {
     public static ObjMapper PARAM_OUTPUT = new ObjMapper("OUTPUT", "OUTPUT", "OUTPUT");
     public static ObjMapper PARAM_INPUT_AND_OUTPUT = new ObjMapper("BOTH", "INOUT", ""); //TODO check for usage of this
 
-    public static ObjMapper UTILITIES_PROC = new ObjMapper("PROCEDURE", "PROCEDURE", "PROCEDURE");
+    public static ObjMapper UTILITIES_PROC = new ObjMapper("PROCEDURE", "PROC", "PROCEDURE");
+    public static ObjMapper UTILITIES_PROCEDURE = new ObjMapper("PROCEDURE", "PROCEDURE", "PROCEDURE");
     public static ObjMapper UTILITIES_FUNCTION = new ObjMapper("FUNCTION", "FUNCTION", "FUNCTION");
-    public static ObjMapper UTILITIES_TRIGGER = new ObjMapper("TRIGGER\"", "TRIGGER", "TRIGGER");
+    public static ObjMapper UTILITIES_TRIGGER = new ObjMapper("TRIGGER", "TRIGGER", "TRIGGER");
 
     public static ObjMapper FOLDER_FIELD_DEFAULT = new ObjMapper("Defaults", "splitDefaults", "splitDefaults");
     public static ObjMapper FOLDER_FIELD_USERDATATYPE = new ObjMapper("CustomDataTypes", "splitUserDatatypes", "splitUserDatatypes");
@@ -156,9 +160,10 @@ public class DBObjMapper {
     public static ObjMapper REGEX_WITH_CLAUSE = new ObjMapper("WithClause", "", "");
     public static ObjMapper REGEX_CHECK_WRAPPER_WITH_CHILD_CRITERIA = new ObjMapper("CheckWrapperWithChildCriteria", "", "");
 
-//    public List<String> OPERATORS
+    //Space on the end of string value below is added intentially for proper regex handling.
+    public static String END_OF_LINE_MAPPER = "#E-O-L-Key# ";
 
-    private static class ObjMapper {
+    public static class ObjMapper {
         String objKey;
         String sybaseKey;
         String mssqlKey;
@@ -263,7 +268,10 @@ public class DBObjMapper {
         }
 
         void initializeDataTypeConversionMap() {
+
             map.put("UNIVARCHAR", "NVARCHAR");
+            map.put("VARCHAR", "NVARCHAR");
+            map.put("CHAR", "NCHAR");
         }
 
         public String getMssqlForSybaseType(String dataType) {
