@@ -93,17 +93,24 @@ public class Constraint {
                 ", subType=" + subType +
                 ", action=" + action +
                 ", fields={");
-                for (String o: fields) {
-                    buff.append(o + ",");
+                if (fields!= null && fields.size()>0) {
+                    for (String o : fields) {
+                        buff.append(o + ",");
+                    }
                 }
                 buff.append("}, table=" + tableName +
-                ", referenceTable=" + referenceTableName +
-                ", referenceFields={");
-                for (String o: referenceFields) {
-                    buff.append(o + ",");
+                        ", referenceTable=" + referenceTableName +
+                        ", referenceFields={");
+                if (referenceFields != null && referenceFields.size()>0) {
+                    for (String o : referenceFields) {
+                        buff.append(o + ",");
+                    }
                 }
-                buff.append("}, criteria=" + criteria.toString() +
-                "]");
+                buff.append("}");
+                if (criteria != null) {
+                    buff.append(", criteria=" + criteria.toString());
+                }
+                buff.append("]");
 
         return super.toString();
     }
