@@ -934,13 +934,17 @@ class SybaseOperator {
 
         String sqlFileName = ''
         def sqlFile
+        boolean blockOpen = false //This will be made true for every block statement open and made false only when encounters "GO"
 
         sybaseSqlFile.eachLine { String line ->
                 // If line not blank
                 if (line.trim()) {
                     line = line.trim().replaceAll("( )+", " ")
-                    if (lineChecker.lineStartsWith(line, "create procedure")) {
+                    if (lineChecker.lineStartsWith(line, "create procedure") || lineChecker.lineStartsWith(line, "create proc")) {
                         lineType = "create"
+                        //this blockOpen = false - line is required to handle the cases where "create procedure.." is not preceeded by "go" statement
+                        //eg: some comments before create procedure etc..
+                        blockOpen = false
                         if (isFirstCreateStatement) {
                             log.info("Dropping completed. Current entity name reset and start creating...")
                             currentEntityName = ''
@@ -950,18 +954,31 @@ class SybaseOperator {
                     else if (lineChecker.lineStartsWith(line, "if object_id")) {
                         lineType = "if object_id"
                     }
+                    else  {
+                        //Don't use contains, which might fail for other lines..
+                        if (lineChecker.lineStartsWith(line + " ", "go")) {
+                            blockOpen = false
+                            lineType = "go"
+                        } else
+                        {
+                            lineType = ""
+                            blockOpen = true
+                        }
+                    }
                     if (lineChecker.lineStartsWith(line, "if object_id") || lineChecker.lineStartsWith(line, "create procedure") || lineChecker.lineStartsWith(line, "create proc")) {
-                        String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
-                        if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName) && !line.contains("--")) {
-                            currentEntityName = newEntityName
-                            // Create a new file for new entity
-                            sqlFileName = outputDir + File.separator + "splitSPs-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
-                            new File(sqlFileName).createNewFile()
-                            sqlFile = new File(sqlFileName)
-                            log.info("File '${sqlFileName}' created")
-                            counter++
-                            writeLineBufferIntoFile(sqlFile, schemaStatement)
-                            firstFileNotCreated = false
+                        if (!blockOpen) {
+                            String newEntityName = lineChecker.getEntityNameFromLine(line, lineType)
+                            if (lineChecker.entityNameHasChanged(newEntityName, currentEntityName) && !line.contains("--")) {
+                                currentEntityName = newEntityName
+                                // Create a new file for new entity
+                                sqlFileName = outputDir + File.separator + "splitSPs-" + counter + "-" + currentEntityName + "-" + lineChecker.getTypeFromLine(line) + ".sql"
+                                new File(sqlFileName).createNewFile()
+                                sqlFile = new File(sqlFileName)
+                                log.info("File '${sqlFileName}' created")
+                                counter++
+                                writeLineBufferIntoFile(sqlFile, schemaStatement)
+                                firstFileNotCreated = false
+                            }
                         }
                         sqlFile << line + '\r\n'
                     }
