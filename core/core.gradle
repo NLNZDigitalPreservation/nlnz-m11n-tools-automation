@@ -68,6 +68,8 @@ dependencies { dependencyHandler ->
     compile group: 'org.jboss.tattletale', name: 'tattletale-ant', version: '1.1.2.Final'
     compile group: 'org.jboss.tattletale', name: 'tattletale-maven', version: '1.1.2.Final'
 
+    compile group: 'nz.govt.nzqa.m11n.tools', name: 'm11n-tools-automation-dbmodel', version: '1.0.0-SNAPSHOT'
+
     compileOnly 'org.slf4j:slf4j-api:1.7.+'
 
     // We use the awesome Spock testing and specification framework
