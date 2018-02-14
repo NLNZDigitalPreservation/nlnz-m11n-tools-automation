@@ -142,63 +142,106 @@ public class MigrateWrapper {
 
     @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer("MigrateWrapper [schema=" + schema + ", defaults={");
-                for (Entity e: defaults.values()) {
-                    buff.append(e.toString() + ", ");
-                }
-                buff.append("}, customDataTypes= {");
-                for (Entity e: customDataTypes.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, tables={");
-                for (Entity e: tables.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, keys={");
-                for (Entity e: keys.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, constraints={");
-                for (Entity e: constraints.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, indexes={");
-                for (Index e: indexes.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, views={");
-                for (Entity e: views.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, triggers={");
-                for (Utilities e: triggers.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, procedures={");
-                for (Utilities e: procedures.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, functions={");
-                for (Utilities e: functions.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, users={");
-                for (Entity e: users.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, groups={");
+        StringBuffer buff = new StringBuffer("MigrateWrapper [schema=" + schema + ",");
+        if (defaults != null && defaults.size() >0) {
+            buff.append(" defaults={");
+            for (Entity e: defaults.values()) {
+                buff.append(e.toString() + ", ");
+            }
+            buff.append("},");
+        }
+        if (customDataTypes != null && customDataTypes.size()>0) {
+            buff.append(" customDataTypes= {");
+            for (Entity e : customDataTypes.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (tables != null && tables.size()>0) {
+            buff.append(" tables={");
+            for (Entity e : tables.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (keys != null && keys.size()>0) {
+            buff.append(" keys={");
+            for (Entity e : keys.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (constraints != null && constraints.size()>0) {
+            buff.append(" constraints={");
+            for (Entity e : constraints.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (indexes != null && indexes.size()>0) {
+            buff.append(" indexes={");
+            for (Index e : indexes.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (views != null && views.size()>0) {
+            buff.append(" views={");
+            for (Entity e : views.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (triggers != null && triggers.size()>0) {
+            buff.append(" triggers={");
+            for (Utilities e : triggers.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (procedures != null && procedures.size()>0) {
+            buff.append(" procedures={");
+            for (Utilities e : procedures.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if (functions!=null && functions.size()>0) {
+            buff.append(" functions={");
+            for (Utilities e : functions.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if(users != null && users.size()>0) {
+            buff.append(" users={");
+            for (Entity e : users.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if(groups != null && groups.size()>0) {
+                buff.append(" groups={");
                 for (Entity e: groups.values()) {
                     buff.append(e.toString() + ",");
                 }
-                buff.append("}, rules={");
-                for (Entity e: rules.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}, messages={");
-                for (Entity e: messages.values()) {
-                    buff.append(e.toString() + ",");
-                }
-                buff.append("}]");
+            buff.append("},");
+        }
+        if(rules != null && rules.size()>0) {
+            buff.append(" rules={");
+            for (Entity e : rules.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        if(messages != null && messages.size()>0) {
+            buff.append(" messages={");
+            for (Entity e : messages.values()) {
+                buff.append(e.toString() + ",");
+            }
+            buff.append("},");
+        }
+        buff.append("}]");
         return buff.toString();
     }
 }
