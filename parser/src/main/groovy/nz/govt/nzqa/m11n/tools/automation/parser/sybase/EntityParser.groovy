@@ -275,7 +275,11 @@ class EntityParser implements Parser{
                     entity.setName(getName(sqlStatement))
                     entity.setAction(getAction(sqlStatement))
                     entity.setOperationType(getOperationType(sqlStatement))
-                    entity.setFields(getFields(sqlStatement))
+                    if (entity.getType() == DBObjMapper.ENTITY_TABLE.getObjKey() ||
+                            entity.getType() == DBObjMapper.ENTITY_KEY.getObjKey() ||
+                            entity.getType() == DBObjMapper.ENTITY_CONSTRAINT.getObjKey()) {
+                        entity.setFields(getFields(sqlStatement))
+                    }
                     entity.setDataType(getDataType(sqlStatement))
                     entity.setQueryValue(getQueryValue(sqlStatement))
                     entity.setConstraints(getConstraints(sqlStatement))
