@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Utilities {
+
+    private String PROXY_TABLE_IDENTIFIER = "dba_pxy_";
+
     private String databaseName;
     private String type;
     private String name;
@@ -93,6 +96,11 @@ public class Utilities {
 
     public void setTriggerOperations(List<String> triggerOperations) {
         this.triggerOperations = triggerOperations;
+    }
+
+    //Method used to identify the proxy
+    public boolean isProxy () {
+        return sql != null ? sql.trim().length()>0 ? sql.contains(PROXY_TABLE_IDENTIFIER) : false : false;
     }
 
     @Override
