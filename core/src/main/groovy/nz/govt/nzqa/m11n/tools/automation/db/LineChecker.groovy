@@ -297,7 +297,7 @@ class LineChecker {
 
     boolean entityNameHasChanged(String newEntityName, String currentEntityName){
         if(!newEntityName.equalsIgnoreCase(currentEntityName)){
-            return ! newEntityName.replace("dbo.", "").equalsIgnoreCase(currentEntityName)
+            return ! newEntityName.replace("dbo.", "").equalsIgnoreCase(currentEntityName.replace("dbo.", ""))
         }
 
         return ! newEntityName.equalsIgnoreCase(currentEntityName)
