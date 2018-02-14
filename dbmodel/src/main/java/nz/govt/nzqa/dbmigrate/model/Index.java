@@ -3,6 +3,8 @@ package nz.govt.nzqa.dbmigrate.model;
 import java.util.List;
 
 public class Index {
+    private String KEY_ALLOW_DUP = "ALLOW_DUP_ROW";
+
     private String type;
     private String name;
     private String action;
@@ -65,6 +67,14 @@ public class Index {
 
     public void setWithClause(String withClause) {
         this.withClause = withClause;
+    }
+
+    public boolean isDuplicateAllowed () {
+        if (withClause != null && withClause.trim().length()>0) {
+            return withClause.trim().indexOf(KEY_ALLOW_DUP) > -1;
+        } else {
+            return false;
+        }
     }
 
     @Override
