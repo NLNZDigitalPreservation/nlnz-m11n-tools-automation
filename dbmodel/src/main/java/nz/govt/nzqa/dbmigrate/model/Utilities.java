@@ -17,6 +17,7 @@ public class Utilities {
     private Map<String, Relation> grants;
     private String triggerTableName;
     private List<String> triggerOperations;
+    private SQLSplit sqlSplit;
 
     public String getDatabaseName() {
         return databaseName;
@@ -101,6 +102,14 @@ public class Utilities {
     //Method used to identify the proxy
     public boolean isProxy () {
         return sql != null ? sql.trim().length()>0 ? sql.contains(PROXY_TABLE_IDENTIFIER) : false : false;
+    }
+
+    public SQLSplit getSqlSplit() {
+        return sqlSplit;
+    }
+
+    public void setSqlSplit(SQLSplit sqlSplit) {
+        this.sqlSplit = sqlSplit;
     }
 
     @Override

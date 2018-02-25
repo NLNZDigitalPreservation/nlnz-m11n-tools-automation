@@ -48,15 +48,17 @@ class AttributeParser implements Parser{
     String getDataType(String attributeString){
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_DATA_TYPE.getObjKey())
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
-        def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : '')
-        String dataType = (type? type[0][1].toString() : (attributeFields.size() > 0? attributeFields[1]: ''))
+        //Getting value from second field is available, so check should be size > 1
+        def type = (attributeFields.size() > 1? attributeFields[1] =~ /$regex/ : '')
+        String dataType = (type? type[0][1].toString() : (attributeFields.size() > 1? attributeFields[1]: ''))
         return dataType
     }
 
     String getLength(String attributeString){
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_LENGTH.getObjKey())
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
-        def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : attributeFields[1])
+        //Getting value from second field is available, so check should be size > 1
+        def type = (attributeFields.size() > 1? attributeFields[1] =~ /$regex/ : '')
         String[] types = (type? type[0][2].toString().split(",") : '')
         String length =  (types.size() == 2? types[0] : (types.size() > 0? type[0][2] : ''))
         return length
@@ -65,7 +67,7 @@ class AttributeParser implements Parser{
     String getFraction(String attributeString){
         String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_FRACTION.getObjKey())
         String[] attributeFields = attributeString.trim().replaceAll(" +", " ").split(" ")
-        def type = (attributeFields.size() > 0? attributeFields[1] =~ /$regex/ : '')
+        def type = (attributeFields.size() > 1? attributeFields[1] =~ /$regex/ : '')
         String[] types = (type? type[0][2].toString().split(",") : '')
         String fraction = (types.size() == 2? types[1] : '')
         return fraction
@@ -103,6 +105,13 @@ class AttributeParser implements Parser{
         return isNull
     }
 
+    boolean getIsIdentity(String attributeString){
+        String regex = regexBuilder.buildAttributeRegex(DBObjMapper.REGEX_IS_IDENTITY.getObjKey())
+        def result = (attributeString =~ /$regex/)
+        return result
+    }
+
+
     @Override
     Attribute parse(File file, String schema){
         Attribute attribute = new Attribute()
@@ -121,6 +130,7 @@ class AttributeParser implements Parser{
         attribute.setDefaultValue(getDefaultValue(attributeString))
         attribute.setDefaultValDataType(getDefaultValueDataType(attributeString))
         attribute.setNull(getIsNull(attributeString))
+        attribute.setIdentity(getIsIdentity(attributeString))
 
         return attribute
     }

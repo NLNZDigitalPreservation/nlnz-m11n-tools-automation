@@ -95,6 +95,7 @@ class SybaseRegexBuilder implements RegexBuilder {
 
             case(DBObjMapper.REGEX_FIELDS.getObjKey()):case(DBObjMapper.REGEX_CONSRTAINTS.getObjKey()):
                 //(?i)(CREATE|ADD|DROP) (\S+) (\S+) \((.*)\)
+                //----to Implement --------(?i)(CREATE|ADD|DROP) (\S+) (.*?) \((.*)\) -- Modified to allow new line key before "("
                 regexString = String.format("(?i)(%s|%s|%s) (\\S+) (\\S+) \\((.*)\\)",
                         DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ACTION_ADD.getSybaseKey(),
                         DBObjMapper.ACTION_DROP.getSybaseKey())
@@ -103,6 +104,12 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_LOCKS.getObjKey()):
                 //(?i)LOCK (\S+)
                 regexString = String.format("(?i)%s (\\S+)", DBObjMapper.KEY_LOCK.getSybaseKey())
+                break
+
+            case(DBObjMapper.REGEX_WITH_CLAUSE.getObjKey()):
+                //(?i)WITH (.*)
+                regexString = String.format("(?i)%s (.*)", DBObjMapper.KEY_WITH.getSybaseKey())
+                //regexString = "(?i)WITH (.*)"
                 break
 
             case(DBObjMapper.REGEX_OPERATION_TYPE.getObjKey()):
@@ -179,6 +186,10 @@ class SybaseRegexBuilder implements RegexBuilder {
             case(DBObjMapper.REGEX_IS_NULL.getObjKey()):
                 regexString = "(?i)NOT NULL"
                 break
+
+            case(DBObjMapper.REGEX_IS_IDENTITY.getObjKey()):
+                regexString = "(?i)IDENTITY"
+                break
         }
         return regexString
     }
@@ -219,6 +230,33 @@ class SybaseRegexBuilder implements RegexBuilder {
                 //Fix to match first create - refer dbo.proc_examGetMrkSheets - for multiple create pattern matching issue...
                 //(?i)CREATE .*? AS (.*)  -- ? after .* is added to get short match of "Create .. as" pattern
                 //(?:^|\\W)(?i)%s .* AS (?:\$|\\W)(.*)  --> not working
+                regexString = String.format("(?i)CREATE .*? AS (.*)", DBObjMapper.ACTION_CREATE.getSybaseKey())
+                break
+
+            case DBObjMapper.REGEX_TEMP_TABLES.getObjKey():
+                //(?i)(CREATE|ADD|DROP) (\S+) (\S+)
+                regexString = String.format("(?i)%s %s (.*?) \\( (.*?) \\)", DBObjMapper.ACTION_CREATE.getSybaseKey(), DBObjMapper.ENTITY_TABLE.getSybaseKey())
+                break
+
+            //Pick the last select keyword in the select....from scope.
+            //Issue refer --> splitSPs-463-dbo.DpResultRankingSel-add.sql - multiple selects before from..
+            case DBObjMapper.REGEX_JOIN_QUERY_LEFT.getObjKey():
+                regexString = "(?i)SELECT(?!.*SELECT)\\s(.*?)FROM\\s(.*?)WHERE\\s(.*?)s+(.+?)\\s+\\*\\=\\s+(.+?)\\s+(ORDER BY|GROUP BY)\\s"
+                break
+
+            case DBObjMapper.REGEX_JOIN_QUERY_LEFT_REST_ALL.getObjKey():
+                regexString = "(?i)SELECT(?!.*SELECT)\\s(.*?)FROM\\s(.*?)WHERE\\s(.*?)s+(.+?)\\s+\\*\\=\\s+(.+)"
+                break
+
+            case DBObjMapper.REGEX_JOIN_QUERY_RIGHT.getObjKey():
+                regexString = "(?i)SELECT(?!.*SELECT)\\s(.*?)FROM\\s(.*?)WHERE\\s(.*?)s+(.+?)\\s+\\=\\*\\s+(.+?)\\s+(ORDER BY|GROUP BY)\\s"
+                break
+
+            case DBObjMapper.REGEX_JOIN_QUERY_RIGHT_REST_ALL.getObjKey():
+                regexString = "(?i)SELECT(?!.*SELECT)\\s(.*?)FROM\\s(.*?)WHERE\\s(.*?)s+(.+?)\\s+\\=\\*\\s+(.+)"
+                break
+
+            case DBObjMapper.REGEX_IDENTITY_QUERY.getObjKey():
                 regexString = String.format("(?i)CREATE .*? AS (.*)", DBObjMapper.ACTION_CREATE.getSybaseKey())
                 break
 

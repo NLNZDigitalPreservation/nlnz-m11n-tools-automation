@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Entity {
+
+    private String IDENTITY_GAP = "IDENTITY_GAP";
+
     private String databaseName;
     private String type;
     private String name;
@@ -15,6 +18,7 @@ public class Entity {
     private Map<String, Constraint> constraints;
     private Map<String, Relation> grants;
     private List<String> locks;
+    private List<String> withClause;
 
     public String getDatabaseName() {
         return databaseName;
@@ -104,6 +108,23 @@ public class Entity {
         this.locks = locks;
     }
 
+    public List<String> getWithClause() {
+        return withClause;
+    }
+
+    public void setWithClause(List<String> withClause) {
+        this.withClause = withClause;
+    }
+
+    public String getIdentityGap() {
+        for (String ig: withClause) {
+            if (ig.startsWith(IDENTITY_GAP)) {
+                return ig.substring(IDENTITY_GAP.length()+1);
+            }
+        }
+        return "";
+    }
+
     @Override
     public String toString() {
         StringBuffer buff = new StringBuffer("[database=" + databaseName +
@@ -129,7 +150,7 @@ public class Entity {
                 for (String c: locks) {
                     buff.append(c + ",");
                 }
-                buff.append("}]");
+                buff.append("}, queryValue=" + queryValue  + "]");
         return buff.toString();
     }
 }

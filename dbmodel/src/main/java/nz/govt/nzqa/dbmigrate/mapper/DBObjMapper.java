@@ -12,6 +12,7 @@ public class DBObjMapper {
     public static ObjMapper KEY_GRANT = new ObjMapper("GRANT", "GRANT", "GRANT");
     public static ObjMapper KEY_INDEX = new ObjMapper("INDEX", "INDEX", "INDEX");
     public static ObjMapper KEY_LOCK = new ObjMapper("LOCK", "LOCK", "");
+    public static ObjMapper KEY_WITH = new ObjMapper("WITH", "WITH", "");
 
     public static ObjMapper ACTION_CREATE = new ObjMapper("CREATE", "CREATE", "CREATE");
     public static ObjMapper ACTION_ALTER = new ObjMapper("ALTER", "ALTER", "ALTER");
@@ -63,6 +64,7 @@ public class DBObjMapper {
     public static ObjMapper CONSTRAINT_REFERENCES = new ObjMapper("REFERENCES", "REFERENCES", "REFERENCES");
     public static ObjMapper CONSTRAINT_NULL = new ObjMapper("NULL", "NULL", "NULL");
     public static ObjMapper CONSTRAINT_NOT_NULL = new ObjMapper("NOT NULL", "NOT NULL", "NOT NULL");
+    public static ObjMapper CONSTRAINT_IDENTITY = new ObjMapper("IDENTITY", "IDENTITY", "IDENTITY");
 
     public static ObjMapper CRITERIA_CHECK = new ObjMapper("CHECK", "CHECK", "CHECK");
     public static ObjMapper CRITERIA_CHECKWRAPPER = new ObjMapper("CHECKWRAPPER", "", "");
@@ -128,12 +130,13 @@ public class DBObjMapper {
     public static ObjMapper REGEX_QUERY_VALUE = new ObjMapper("QueryValue", "", "");
     public static ObjMapper REGEX_CONSRTAINTS = new ObjMapper("Constraints", "", "");
     public static ObjMapper REGEX_GRANTS = new ObjMapper("Grant", "", "");
-    public static ObjMapper REGEX_LOCKS = new ObjMapper("Grant", "", "");
+    public static ObjMapper REGEX_LOCKS = new ObjMapper("Lock", "", "");
     public static ObjMapper REGEX_LENGTH = new ObjMapper("Length", "", "");
     public static ObjMapper REGEX_FRACTION = new ObjMapper("Fraction", "", "");
     public static ObjMapper REGEX_DEFAULT_VALUE = new ObjMapper("DefaultValue", "", "");
     public static ObjMapper REGEX_DEFAULT_VALUE_DATA_TYPE = new ObjMapper("DefaultValueDataType", "", "");
     public static ObjMapper REGEX_IS_NULL = new ObjMapper("IsNull", "", "");
+    public static ObjMapper REGEX_IS_IDENTITY = new ObjMapper("IsIdentity", "", "");
     public static ObjMapper REGEX_IN_FIELDS = new ObjMapper("InFields", "", "");
     public static ObjMapper REGEX_RETURN_TYPE = new ObjMapper("ReturnType", "", "");
     public static ObjMapper REGEX_SQL = new ObjMapper("SQL", "", "");
@@ -159,6 +162,13 @@ public class DBObjMapper {
     public static ObjMapper REGEX_TRIGGER_OPERATIONS = new ObjMapper("TriggerOperations", "", "");
     public static ObjMapper REGEX_WITH_CLAUSE = new ObjMapper("WithClause", "", "");
     public static ObjMapper REGEX_CHECK_WRAPPER_WITH_CHILD_CRITERIA = new ObjMapper("CheckWrapperWithChildCriteria", "", "");
+    public static ObjMapper REGEX_TEMP_TABLES = new ObjMapper("tempTable", "", "");
+    public static ObjMapper REGEX_JOIN_QUERY_LEFT = new ObjMapper("joinSelectLeft", "", "");
+    public static ObjMapper REGEX_JOIN_QUERY_RIGHT = new ObjMapper("joinSelectRight", "", "");
+    public static ObjMapper REGEX_JOIN_QUERY_LEFT_REST_ALL = new ObjMapper("joinSelectLeftRestAll", "", "");
+    public static ObjMapper REGEX_JOIN_QUERY_RIGHT_REST_ALL = new ObjMapper("joinSelectRightRestAll", "", "");
+    public static ObjMapper REGEX_IDENTITY_QUERY = new ObjMapper("identitySelect", "", "");
+
 
     //Space on the end of string value below is added intentially for proper regex handling.
     public static String END_OF_LINE_MAPPER = "#E-O-L-Key# ";

@@ -27,8 +27,9 @@ class EntityParser implements Parser{
         String alterRegex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_DATABASE_NAME.getObjKey(), DBObjMapper.ACTION_ALTER.getObjKey())
         def result = (sqlStatement =~ /$regex/)
         def alterResult = (sqlStatement =~ /$alterRegex/)
-        String databaseName = (alterResult? alterResult[0][2].toString().split("\\.")[0]
-                : result? result[0][3].toString().split("\\.")[0] : '')
+        String databaseName = (alterResult? (alterResult[0][2].toString().indexOf('.')>-1 ? alterResult[0][2].toString().split("\\.")[0] : '')
+                : result? (result[0][3].toString().indexOf('.')>-1 ? result[0][3].toString().split("\\.")[0] : '')
+                : '')
         return databaseName
     }
 
@@ -72,12 +73,12 @@ class EntityParser implements Parser{
 
         if (alterResult){
             String[] dbName = alterResult[0][2].toString().split("\\.")
-            name = (dbName.size() == 2? dbName[1]: '')
+            name = (dbName.size() == 2? dbName[1]: (alterResult[0][3].toString().indexOf('.')<=-1 ? dbName[0] : ''))
         }
 
         else if (result){
             String[] dbName = result[0][3].toString().split("\\.")
-            name = (dbName.size() == 2? dbName[1]: '')
+            name = (dbName.size() == 2? dbName[1]: (result[0][3].toString().indexOf('.')<=-1 ? dbName[0] : ''))
         }
 
         else if (dataTypeResult){
@@ -147,7 +148,15 @@ class EntityParser implements Parser{
         def result = (sqlStatement =~ /$regex/)
 
         if (result){
-            List<String> attributes = result[0][4].toString().split(", ")
+            //space after , is removed as this is not splitting fields for all cases of attributes
+            //Removing space after "," will wrongly split for data type cases like numeric(10,2)
+            //This issue handled with regex lookahead as below
+            String attributesString = result[0][4].toString()
+            //Remove any comibnation of " ," with "," - which will affect the split regex
+            attributesString = attributesString.replaceAll(" ,", ",")
+            //split the string based on "," that are not preceed by a digit. (This will ensure "number(10,3)" will not be split)
+            //Using regex look ahead to split with , and getting resultant value without truncation
+            List<String> attributes = attributesString.split("(?<=[^0-9]),")
             Collection<String> attributeStrings = Collections2.filter(attributes, Predicates.not(Predicates.containsPattern(DBObjMapper.KEY_CONSTRAINT.getSybaseKey())))
 
             for (String attributeString : attributeStrings){
@@ -256,6 +265,13 @@ class EntityParser implements Parser{
         return locks
     }
 
+    List<String> getWithClause(String sqlStatement){
+        String regex = regexBuilder.buildEntityRegex(DBObjMapper.REGEX_WITH_CLAUSE.getObjKey())
+        def result = (sqlStatement =~ /$regex/)
+        String withClauseString = (result? result[0][1] : "")
+        return Arrays.asList(withClauseString.split(","))
+    }
+
     @Override
     Entity parse(File file, String schema){
         Entity entity = null
@@ -284,6 +300,7 @@ class EntityParser implements Parser{
                     entity.setQueryValue(getQueryValue(sqlStatement))
                     entity.setConstraints(getConstraints(sqlStatement))
                     entity.setLocks(getLocks(sqlStatement))
+                    entity.setWithClause(getWithClause(sqlStatement))
                 } else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())) {
                     grantStatements.add(sqlStatement)
                 }
@@ -313,6 +330,7 @@ class EntityParser implements Parser{
             entity.setQueryValue(getQueryValue(sqlStatement))
             entity.setConstraints(getConstraints(sqlStatement))
             entity.setLocks(getLocks(sqlStatement))
+            entity.setWithClause(getWithClause(sqlStatement))
         }
 
         else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())){

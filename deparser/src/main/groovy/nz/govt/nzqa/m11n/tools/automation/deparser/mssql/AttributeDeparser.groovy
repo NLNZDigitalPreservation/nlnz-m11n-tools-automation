@@ -52,10 +52,14 @@ class AttributeDeparser implements Deparser{
                 buff.append("($attribute.length)")
             }
         }
-        if (attribute.isNull()) {
-            buff.append(" NULL")
-        } else {
-            buff.append(" NOT NULL")
+        if (attribute.isIdentity()) {
+            buff.append(" $DBObjMapper.CONSTRAINT_IDENTITY.mssqlKey(1, #IDENTITY_GAP#) $DBObjMapper.CONSTRAINT_NOT_NULL.mssqlKey")
+        } else  {
+            if (attribute.isNull()) {
+                buff.append(" $DBObjMapper.CONSTRAINT_NULL.mssqlKey")
+            } else {
+                buff.append(" $DBObjMapper.CONSTRAINT_NOT_NULL.mssqlKey")
+            }
         }
         return buff.toString()
     }

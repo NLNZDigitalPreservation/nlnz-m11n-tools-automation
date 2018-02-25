@@ -13,12 +13,39 @@ class EntityDeparser extends WritableDeparser{
 
     Entity entity
     String outputStatement
+    boolean checkObjectB4Create
+    boolean checkObjectB4Drop
+    boolean dropObjectB4Create
+    boolean includeTablePrePostQuotes
 
     private EntityDeparser () {}
 
+    /**
+     * Initialize this object with null OutputWritter for not writing to file.
+     * @param entity1
+     * @param outputWritter1
+     */
     EntityDeparser(Entity entity1, OutputWritter outputWritter1) {
         super (outputWritter1)
         this.entity = entity1
+        this.checkObjectB4Create = true
+        this.checkObjectB4Drop = true
+        this.dropObjectB4Create = true
+        this.includeTablePrePostQuotes = true
+    }
+
+    /**
+     * Initialize this object with null OutputWritter for not writing to file.
+     * @param entity1
+     * @param outputWritter1
+     */
+    EntityDeparser(Entity entity1, OutputWritter outputWritter1, boolean CheckObjectB4Create1, boolean checkObjectB4Drop1, boolean dropObjectB4Create1, boolean includeTablePrePostQuotes1) {
+        super (outputWritter1)
+        this.entity = entity1
+        this.checkObjectB4Create = CheckObjectB4Create1
+        this.checkObjectB4Drop = checkObjectB4Drop1
+        this.dropObjectB4Create = dropObjectB4Create1
+        this.includeTablePrePostQuotes = includeTablePrePostQuotes1
     }
 
     String deParse() {
@@ -99,7 +126,7 @@ class EntityDeparser extends WritableDeparser{
                         break
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        if (MSSQLConstants.ADD_DROP_FOR_CREATE){
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE && this.dropObjectB4Create){
                             buff.append(dropTable())
                             buff.append("\n")
                         }
@@ -122,7 +149,7 @@ class EntityDeparser extends WritableDeparser{
                         break
                     case (DBObjMapper.ACTION_ALTER.getObjKey()):
                         action = DBObjMapper.ACTION_ALTER.getObjKey()
-                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE && this.dropObjectB4Create) {
                             buff.append(dropKey())
                             buff.append("\n")
                         }
@@ -141,7 +168,7 @@ class EntityDeparser extends WritableDeparser{
                         break
                     case (DBObjMapper.ACTION_ALTER.getObjKey()):
                         action = DBObjMapper.ACTION_ALTER.getObjKey()
-                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE && this.dropObjectB4Create) {
                             buff.append(dropConstraint())
                             buff.append("\n")
                         }
@@ -158,7 +185,7 @@ class EntityDeparser extends WritableDeparser{
 
                     case (DBObjMapper.ACTION_CREATE.getObjKey()):
                         action = DBObjMapper.ACTION_CREATE.getObjKey()
-                        if (MSSQLConstants.ADD_DROP_FOR_CREATE) {
+                        if (MSSQLConstants.ADD_DROP_FOR_CREATE && this.dropObjectB4Create) {
                             buff.append(dropView())
                             buff.append("\n")
                         }
@@ -299,7 +326,7 @@ class EntityDeparser extends WritableDeparser{
 
     String dropTable() {
         StringBuffer bf = new StringBuffer()
-        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP && this.checkObjectB4Drop) {
             String checkDrop = MSSQLConstants.CHECK_DROP_TABLE
             if (entity.getDatabaseName() != null) {
                 checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
@@ -320,7 +347,7 @@ class EntityDeparser extends WritableDeparser{
 
     String dropKey() {
         StringBuffer bf = new StringBuffer()
-        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP && this.checkObjectB4Drop) {
             String checkDrop
             switch (entity.getConstraints().values().first().getType()) {
                 case(DBObjMapper.CONSTRAINT_FOREIGNKEY.getObjKey()):
@@ -355,7 +382,7 @@ class EntityDeparser extends WritableDeparser{
     String dropConstraint() {
         // It is assumed that for CONSTRAINT type, only one constraint object will be available for easier identification of single Constraint
         StringBuffer bf = new StringBuffer()
-        if (MSSQLConstants.CHECK_EXIST_FOR_DROP) {
+        if (MSSQLConstants.CHECK_EXIST_FOR_DROP && this.checkObjectB4Drop) {
             String checkDrop = MSSQLConstants.CHECK_DROP_CONSTRAINT_CHECK
             if (entity.getDatabaseName() != null) {
                 checkDrop = checkDrop.replaceAll('@DB@', entity.getDatabaseName())
@@ -384,12 +411,16 @@ class EntityDeparser extends WritableDeparser{
     String createTable(DBObjMapper.ObjMapper type, DBObjMapper.ObjMapper action) {
         StringBuffer bf = new StringBuffer()
 
-        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE && this.checkObjectB4Create) {
             //Add object availability check
             switch (type.getObjKey()) {
                 case (DBObjMapper.ENTITY_TABLE.getObjKey()):
                     if (DBObjMapper.ACTION_CREATE.getObjKey() == action.getObjKey()) {
-                        String checkCreate = MSSQLConstants.CHECK_CREATE_TABLE
+                        String checkCreate
+                        if (this.includeTablePrePostQuotes) {
+                            checkCreate = MSSQLConstants.PREQUOTE_CREATE_TABLE
+                        }
+                        checkCreate += MSSQLConstants.CHECK_CREATE_TABLE
                         if (entity.getDatabaseName() != null) {
                             checkCreate = checkCreate.replaceAll('@DB@', entity.getDatabaseName())
                         } else {
@@ -465,7 +496,12 @@ class EntityDeparser extends WritableDeparser{
                         firstCall = false
                     }
                     ad = new AttributeDeparser(field)
-                    bf.append(ad.deParse())
+                    String attribute = ad.deParse()
+                    if (attribute.indexOf("#IDENTITY_GAP#") ) {
+                        attribute = attribute.replaceAll("#IDENTITY_GAP#",
+                                (entity.getIdentityGap() != null && entity.getIdentityGap().toString().trim().length() > 0) ? entity.getIdentityGap()  : "1")
+                    }
+                    bf.append(attribute)
                 }
             }
 
@@ -491,7 +527,7 @@ class EntityDeparser extends WritableDeparser{
             bf.append("\n)")
         }
 
-        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE) {
+        if (MSSQLConstants.CHECK_NOTEXIST_FOR_CREATE && this.checkObjectB4Create) {
             if (DBObjMapper.ACTION_CREATE.getObjKey() == action.getObjKey()) {
                 if (MSSQLConstants.INCLUDE_FILEGROUP) {
                     String fg = MSSQLConstants.END_WITH_FILEGROUP
@@ -499,6 +535,9 @@ class EntityDeparser extends WritableDeparser{
                     bf.append(fg)
                 }
                 bf.append(MSSQLConstants.END_BLOCK_TABLE)
+                if (this.includeTablePrePostQuotes) {
+                    bf.append(MSSQLConstants.POSTQUOTE_CREATE_TABLE)
+                }
             }
         }
         bf.append(MSSQLConstants.CLOSE_BLOCK)

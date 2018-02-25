@@ -2,7 +2,8 @@ package nz.govt.nzqa.m11n.tools.automation.deparser.mssql.helper
 
 class MSSQLConstants {
     static String CHECK_DROP_TABLE = "IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@DB@].[@TABLENAME@]') AND type in (N'U'))"
-    static String CHECK_CREATE_TABLE = "SET ANSI_NULLS ON \nGO \nSET QUOTED_IDENTIFIER ON \nGO \nSET ANSI_PADDING ON \nGO \nIF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@DB@].[@TABLENAME@]') AND type in (N'U'))\n BEGIN"
+    static String CHECK_CREATE_TABLE = "IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@DB@].[@TABLENAME@]') AND type in (N'U'))\n BEGIN"
+    static String PREQUOTE_CREATE_TABLE = "SET ANSI_NULLS ON \nGO \nSET QUOTED_IDENTIFIER ON \nGO \nSET ANSI_PADDING ON \nGO \n"
 
     static String CHECK_DROP_KEY_FOREIGN = "IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[@DB@].[@KEY@]') AND parent_object_id = OBJECT_ID(N'[@DB@].[@TABLENAME@]'))"
     static String CHECK_CREATE_KEY_FOREIGN = "IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[@DB@].[@KEY@]') AND parent_object_id = OBJECT_ID(N'[@DB@].[@TABLENAME@]'))"
@@ -53,7 +54,8 @@ class MSSQLConstants {
     static String PATTERN_ALLOWDUPROW = "@ALLOWDUP@"
 
     static String END_BLOCK = "\nEND \n"
-    static String END_BLOCK_TABLE = "\nEND \nGO \nSET ANSI_PADDING OFF "
+    static String END_BLOCK_TABLE = "\nEND "
+    static String POSTQUOTE_CREATE_TABLE = "\nGO \nSET ANSI_PADDING OFF "
     static String END_BLOCK_KEY_PK_UNIQUE = "\nWITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) "
     static String END_BLOCK_INDEX = "\nWITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = @ALLOWDUP@, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) "
     static String CLOSE_BLOCK = "\nGO \n"

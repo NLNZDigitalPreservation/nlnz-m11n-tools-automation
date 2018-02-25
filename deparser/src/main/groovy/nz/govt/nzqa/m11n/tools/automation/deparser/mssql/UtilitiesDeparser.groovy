@@ -170,9 +170,18 @@ class UtilitiesDeparser extends WritableDeparser{
         }
 
         bf.append("AS \n")
-        String sqlTemp = utility.sql
+        String sqlTemp
+
+        if (utility.getSqlSplit() != null && utility.getSqlSplit().getSqlTemplate()!= null && utility.getSqlSplit().getSqlTemplate().trim().length()>0) {
+            SQLSplitDeparser dp = new SQLSplitDeparser(utility.getSqlSplit())
+            sqlTemp = dp.deParse()
+        } else {
+            sqlTemp = utility.sql
+        }
         if (DBObjMapper.END_OF_LINE_MAPPER != null && DBObjMapper.END_OF_LINE_MAPPER.trim().length()>0) {
             sqlTemp = sqlTemp.replaceAll(DBObjMapper.END_OF_LINE_MAPPER, "\n")
+            //handle the replacement for lowercase - ref QueryConverterUtil.groovy - WHERE replacement..
+            sqlTemp = sqlTemp.replaceAll(DBObjMapper.END_OF_LINE_MAPPER.trim(), "\n")
         }
         bf.append(" $sqlTemp ")
         bf.append(MSSQLConstants.CLOSE_BLOCK)

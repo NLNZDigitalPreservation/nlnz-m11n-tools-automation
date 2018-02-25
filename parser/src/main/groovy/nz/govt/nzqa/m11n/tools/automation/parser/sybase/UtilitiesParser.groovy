@@ -115,6 +115,12 @@ class UtilitiesParser implements Parser {
                     utilities.setSql(getSql(sqlStatement))
                     utilities.setTriggerTableName(getTriggerTableName(sqlStatement))
                     utilities.setTriggerOperations(getTriggerOperations(sqlStatement))
+
+                    if (utilities.getSql() != null && utilities.getSql().trim().length()>0) {
+                        SQLSplitParser splitter = new SQLSplitParser()
+                        utilities.setSqlSplit(splitter.parse(utilities.getSql()))
+                    }
+
                 } else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())) {
                     grantStatements.add(sqlStatement)
                 }
@@ -142,6 +148,11 @@ class UtilitiesParser implements Parser {
             utilities.setSql(getSql(sqlStatement))
             utilities.setTriggerTableName(getTriggerTableName(sqlStatement))
             utilities.setTriggerOperations(getTriggerOperations(sqlStatement))
+
+            if (utilities.getSql() != null && utilities.getSql().trim().length()>0) {
+                SQLSplitParser splitter = new SQLSplitParser()
+                utilities.setSqlSplit(splitter.parse(utilities.getSql()))
+            }
         }
 
         else if (sqlStatement.startsWith(DBObjMapper.KEY_GRANT.getSybaseKey())){

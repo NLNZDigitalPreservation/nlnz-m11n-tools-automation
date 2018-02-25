@@ -11,6 +11,7 @@ public class Attribute {
     private String defaultValue;
     private String defaultValDataType;
     private boolean isNull;
+    private boolean isIdentity;
 
     public String getType() {
         return type;
@@ -84,6 +85,14 @@ public class Attribute {
         isNull = aNull;
     }
 
+    public boolean isIdentity() {
+        return isIdentity;
+    }
+
+    public void setIdentity(boolean identity) {
+        isIdentity = identity;
+    }
+
     @Override
     public String toString() {
         StringBuffer buff = new StringBuffer("[type=" + type +
@@ -95,6 +104,7 @@ public class Attribute {
                 ", defaultValue=" + defaultValue +
                 ", defaultValDataType=" + defaultValDataType +
                 ", isNull="+isNull +
+                ", isIdentity="+isIdentity +
                 "]");
         return buff.toString();
     }
