@@ -42,7 +42,13 @@ Please include the command line arguments:
     // See {@link nz.govt.nzqa.eqa.tools.build.BuildChecker#getSubprojectDependencies} for the reasoning as to why
     // these subproject dependencies must be declared here
     subprojectDependenciesMap = [
-            'm11n-tools-automation-core' : [  ],
+            'm11n-tools-automation-core' : [ project(':m11n-tools-automation-dbmodel') ],
+            'm11n-tools-automation-db' : [ project(':m11n-tools-automation-core'),
+                                           project(':m11n-tools-automation-dbmodel') ],
+            'm11n-tools-automation-dbmodel' : [  ],
+            'm11n-tools-automation-deparser' : [ project(':m11n-tools-automation-core'),
+                                                 project(':m11n-tools-automation-dbmodel')],
+            'm11n-tools-automation-parser' : [ project(':m11n-tools-automation-dbmodel') ],
             'm11n-tools-automation-plugin' : [ project(':m11n-tools-automation-core') ]
     ]
 }

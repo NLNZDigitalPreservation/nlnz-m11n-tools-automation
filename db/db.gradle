@@ -59,13 +59,23 @@ dependencies { dependencyHandler ->
             projectName: 'm11n-tools-automation-core', dependencyHandler: dependencyHandler)
     compile coreDependency.asDependency()
 
-    compile gradleApi()
+    BuildDependency dbmodelDependency = new BuildDependency(project: project,
+            projectName: 'm11n-tools-automation-dbmodel', dependencyHandler: dependencyHandler)
+    compile dbmodelDependency.asDependency()
+
+    compileOnly 'org.slf4j:slf4j-api:1.7.+'
+
+    // latest version
+    testCompile 'junit:junit:4.12'
+
+    // use sl4j logging for tests
+    testCompile 'org.slf4j:slf4j-log4j12:1.7.+'
 }
 
 jar {
     includeEmptyDirs = false
 
-    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Plugin Jar'))
+    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Jar'))
 }
 
 task jarSources(type: Jar, dependsOn: classes) {
@@ -74,8 +84,15 @@ task jarSources(type: Jar, dependsOn: classes) {
 
     from sourceSets.main.allSource
 
-    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Plugin Sources Jar'))
+    setManifest(eqaBuildTool.generateManifest(project.description, project.description + ' Core Sources Jar'))
 }
+
+// We want to force a specific version as part of our dependency resolution
+//configurations.all {
+//    resolutionStrategy {
+//        force 'org.codehaus.groovy:groovy-all:2.4.+'
+//    }
+//}
 
 artifacts {
     publishableArtifacts jar, jarSources

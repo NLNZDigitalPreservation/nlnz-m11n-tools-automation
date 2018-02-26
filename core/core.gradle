@@ -1,5 +1,6 @@
 import nz.govt.nzqa.eqa.tools.build.ArtifactUploadParameters
 import nz.govt.nzqa.eqa.tools.build.EqaBuildTool
+import nz.govt.nzqa.eqa.tools.build.version.BuildDependency
 import nz.govt.nzqa.eqa.tools.build.version.BuildVersion
 import nz.govt.nzqa.eqa.tools.build.version.DependencyVersionFactory
 
@@ -58,17 +59,11 @@ dependencies { dependencyHandler ->
     // compile 'org.codehaus.groovy:groovy-all:2.4.+'
     compile localGroovy()
 
-
     // Use the latest version
     compile "com.google.guava:guava:+"
     // Use the latest version
     compile "org.apache.commons:commons-lang3:+"
-
-    compile group: 'org.jboss.tattletale', name: 'tattletale', version: '1.1.2.Final'
-    compile group: 'org.jboss.tattletale', name: 'tattletale-ant', version: '1.1.2.Final'
-    compile group: 'org.jboss.tattletale', name: 'tattletale-maven', version: '1.1.2.Final'
-
-    compile group: 'nz.govt.nzqa.m11n.tools', name: 'm11n-tools-automation-dbmodel', version: '1.0.0-SNAPSHOT'
+    compile "commons-io:commons-io:2.+"
 
     compileOnly 'org.slf4j:slf4j-api:1.7.+'
 

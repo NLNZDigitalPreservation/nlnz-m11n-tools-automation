@@ -3,6 +3,7 @@ package nz.govt.nzqa.m11n.tools.automation.maven.repository
 import groovy.util.logging.Slf4j
 import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
 import nz.govt.nzqa.m11n.tools.automation.git.GitCommander
+import org.apache.commons.io.FileUtils
 
 import java.text.SimpleDateFormat
 
@@ -77,9 +78,28 @@ class RepositoryProcessor {
      */
     def copyRepository(String sourceRepositoryName, String targetRepositoryName) {
         String sourceFolderPath = workParentFolderPath + File.separator + sourceRepositoryName
+        File sourceFile = new File(sourceFolderPath)
         String targetFolderPath = workParentFolderPath + File.separator + targetRepositoryName
-        String copyCommand = "cp -a ${sourceFolderPath} ${targetFolderPath}"
-        shellCommand.executeOnShellWithWorkingDirectory(copyCommand, workParentFolderPath)
+        File targetFile = new File(targetFolderPath)
+        try {
+            FileUtils.copyDirectory(sourceFile, targetFile, null, true)
+        } catch (IOException|NullPointerException e) {
+            log.error("Failure when copying ${sourceFolderPath} to ${targetFolderPath}", e)
+        }
+    }
+
+    /**
+     * Deletes the given repository.
+     *
+     * @param repositoryName
+     * @return
+     */
+    def deleteRepository(String repositoryName) {
+        String repositoryPath = workParentFolderPath + File.separator + repositoryName
+        File repositoryFile = new File(repositoryPath)
+        if (!repositoryFile.deleteDir()) {
+            log.warn("Failure when deleting directory=${repositoryPath}")
+        }
     }
 
     def bigToSmallReport(String repositoryName, Boolean openReport) {
@@ -104,7 +124,6 @@ class RepositoryProcessor {
 
         gitCommander.createPatches(gitFolder, preserveBranchNames.first(), preserveBranchNames.last(),
                 patchesContainerFolderPath, singlePatchFilePath)
-
     }
 
 }

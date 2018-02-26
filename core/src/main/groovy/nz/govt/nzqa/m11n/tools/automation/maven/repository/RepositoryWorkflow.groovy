@@ -116,4 +116,21 @@ class RepositoryWorkflow {
         }
     }
 
+    void deleteIntermediateRepositories(int startingIndex = 0, boolean includeCurrentRepository = false) {
+        boolean deletingRepositories = true
+        int sequenceIndex = startingIndex
+        while (deletingRepositories) {
+            String repositoryName = repositoryBaseName + '-' + sequenceIndex
+            boolean doDelete = true
+            if (repositoryName == currentRepositoryName) {
+                deletingRepositories = false
+                doDelete = !includeCurrentRepository
+            }
+            if (doDelete) {
+                log.info("\n***************\ndeleting repository=${repositoryName}\n")
+                repositoryProcessor.deleteRepository(repositoryName)
+            }
+            sequenceIndex++
+        }
+    }
 }

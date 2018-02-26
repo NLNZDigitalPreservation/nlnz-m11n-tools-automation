@@ -101,4 +101,4 @@ See git commits to see who contributors are. Issues are tracked through NZQA Jir
 
 ## License
 
-&copy; 2016&ndash;2017 New Zealand Qualification Authority. All rights reserved.
+&copy; 2016&ndash;2018 New Zealand Qualification Authority. All rights reserved.
