@@ -46,8 +46,7 @@ Please include the command line arguments:
             'm11n-tools-automation-db' : [ project(':m11n-tools-automation-core'),
                                            project(':m11n-tools-automation-dbmodel') ],
             'm11n-tools-automation-dbmodel' : [  ],
-            'm11n-tools-automation-deparser' : [ project(':m11n-tools-automation-core'),
-                                                 project(':m11n-tools-automation-dbmodel')],
+            'm11n-tools-automation-deparser' : [ project(':m11n-tools-automation-parser') ],
             'm11n-tools-automation-parser' : [ project(':m11n-tools-automation-dbmodel') ],
             'm11n-tools-automation-plugin' : [ project(':m11n-tools-automation-core') ]
     ]

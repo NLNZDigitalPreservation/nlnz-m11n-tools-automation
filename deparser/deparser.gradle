@@ -71,8 +71,6 @@ dependencies { dependencyHandler ->
             projectName: 'm11n-tools-automation-parser', dependencyHandler: dependencyHandler)
     compile parserDependency.asDependency()
 
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
-
     compileOnly 'org.slf4j:slf4j-api:1.7.+'
 
     // latest version
