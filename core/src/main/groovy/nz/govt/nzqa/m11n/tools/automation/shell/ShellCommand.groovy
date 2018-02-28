@@ -29,7 +29,7 @@ class ShellCommand {
         if (!workingDirectory?.exists()) {
             throw new ShellException("Unable to execute (working directory does not exist) command=[${command}], workingDirectory=[${workingDirectory}]")
         }
-        log.debug("Executing\n  ${command}\n  in: ${workingDirectory.getAbsolutePath()}")
+        log.info("Executing\n  ${command}\n  in: ${workingDirectory.getAbsolutePath()}")
         def process = new ProcessBuilder(addCommandPrefix(command))
                 .directory(workingDirectory)
                 .redirectErrorStream(true)
@@ -38,13 +38,13 @@ class ShellCommand {
         process.waitFor()
         exitValue = process.exitValue()
         if (showOutput) {
-            println("${output}")
+            log.info(output.toString())
         }
         if (clearOutputOnCommandCompletion) {
             output = ''
         }
         if (this.hasError() && this.exceptionOnError) {
-            throw new ShellException("${exceptionMessagePrefix} using command=[${this.commandUsed}], exitValue=[${this.exitValue}]")
+            throw new ShellException("${exceptionMessagePrefix} using command=[${this.commandUsed}] in working directory=[${workingDirectory}], exitValue=[${this.exitValue}]")
         }
         return this
     }

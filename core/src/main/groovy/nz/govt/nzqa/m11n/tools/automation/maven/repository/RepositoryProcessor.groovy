@@ -21,7 +21,11 @@ class RepositoryProcessor {
     GitCommander gitCommander = new GitCommander()
     ShellCommand shellCommand = new ShellCommand()
 
-    def setup() {
+    void setup() {
+        gitCommander.showOutput = true
+        gitCommander.setup()
+        shellCommand.showOutput = true
+        shellCommand.clearOutputOnCommandCompletion = true
     }
 
     /**
@@ -38,6 +42,12 @@ class RepositoryProcessor {
         // Filter down to the new repository path
         gitCommander.subdirectoryFilterInFolder(gitFolder, subdirectoryFilter)
         gitCommander.cleanUp(gitFolder)
+        gitCommander.checkFolderSize(gitFolder)
+    }
+
+    void checkFolderSize(String repositoryName) {
+        String gitFolder = workParentFolderPath + File.separator + repositoryName
+        log.info("Folder size for gitFolder=${gitFolder}:")
         gitCommander.checkFolderSize(gitFolder)
     }
 
@@ -81,11 +91,15 @@ class RepositoryProcessor {
         File sourceFile = new File(sourceFolderPath)
         String targetFolderPath = workParentFolderPath + File.separator + targetRepositoryName
         File targetFile = new File(targetFolderPath)
-        try {
-            FileUtils.copyDirectory(sourceFile, targetFile, null, true)
-        } catch (IOException|NullPointerException e) {
-            log.error("Failure when copying ${sourceFolderPath} to ${targetFolderPath}", e)
-        }
+        // TODO This only works for linux
+        String copyCommand = "cp -a ${sourceFolderPath} ${targetFolderPath}"
+        shellCommand.executeOnShellWithWorkingDirectory(copyCommand, new File(workParentFolderPath))
+        // TODO Note that if we use the FileUtils copy we may not get all necessary files copied
+        //try {
+        //    FileUtils.copyDirectory(sourceFile, targetFile, null, true)
+        //} catch (IOException|NullPointerException e) {
+        //    log.error("Failure when copying ${sourceFolderPath} to ${targetFolderPath}", e)
+        //}
     }
 
     /**
@@ -102,10 +116,10 @@ class RepositoryProcessor {
         }
     }
 
-    def bigToSmallReport(String repositoryName, Boolean openReport) {
+    File bigToSmallReport(String repositoryName) {
         String gitFolder = workParentFolderPath + File.separator + repositoryName
 
-        gitCommander.bigToSmallReport(gitFolder, tempFolderPath, openReport)
+        return gitCommander.bigToSmallReport(gitFolder, tempFolderPath)
     }
 
     /**
@@ -116,10 +130,10 @@ class RepositoryProcessor {
     def createPatches(String repositoryName) {
         String gitFolder = workParentFolderPath + File.separator + repositoryName
         String patchesFolderPath = workParentFolderPath + File.separator + "patches"
-        gitCommander.makeFolder(patchesFolderPath)
+        gitCommander.createFolder(patchesFolderPath)
         String patchRange = "${preserveBranchNames.first()}--${preserveBranchNames.last()}"
         String patchesContainerFolderPath = patchesFolderPath + File.separator + repositoryName + File.separator + patchRange
-        gitCommander.makeFolder(patchesContainerFolderPath)
+        gitCommander.createFolder(patchesContainerFolderPath)
         String singlePatchFilePath = "${patchesContainerFolderPath}.patch"
 
         gitCommander.createPatches(gitFolder, preserveBranchNames.first(), preserveBranchNames.last(),

@@ -18,7 +18,6 @@ class RepositoryWorkflow {
     Boolean doPostRemoveFoldersBigToSmallReport = false
     Boolean doCreatePatches = false
     Boolean doBigToSmallReport = false
-    Boolean doOpenLogFileAtEnd = false
 
     String[] preserveBranchNames = [ ]
     String workParentFolderPath = '/tmp'
@@ -39,10 +38,9 @@ class RepositoryWorkflow {
      */
     def setup() {
         String logFilePathStart = workParentFolderPath + File.separator + "logs"
-        log.info("Starting workflow ${workflowName}, logging to ${logFilePathStart}-[current-date-time].log")
+        log.info("Starting workflow ${workflowName}")
 
         repositoryProcessor = new RepositoryProcessor()
-        repositoryProcessor.logger = logger
         repositoryProcessor.preserveBranchNames = preserveBranchNames
         repositoryProcessor.workParentFolderPath = workParentFolderPath
         repositoryProcessor.tempFolderPath = tempFolder
@@ -83,7 +81,8 @@ class RepositoryWorkflow {
 
         log.info("\n***************\ndoBigToSmallReport=${doBigToSmallReport}\n")
         if (doBigToSmallReport) {
-            repositoryProcessor.bigToSmallReport(currentRepositoryName, true)
+            File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName)
+            log.info(bigToSmallReportFile.text)
         }
 
         log.info("\n***************\ndoRemoveFolders=${doRemoveFolders}\n")
@@ -99,7 +98,8 @@ class RepositoryWorkflow {
 
                 log.info("\n***************\ndoPostRemoveFoldersBigToSmallReport=${doPostRemoveFoldersBigToSmallReport}\n")
                 if (doPostRemoveFoldersBigToSmallReport) {
-                    repositoryProcessor.bigToSmallReport(currentRepositoryName, true)
+                    File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName)
+                    log.info(bigToSmallReportFile.text)
                 }
             } else {
                 log.info("\ndoRemoveFolders=${doRemoveFolders} but no folders listed, so skipping\n")
@@ -111,9 +111,8 @@ class RepositoryWorkflow {
             repositoryProcessor.createPatches(currentRepositoryName)
         }
 
-        if (doOpenLogFileAtEnd) {
-            repositoryProcessor.shellCommand.executeOnShellWithWorkingDirectory("subl ${logger.logFilePath}", workParentFolderPath)
-        }
+        log.info("\n***************\nFinal folder size\n")
+        repositoryProcessor.checkFolderSize(currentRepositoryName)
     }
 
     void deleteIntermediateRepositories(int startingIndex = 0, boolean includeCurrentRepository = false) {
@@ -124,7 +123,7 @@ class RepositoryWorkflow {
             boolean doDelete = true
             if (repositoryName == currentRepositoryName) {
                 deletingRepositories = false
-                doDelete = !includeCurrentRepository
+                doDelete = includeCurrentRepository
             }
             if (doDelete) {
                 log.info("\n***************\ndeleting repository=${repositoryName}\n")

@@ -64,6 +64,8 @@ class FilePathDifferenceExtractor {
         unmatchedSubpath.each { String pathPart ->
             difference += pathPart
         }
-        return difference
+        // We want the file separator to always be forward slashes, since they are interpreted correctly across all
+        // operating systems
+        return difference.replace('\\', '/')
     }
 }
