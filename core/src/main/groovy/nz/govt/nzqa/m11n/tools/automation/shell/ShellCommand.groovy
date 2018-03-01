@@ -9,7 +9,7 @@ import groovy.util.logging.Slf4j
 class ShellCommand {
 
     def exitValue
-    def output = ''
+    def internalOutput = ''
     Boolean showOutput = false
     Boolean clearOutputOnCommandCompletion = false
     String commandUsed
@@ -38,10 +38,10 @@ class ShellCommand {
         process.waitFor()
         exitValue = process.exitValue()
         if (showOutput) {
-            log.info(output.toString())
+            log.info(getOutput())
         }
         if (clearOutputOnCommandCompletion) {
-            output = ''
+            internalOutput = ''
         }
         if (this.hasError() && this.exceptionOnError) {
             throw new ShellException("${exceptionMessagePrefix} using command=[${this.commandUsed}] in working directory=[${workingDirectory}], exitValue=[${this.exitValue}]")
@@ -83,13 +83,13 @@ class ShellCommand {
     }
 
     void processOutput(String outputLine) {
-        output <<= outputLine
-        output <<= '\n'
+        internalOutput <<= outputLine
+        internalOutput <<= '\n'
         log.debug(outputLine)
     }
 
     String getOutput() {
-        return output.toString()
+        return internalOutput.toString()
     }
 
     boolean hasError() {

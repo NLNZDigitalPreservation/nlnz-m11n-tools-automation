@@ -18,6 +18,8 @@ class RepositoryWorkflow {
     Boolean doPostRemoveFoldersBigToSmallReport = false
     Boolean doCreatePatches = false
     Boolean doBigToSmallReport = false
+    Boolean doApplyPatches = false
+    Boolean doFinalRepositorySize = false
 
     String[] preserveBranchNames = [ ]
     String workParentFolderPath = '/tmp'
@@ -27,6 +29,11 @@ class RepositoryWorkflow {
     Integer sequenceIndex = 0
     String currentRepositoryName
     String previousRepositoryName
+
+    String patchTargetRepositoryPath
+    String patchTargetRepositoryBranch
+
+    String projectNameKey
 
     String workflowName
     String subdirectoryFilterPath
@@ -106,13 +113,26 @@ class RepositoryWorkflow {
             }
         }
 
+        File patchesFolder = null
         log.info("\n***************\ndoCreatePatches=${doCreatePatches}\n")
         if (doCreatePatches) {
-            repositoryProcessor.createPatches(currentRepositoryName)
+            patchesFolder = repositoryProcessor.createPatches(currentRepositoryName, projectNameKey, true)
+        } else {
+            patchesFolder = new File(repositoryProcessor.generatePatchesFolderPath(currentRepositoryName, projectNameKey))
         }
 
-        log.info("\n***************\nFinal folder size\n")
-        repositoryProcessor.checkFolderSize(currentRepositoryName)
+        log.info("\n***************\ndoApplyPatches=${doApplyPatches}\n")
+        if (doApplyPatches) {
+            repositoryProcessor.applyPatches(patchTargetRepositoryPath, patchTargetRepositoryBranch, patchesFolder,
+                    2, true)
+        }
+
+        log.info("\n***************\ndoFinalRepositorySize=${doFinalRepositorySize}\n")
+        if (doFinalRepositorySize) {
+            log.info("")
+            log.info("\n***************\nFinal folder size\n")
+            repositoryProcessor.checkFolderSize(currentRepositoryName)
+        }
     }
 
     void deleteIntermediateRepositories(int startingIndex = 0, boolean includeCurrentRepository = false) {

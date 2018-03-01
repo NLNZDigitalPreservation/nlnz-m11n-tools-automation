@@ -1,9 +1,10 @@
 package nz.govt.nzqa.m11n.tools.automation.maven.repository
 
+import groovy.io.FileType
 import groovy.util.logging.Slf4j
+import nz.govt.nzqa.m11n.tools.automation.AutomationException
 import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
 import nz.govt.nzqa.m11n.tools.automation.git.GitCommander
-import org.apache.commons.io.FileUtils
 
 import java.text.SimpleDateFormat
 
@@ -122,22 +123,47 @@ class RepositoryProcessor {
         return gitCommander.bigToSmallReport(gitFolder, tempFolderPath)
     }
 
+    String generatePatchesFolderPath(String repositoryName, String projectNameKey) {
+        String patchesFolderPath = workParentFolderPath + File.separator + "patches" + File.separator + projectNameKey
+        String patchRange = "${preserveBranchNames.first()}--${preserveBranchNames.last()}"
+        String patchesContainerFolderPath = patchesFolderPath + "-" + patchRange
+
+        return patchesContainerFolderPath
+    }
     /**
      * Creates patches from the given repository.
      * @param repositoryName
      * @return
      */
-    def createPatches(String repositoryName) {
+    File createPatches(String repositoryName, String projectNameKey, boolean returnPatchesFolder = true) {
         String gitFolder = workParentFolderPath + File.separator + repositoryName
-        String patchesFolderPath = workParentFolderPath + File.separator + "patches"
-        gitCommander.createFolder(patchesFolderPath)
-        String patchRange = "${preserveBranchNames.first()}--${preserveBranchNames.last()}"
-        String patchesContainerFolderPath = patchesFolderPath + File.separator + repositoryName + File.separator + patchRange
+        String patchesContainerFolderPath = generatePatchesFolderPath(repositoryName, projectNameKey)
         gitCommander.createFolder(patchesContainerFolderPath)
         String singlePatchFilePath = "${patchesContainerFolderPath}.patch"
 
-        gitCommander.createPatches(gitFolder, preserveBranchNames.first(), preserveBranchNames.last(),
-                patchesContainerFolderPath, singlePatchFilePath)
+        return gitCommander.createPatches(gitFolder, preserveBranchNames.first(), preserveBranchNames.last(),
+                patchesContainerFolderPath, singlePatchFilePath, returnPatchesFolder)
+    }
+
+    void applyPatches(String patchTargetRepositoryPath, String patchTargetRepositoryBranch, File patchesFolder,
+                      int startingPatchIndex, boolean exceptionIfPatchFails = true) {
+        gitCommander.checkoutBranch(patchTargetRepositoryPath, patchTargetRepositoryBranch)
+        if (startingPatchIndex >= 0 && startingPatchIndex < 9) {
+            List<File> sortedPatches =  [ ]
+            // Note that placing a tilde (~) in front of the pattern creates a pattern instance
+            patchesFolder.eachFileMatch(FileType.FILES, ~/^\d\d\d[${startingPatchIndex}-9].*?\.patch/) { File match ->
+                sortedPatches << match
+            }
+            sortedPatches.toSorted { File a, File b ->
+                a.absolutePath <=> b.absolutePath
+            }
+            sortedPatches.each { File patchFile ->
+                log.info("Patch file=${patchFile.absolutePath}")
+                ShellCommand shellCommand = gitCommander.applyPatch(patchTargetRepositoryPath, patchFile, exceptionIfPatchFails)
+            }
+        } else {
+            throw new AutomationException("0 <= startingPatchIndex=${startingPatchIndex} < 9. Numbers outside this range are not supported at this time.")
+        }
     }
 
 }

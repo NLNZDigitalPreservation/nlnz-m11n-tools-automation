@@ -22,6 +22,11 @@ processing.
 Gradle builds provide part of the platform of build and deploy automation. This plugin makes objects available for
 use in scripting.
 
+## Important
+
+There is an assumption in some of the included functionality that unix commands are available. The functionality
+may also work in a Windows git bash shell.
+
 ## Versioning
 
 See the `build.gradle` file for the current jar version that will be generated.

@@ -109,14 +109,19 @@ class GitCommander {
     }
 
     def getBranchHash(String gitFolder, String branchName) {
+        // Use a different ShellCommand because we want to maintain the output
+        ShellCommand specificShellCommand = new ShellCommand()
+        specificShellCommand.showOutput = shellCommand.showOutput
+        specificShellCommand.clearOutputOnCommandCompletion = false
         String command = "git show ${branchName} --format=\"%H\" --no-patch"
-        shellCommand.executeOnShellWithWorkingDirectory(command, new File(gitFolder))
-        String branchHash = shellCommand.output.toString().split("\n")[0]
+        specificShellCommand.executeOnShellWithWorkingDirectory(command, new File(gitFolder))
+        String branchHash = specificShellCommand.getOutput().split("\n")[0]
         log.info("${gitFolder} branch ${branchName} hash is '${branchHash}'")
         return branchHash
     }
 
-    def createPatches(String gitFolder, String startingBranchName, String endingBranchName, String patchesFolder, String singlePatchFilePath) {
+    File createPatches(String gitFolder, String startingBranchName, String endingBranchName, String patchesFolder,
+                       String singlePatchFilePath, returnPatchesFolder = true) {
         createFolder(patchesFolder)
         File folder = new File(gitFolder)
         String commandForDirectory = "git format-patch ${startingBranchName}..${endingBranchName} " +
@@ -125,6 +130,22 @@ class GitCommander {
         String commandForSingleFile = "git format-patch ${startingBranchName}..${endingBranchName} " +
                 "--stdout > \"${singlePatchFilePath}\""
         shellCommand.executeOnShellWithWorkingDirectory(commandForSingleFile, folder)
+
+        if (returnPatchesFolder) {
+            return new File(patchesFolder)
+        } else {
+            return new File(singlePatchFilePath)
+        }
+    }
+
+    ShellCommand applyPatch(String gitFolder, File patchFile, boolean exceptionIfPatchFails = true) {
+        File folder = new File(gitFolder)
+        ShellCommand specificShellCommand = new ShellCommand()
+        specificShellCommand.showOutput = shellCommand.showOutput
+        specificShellCommand.clearOutputOnCommandCompletion = shellCommand.clearOutputOnCommandCompletion
+        specificShellCommand.exceptionOnError = exceptionIfPatchFails
+        specificShellCommand.exceptionMessagePrefix = "Unable to apply patch:"
+        return specificShellCommand.executeOnShellWithWorkingDirectory("git am --whitespace=fix ${patchFile.absolutePath}", folder)
     }
 
     File bigToSmallReport(String gitFolder, String workingDirectory) {
@@ -185,6 +206,32 @@ class GitCommander {
         shellCommand.executeOnShellWithWorkingDirectory("git init", new File(folderPath))
     }
 
+    def createBranch(String folderPath, String branchName, String baseBranch) {
+        File folder = new File(folderPath)
+        shellCommand.executeOnShellWithWorkingDirectory("git checkout --no-track -b ${branchName} origin/${baseBranch}", folder)
+        shellCommand.executeOnShellWithWorkingDirectory("git config branch.${branchName}.remote origin", folder)
+        shellCommand.executeOnShellWithWorkingDirectory("git config branch.${branchName}.merge refs/heads/${branchName}", folder)
+    }
+
+    def checkoutBranch(String folderPath, String branchName, boolean onlyCheckoutIfItExists = true) {
+        File folder = new File(folderPath)
+        ShellCommand specificShellCommand = new ShellCommand()
+        specificShellCommand.showOutput = shellCommand.showOutput
+        specificShellCommand.clearOutputOnCommandCompletion = false
+        boolean exists = false
+        if (onlyCheckoutIfItExists) {
+            // If we use grep the output will end up in a separate process and we may not get the output properly.
+            specificShellCommand.executeOnShellWithWorkingDirectory("git branch -a", folder)
+            List<String> matches = specificShellCommand.getOutput().findAll(/.*${branchName}.*?/)
+            if (!matches.isEmpty()) {
+                exists = true
+            }
+        }
+        if ((onlyCheckoutIfItExists && exists) || !onlyCheckoutIfItExists) {
+            specificShellCommand.executeOnShellWithWorkingDirectory("git checkout \"${branchName}\"", folder)
+        }
+    }
+
     def createGitAttributes (String folderPath) {
         File folder = new File(folderPath)
         shellCommand.executeOnShellWithWorkingDirectory("git config merge.ours.driver true", folder)
@@ -201,5 +248,10 @@ class GitCommander {
 
     def deleteGitIgnore(String folderPath) {
         shellCommand.executeOnShellWithWorkingDirectory("rm .gitignore", new File(folderPath))
+    }
+
+    def removeRemoteOrigin(String folderPath) {
+        File folder = new File(folderPath)
+        shellCommand.executeOnShellWithWorkingDirectory("git remote rm origin", folder)
     }
 }
