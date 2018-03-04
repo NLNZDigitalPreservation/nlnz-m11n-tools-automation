@@ -130,40 +130,48 @@ class RepositoryProcessor {
 
         return patchesContainerFolderPath
     }
+
     /**
      * Creates patches from the given repository.
      * @param repositoryName
      * @return
      */
-    File createPatches(String repositoryName, String projectNameKey, boolean returnPatchesFolder = true) {
+    File createPatches(String repositoryName, String projectNameKey) {
         String gitFolder = workParentFolderPath + File.separator + repositoryName
         String patchesContainerFolderPath = generatePatchesFolderPath(repositoryName, projectNameKey)
         gitCommander.createFolder(patchesContainerFolderPath)
-        String singlePatchFilePath = "${patchesContainerFolderPath}.patch"
 
         return gitCommander.createPatches(gitFolder, preserveBranchNames.first(), preserveBranchNames.last(),
-                patchesContainerFolderPath, singlePatchFilePath, returnPatchesFolder)
+                patchesContainerFolderPath)
     }
 
     void applyPatches(String patchTargetRepositoryPath, String patchTargetRepositoryBranch, File patchesFolder,
                       int startingPatchIndex, boolean exceptionIfPatchFails = true) {
         gitCommander.checkoutBranch(patchTargetRepositoryPath, patchTargetRepositoryBranch)
-        if (startingPatchIndex >= 0 && startingPatchIndex < 9) {
-            List<File> sortedPatches =  [ ]
+        if (startingPatchIndex >= 0) {
+            Map<Integer, File> indexToFileMap = [ : ]
+
             // Note that placing a tilde (~) in front of the pattern creates a pattern instance
-            patchesFolder.eachFileMatch(FileType.FILES, ~/^\d\d\d[${startingPatchIndex}-9].*?\.patch/) { File match ->
-                sortedPatches << match
+            def pattern = /^(\d\d\d\d)-.*?\.patch/
+            patchesFolder.eachFileMatch(~pattern) { File matchFile ->
+                def match = matchFile.name =~ pattern
+                String number = match[0][1]
+                Integer actualNumber = Integer.parseInt(number)
+                if (actualNumber >= startingPatchIndex) {
+                    indexToFileMap.put(actualNumber, matchFile)
+                }
             }
-            sortedPatches.toSorted { File a, File b ->
-                a.absolutePath <=> b.absolutePath
+            // as per http://mrhaki.blogspot.co.nz/2010/04/groovy-goodness-sorting-map.html
+            List<Integer> expectedKeys = indexToFileMap.sort()*.key
+            List<File> sortedPatches = expectedKeys.collect { Integer key ->
+                indexToFileMap.get(key)
             }
             sortedPatches.each { File patchFile ->
                 log.info("Patch file=${patchFile.absolutePath}")
                 ShellCommand shellCommand = gitCommander.applyPatch(patchTargetRepositoryPath, patchFile, exceptionIfPatchFails)
             }
         } else {
-            throw new AutomationException("0 <= startingPatchIndex=${startingPatchIndex} < 9. Numbers outside this range are not supported at this time.")
+            throw new AutomationException("startingPatchIndex=${startingPatchIndex} must be greater than zero.")
         }
     }
-
 }

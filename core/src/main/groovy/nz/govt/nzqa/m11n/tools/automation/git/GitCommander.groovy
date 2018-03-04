@@ -1,6 +1,7 @@
 package nz.govt.nzqa.m11n.tools.automation.git
 
 import groovy.util.logging.Slf4j
+import nz.govt.nzqa.m11n.tools.automation.AutomationException
 import nz.govt.nzqa.m11n.tools.automation.shell.ShellCommand
 
 import java.text.SimpleDateFormat
@@ -120,22 +121,150 @@ class GitCommander {
         return branchHash
     }
 
-    File createPatches(String gitFolder, String startingBranchName, String endingBranchName, String patchesFolder,
-                       String singlePatchFilePath, returnPatchesFolder = true) {
-        createFolder(patchesFolder)
-        File folder = new File(gitFolder)
-        String commandForDirectory = "git format-patch ${startingBranchName}..${endingBranchName} " +
-                "--output-directory \"${patchesFolder}\""
-        shellCommand.executeOnShellWithWorkingDirectory(commandForDirectory, folder)
-        String commandForSingleFile = "git format-patch ${startingBranchName}..${endingBranchName} " +
-                "--stdout > \"${singlePatchFilePath}\""
-        shellCommand.executeOnShellWithWorkingDirectory(commandForSingleFile, folder)
+    File createPatches(String gitFolder, String startingBranchName, String endingBranchName, String patchesFolder) {
+        log.info("GitCommand createPatches gitFolder=${gitFolder}, startingBranchName=${startingBranchName}, endingBranchName=${endingBranchName}, patchesFolder=${patchesFolder}")
+        List<PatchCommit> rootPatchCommits = createPatchCommitChildren(gitFolder, null, startingBranchName,
+                                                                       endingBranchName, patchesFolder, new HashSet<PatchCommit>())
 
-        if (returnPatchesFolder) {
-            return new File(patchesFolder)
-        } else {
-            return new File(singlePatchFilePath)
+        assemblePatchesInFolder(new File(patchesFolder), rootPatchCommits, 1)
+
+        return new File(patchesFolder)
+    }
+
+    List<PatchCommit> createPatchCommitChildren(String gitFolder, PatchCommit parentPatchCommit, String startingBranchOrHash,
+                                   String endingBranchOrHash, String basePatchesFolder, Set<PatchCommit> allPatchCommits) {
+        String endingCommitHash = parentPatchCommit == null ? endingBranchOrHash : parentPatchCommit.commitHash
+        List<PatchCommit> patchCommitsFromLog = getPatchCommitsFromLog(gitFolder, startingBranchOrHash, endingCommitHash)
+        File patchesFolder = createPatchesBase(gitFolder, startingBranchOrHash, endingCommitHash, basePatchesFolder)
+        List<PatchCommit> patchCommitsFromPatches = getPatchCommitsFromPatches(patchesFolder)
+        patchCommitsFromLog.each { PatchCommit logPatchCommit ->
+            PatchCommit matchingPatchCommit = patchCommitsFromPatches.find { PatchCommit filePatchCommit ->
+                logPatchCommit.commitHash == filePatchCommit.commitHash
+            }
+            if (matchingPatchCommit != null) {
+                logPatchCommit.commitFile = matchingPatchCommit.commitFile
+                allPatchCommits.add(logPatchCommit)
+            }
         }
+        String previousCommitHash = startingBranchOrHash
+        patchCommitsFromLog.each { PatchCommit logPatchCommit ->
+            if (logPatchCommit.commitFile == null && !allPatchCommits.contains(logPatchCommit)) {
+                allPatchCommits.add(logPatchCommit)
+                logPatchCommit.patchCommits = createPatchCommitChildren(gitFolder, logPatchCommit, previousCommitHash,
+                null, basePatchesFolder, allPatchCommits)
+            }
+            previousCommitHash = logPatchCommit.commitHash
+        }
+        return patchCommitsFromLog
+    }
+
+    File createPatchesBase(String gitFolder, String startingBranchOrHash, String endingBranchOrHash,
+                           String basePatchesFolder) {
+        File folder = new File(gitFolder)
+        String actualPatchesFolder = basePatchesFolder + File.separator + startingBranchOrHash + "--" + endingBranchOrHash
+        createFolder(actualPatchesFolder)
+        String commandForDirectory = "git format-patch ${startingBranchOrHash}..${endingBranchOrHash} " +
+                "--output-directory \"${actualPatchesFolder}\""
+        shellCommand.executeOnShellWithWorkingDirectory(commandForDirectory, folder)
+
+        return new File(actualPatchesFolder)
+
+    }
+
+    List<PatchCommit> getPatchCommitsFromLog(String gitFolder, String startingBranchOrHash,
+                                             String endingBranchOrHash) {
+        File folder = new File(gitFolder)
+        // Use a different ShellCommand because we want to maintain the output
+        ShellCommand specificShellCommand = new ShellCommand()
+        specificShellCommand.showOutput = shellCommand.showOutput
+        specificShellCommand.clearOutputOnCommandCompletion = false
+        specificShellCommand.executeOnShellWithWorkingDirectory("git log ${startingBranchOrHash}..${endingBranchOrHash}", folder)
+
+        return extractPatchCommitsFromLog(specificShellCommand.getOutput()).reverse()
+    }
+
+    List<PatchCommit> extractPatchCommitsFromLog(String gitLog) {
+        List<PatchCommit> patchCommits = [ ]
+        def commitPattern = /^commit (\b[0-9a-f]{5,40}\b)/
+        gitLog.eachLine { String line ->
+            def commitMatcher = (line =~ commitPattern)
+            if (commitMatcher.size() > 0) {
+                patchCommits.add(new PatchCommit(commitHash: commitMatcher[0][1]))
+            }
+        }
+        return patchCommits
+    }
+
+    List<PatchCommit> getPatchCommitsFromPatches(File patchesFolder) {
+        List<PatchCommit> patchCommits = [ ]
+        List<File> patchesFiles = listPatchesFiles(patchesFolder, 1)
+
+        patchesFiles.each { File patchFile ->
+            String commitHash = extractCommitHashFromFileCommit(patchFile)
+            patchCommits.add(new PatchCommit(commitHash: commitHash, commitFile: patchFile))
+        }
+        return patchCommits
+    }
+
+    String extractCommitHashFromFileCommit(File patchFile) {
+        def commitPattern = /^From (\b[0-9a-f]{5,40}\b) /
+        String commitMatch = null
+        patchFile.eachLine { String line ->
+            if (commitMatch == null) {
+                def commitMatcher = (line =~ commitPattern)
+                if (commitMatcher.size() > 0) {
+                    commitMatch = commitMatcher[0][1]
+                }
+            }
+        }
+        if (commitMatch == null) {
+            throw new AutomationException("Unable to find commit SHA in patch file=${patchFile.absolutePath}")
+        }
+        return commitMatch
+    }
+
+    int assemblePatchesInFolder(File patchesFolder, List<PatchCommit> rootPatchCommits, int startingIndex) {
+        int patchIndex = startingIndex
+        rootPatchCommits.each { PatchCommit patchCommit ->
+            if (patchCommit.commitFile != null) {
+                String patchNumber =  String.format('%04d', patchIndex)
+                File targetFile = new File(patchesFolder, patchNumber + "--" + patchCommit.commitFile.name)
+                String copyCommand = "cp -a ${patchCommit.commitFile.absolutePath} ${targetFile.absolutePath}"
+                shellCommand.executeOnShellWithWorkingDirectory(copyCommand, patchesFolder)
+                patchIndex++
+            } else if (patchCommit.patchCommits != null) {
+                patchIndex = assemblePatchesInFolder(patchesFolder, patchCommit.patchCommits, patchIndex)
+            } else {
+                log.warn("patchCommit with commitHash=${patchCommit.commitHash} has no commitFile and no patchCommits! Cannot write out patch.")
+            }
+        }
+        return patchIndex
+    }
+
+    List<File> listPatchesFiles(File patchesFolder, int startingPatchIndex) {
+        List<File> patchesFiles = [ ]
+        if (startingPatchIndex >= 0) {
+            Map<Integer, File> indexToFileMap = [ : ]
+
+            // Note that placing a tilde (~) in front of the pattern creates a pattern instance
+            def pattern = /^(\d\d\d\d)-.*?\.patch/
+            patchesFolder.eachFileMatch(~pattern) { File matchFile ->
+                def match = matchFile.name =~ pattern
+                String number = match[0][1]
+                Integer actualNumber = Integer.parseInt(number)
+                if (actualNumber >= startingPatchIndex) {
+                    indexToFileMap.put(actualNumber, matchFile)
+                }
+            }
+            // as per http://mrhaki.blogspot.co.nz/2010/04/groovy-goodness-sorting-map.html
+            List<Integer> expectedKeys = indexToFileMap.sort()*.key
+            patchesFiles = expectedKeys.collect { Integer key ->
+                indexToFileMap.get(key)
+            }
+        } else {
+            throw new AutomationException("startingPatchIndex=${startingPatchIndex} must be greater than zero.")
+        }
+        return patchesFiles
     }
 
     ShellCommand applyPatch(String gitFolder, File patchFile, boolean exceptionIfPatchFails = true) {
@@ -145,7 +274,7 @@ class GitCommander {
         specificShellCommand.clearOutputOnCommandCompletion = shellCommand.clearOutputOnCommandCompletion
         specificShellCommand.exceptionOnError = exceptionIfPatchFails
         specificShellCommand.exceptionMessagePrefix = "Unable to apply patch:"
-        return specificShellCommand.executeOnShellWithWorkingDirectory("git am --whitespace=fix ${patchFile.absolutePath}", folder)
+        return specificShellCommand.executeOnShellWithWorkingDirectory("git am --ignore-whitespace --whitespace=warn ${patchFile.absolutePath}", folder)
     }
 
     File bigToSmallReport(String gitFolder, String workingDirectory) {

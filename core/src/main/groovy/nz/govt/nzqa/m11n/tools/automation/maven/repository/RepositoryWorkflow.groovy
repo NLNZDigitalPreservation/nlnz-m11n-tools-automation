@@ -116,7 +116,7 @@ class RepositoryWorkflow {
         File patchesFolder = null
         log.info("\n***************\ndoCreatePatches=${doCreatePatches}\n")
         if (doCreatePatches) {
-            patchesFolder = repositoryProcessor.createPatches(currentRepositoryName, projectNameKey, true)
+            patchesFolder = repositoryProcessor.createPatches(currentRepositoryName, projectNameKey)
         } else {
             patchesFolder = new File(repositoryProcessor.generatePatchesFolderPath(currentRepositoryName, projectNameKey))
         }
@@ -124,7 +124,7 @@ class RepositoryWorkflow {
         log.info("\n***************\ndoApplyPatches=${doApplyPatches}\n")
         if (doApplyPatches) {
             repositoryProcessor.applyPatches(patchTargetRepositoryPath, patchTargetRepositoryBranch, patchesFolder,
-                    2, true)
+                    1, true)
         }
 
         log.info("\n***************\ndoFinalRepositorySize=${doFinalRepositorySize}\n")
