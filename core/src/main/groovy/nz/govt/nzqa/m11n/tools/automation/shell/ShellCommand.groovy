@@ -2,14 +2,19 @@ package nz.govt.nzqa.m11n.tools.automation.shell
 
 import groovy.util.logging.Slf4j
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption
+
 /**
  * Provides a means to perform a shell command from groovy.
  */
 @Slf4j
 class ShellCommand {
+    static byte[] NEWLINE_BYTES = "\n".getBytes()
 
     def exitValue
-    def internalOutput = ''
+    Path internalOutputPath
     Boolean showOutput = false
     Boolean clearOutputOnCommandCompletion = false
     String commandUsed
@@ -34,14 +39,17 @@ class ShellCommand {
                 .directory(workingDirectory)
                 .redirectErrorStream(true)
                 .start()
+        if (internalOutputPath == null) {
+            internalOutputPath = Files.createTempFile("ShellCommand-", ".log")
+            internalOutputPath.toFile().deleteOnExit()
+        }
         process.inputStream.eachLine { processOutput(it) }
         process.waitFor()
         exitValue = process.exitValue()
-        if (showOutput) {
-            log.info(getOutput())
-        }
+
         if (clearOutputOnCommandCompletion) {
-            internalOutput = ''
+            internalOutputPath.toFile().delete()
+            internalOutputPath = null
         }
         if (this.hasError() && this.exceptionOnError) {
             throw new ShellException("${exceptionMessagePrefix} using command=[${this.commandUsed}] in working directory=[${workingDirectory}], exitValue=[${this.exitValue}]")
@@ -82,14 +90,50 @@ class ShellCommand {
         return commandArray
     }
 
-    void processOutput(String outputLine) {
-        internalOutput <<= outputLine
-        internalOutput <<= '\n'
-        log.debug(outputLine)
+    private void processOutput(String outputLine) {
+        Files.write(internalOutputPath, outputLine.getBytes(), StandardOpenOption.APPEND)
+        Files.write(internalOutputPath, NEWLINE_BYTES, StandardOpenOption.APPEND)
+        if (showOutput) {
+            log.info(outputLine)
+        } else {
+            log.debug(outputLine)
+        }
     }
 
-    String getOutput() {
-        return internalOutput.toString()
+    String getOutput(int maximumStringLength = 1024000) {
+        if (internalOutputPath == null) {
+            return new String()
+        }
+        int totalCharacters = 0
+        byte[] data = new byte[16384]
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream()
+        InputStream fileInputStream = new FileInputStream(internalOutputPath.toFile())
+        boolean continueReading = true
+        while (continueReading) {
+            int charactersRead = fileInputStream.read(data, 0, data.length)
+            if (charactersRead == -1) {
+                continueReading = false
+            } else {
+                int charactersRemaining = maximumStringLength - totalCharacters
+                if (charactersRemaining < charactersRead) {
+                    charactersRead = charactersRemaining
+                    continueReading = false
+                }
+                totalCharacters += charactersRead
+                buffer.write(data, 0, charactersRead)
+            }
+        }
+        buffer.flush()
+
+        return new String(buffer.toByteArray())
+    }
+
+    File getOutputFile() {
+        if (internalOutputPath == null) {
+            log.warn("ShellCommand: Cannot return output file as it has been cleared. Set 'clearOutputOnCommandCompletion' to false to obtain output file.")
+            return null
+        }
+        return internalOutputPath.toFile()
     }
 
     boolean hasError() {
