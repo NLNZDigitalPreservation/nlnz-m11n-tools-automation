@@ -14,9 +14,8 @@ import java.text.SimpleDateFormat
 @Slf4j
 class RepositoryProcessor {
 
-    static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss")
-    String operationDateTime = DATE_FORMATTER.format(new Date())
     String[] preserveBranchNames = [ ]
+    File patchesFolder
     String workParentFolderPath = "/tmp"
     String tempFolderPath = "/tmp"
     GitCommander gitCommander = new GitCommander()
@@ -138,7 +137,12 @@ class RepositoryProcessor {
      */
     File createPatches(String repositoryName, String projectNameKey) {
         String gitFolder = workParentFolderPath + File.separator + repositoryName
-        String patchesContainerFolderPath = generatePatchesFolderPath(repositoryName, projectNameKey)
+        String patchesContainerFolderPath
+        if (patchesFolder == null) {
+            patchesContainerFolderPath = generatePatchesFolderPath(repositoryName, projectNameKey)
+        } else {
+            patchesContainerFolderPath = patchesFolder.getAbsolutePath()
+        }
         gitCommander.createFolder(patchesContainerFolderPath)
 
         return gitCommander.createPatches(gitFolder, preserveBranchNames.first(), preserveBranchNames.last(),

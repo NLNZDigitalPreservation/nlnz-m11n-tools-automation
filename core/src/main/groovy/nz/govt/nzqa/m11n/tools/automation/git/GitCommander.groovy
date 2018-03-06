@@ -361,6 +361,12 @@ class GitCommander {
         }
     }
 
+    def rebaseBranch(String folderPath, String branchName, String baseBranch) {
+        File folder = new File(folderPath)
+        setBranch(folderPath, branchName)
+        shellCommand.executeOnShellWithWorkingDirectory("git rebase ${baseBranch}", folder)
+    }
+
     def createGitAttributes (String folderPath) {
         File folder = new File(folderPath)
         shellCommand.executeOnShellWithWorkingDirectory("git config merge.ours.driver true", folder)
@@ -382,5 +388,20 @@ class GitCommander {
     def removeRemoteOrigin(String folderPath) {
         File folder = new File(folderPath)
         shellCommand.executeOnShellWithWorkingDirectory("git remote rm origin", folder)
+    }
+
+    def setRemoteOrigin(String folderPath, String branchName, String remoteOrigin, boolean doPull = true) {
+        File folder = new File(folderPath)
+        setBranch(folderPath, branchName)
+        shellCommand.executeOnShellWithWorkingDirectory("git remote set-url origin ${remoteOrigin}", folder)
+        if (doPull) {
+            shellCommand.executeOnShellWithWorkingDirectory("git pull", folder)
+        }
+    }
+
+    def pushBranchOrigin(String folderPath, String branchName) {
+        File folder = new File(folderPath)
+        setBranch(folderPath, branchName)
+        shellCommand.executeOnShellWithWorkingDirectory("git push origin HEAD", folder)
     }
 }

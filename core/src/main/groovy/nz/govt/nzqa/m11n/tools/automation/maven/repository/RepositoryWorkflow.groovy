@@ -30,6 +30,7 @@ class RepositoryWorkflow {
     String currentRepositoryName
     String previousRepositoryName
 
+    String patchesFolderPath
     String patchTargetRepositoryPath
     String patchTargetRepositoryBranch
 
@@ -113,9 +114,10 @@ class RepositoryWorkflow {
             }
         }
 
-        File patchesFolder = null
+        File patchesFolder = (patchesFolderPath == null || patchesFolderPath.isEmpty()) ? null : new File(patchesFolderPath)
         log.info("\n***************\ndoCreatePatches=${doCreatePatches}\n")
         if (doCreatePatches) {
+            repositoryProcessor.patchesFolder = patchesFolder
             patchesFolder = repositoryProcessor.createPatches(currentRepositoryName, projectNameKey)
         } else {
             patchesFolder = new File(repositoryProcessor.generatePatchesFolderPath(currentRepositoryName, projectNameKey))
