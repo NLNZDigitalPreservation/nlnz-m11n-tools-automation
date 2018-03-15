@@ -108,12 +108,16 @@ class RepositoryProcessor {
      * @param repositoryName
      * @return
      */
-    def deleteRepository(String repositoryName) {
+    boolean deleteRepository(String repositoryName) {
+        boolean success = false
         String repositoryPath = workParentFolderPath + File.separator + repositoryName
         File repositoryFile = new File(repositoryPath)
-        if (!repositoryFile.deleteDir()) {
+        if (repositoryFile.deleteDir()) {
+            success = true
+        } else {
             log.warn("Failure when deleting directory=${repositoryPath}")
         }
+        return success
     }
 
     File bigToSmallReport(String repositoryName) {

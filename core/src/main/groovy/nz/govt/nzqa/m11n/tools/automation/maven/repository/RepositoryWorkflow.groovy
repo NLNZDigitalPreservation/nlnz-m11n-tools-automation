@@ -16,6 +16,7 @@ class RepositoryWorkflow {
     Boolean doRemoveFolders = false
     Boolean doPostRemovalFoldersPull = false
     Boolean doPostRemoveFoldersBigToSmallReport = false
+    Boolean doDeleteIntermediateRepositories = false
     Boolean doCreatePatches = false
     Boolean doBigToSmallReport = false
     Boolean doApplyPatches = false
@@ -138,20 +139,27 @@ class RepositoryWorkflow {
     }
 
     void deleteIntermediateRepositories(int startingIndex = 0, boolean includeCurrentRepository = false) {
-        boolean deletingRepositories = true
-        int sequenceIndex = startingIndex
-        while (deletingRepositories) {
-            String repositoryName = repositoryBaseName + '-' + sequenceIndex
-            boolean doDelete = true
-            if (repositoryName == currentRepositoryName) {
-                deletingRepositories = false
-                doDelete = includeCurrentRepository
+        log.info("\n***************\ndoDeleteIntermediateRepositories=${doDeleteIntermediateRepositories}\n")
+        if (doDeleteIntermediateRepositories) {
+            boolean deletingRepositories = true
+            int sequenceIndex = startingIndex
+            while (deletingRepositories) {
+                String repositoryName = repositoryBaseName + '-' + sequenceIndex
+                boolean doDelete = true
+                if (repositoryName == currentRepositoryName) {
+                    deletingRepositories = false
+                    doDelete = includeCurrentRepository
+                }
+                if (doDelete) {
+                    log.info("\n***************\ndeleting repository=${repositoryName}\n")
+                    boolean success = repositoryProcessor.deleteRepository(repositoryName)
+                    if (!success) {
+                        log.warn("Failure to delete repositoryName=${repositoryName}, skipping further deletions.")
+                        deletingRepositories = false
+                    }
+                }
+                sequenceIndex++
             }
-            if (doDelete) {
-                log.info("\n***************\ndeleting repository=${repositoryName}\n")
-                repositoryProcessor.deleteRepository(repositoryName)
-            }
-            sequenceIndex++
         }
     }
 }
