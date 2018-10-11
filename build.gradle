@@ -1,67 +1,17 @@
-import nz.govt.nzqa.eqa.tools.build.BuildException
-import nz.govt.nzqa.eqa.tools.build.RepositoryAttributes
-
-buildscript {
+allprojects {
     repositories {
-        mavenLocal()
         mavenCentral()
-        maven {
-            url = 'http://pdnexus01.nzqa.govt.nz:8081/nexus/content/groups/public'
-        }
     }
-    dependencies {
-        classpath 'nz.govt.nzqa.eqa.tools.build:eqa-build-plugin:1.+'
-    }
-}
-
-ext {
-    // For the eqa-build-plugin, we upload it to pdnexus01, which is nzqa's repository
-    // The username and password must be specified on the command line, as in:
-    // gradle clean build -PuploadRepositoryUsername=[username] -PuploadRepositoryPassword=[password]
-    List<TaskExecutionRequest> taskExecutionRequestList = project.gradle.getStartParameter().getTaskRequests()
-    boolean hasPublish = taskExecutionRequestList.find { TaskExecutionRequest taskExecutionRequest ->
-        "publish" == taskExecutionRequest.args.find { argument ->
-            "publish".equals(argument)
-        }
-    }
-    // The upload repository is important to retrieve versioning information as well as for publishing
-    // TODO We may want to make the upload repository more generic
-    uploadRepository = new RepositoryAttributes(name: "pdnexus01-releases",
-            url: 'http://pdnexus01.nzqa.govt.nz:8081/nexus/content/repositories/releases',
-            artifactUrls: [ 'http://pdnexus01.nzqa.govt.nz:8081/nexus/content/repositories/releases' ],
-            userName: project.hasProperty('uploadRepositoryUsername') ? project.uploadRepositoryUsername : null,
-            password: project.hasProperty('uploadRepositoryPassword') ? project.uploadRepositoryPassword : null)
-    if (hasPublish) {
-        if (!project.hasProperty('uploadRepositoryUsername') || !project.hasProperty('uploadRepositoryPassword')) {
-            throw new BuildException("""A publish of the plugin must include the pdnexus01 uploadRepositoryUsername and uploadRepositoryPassword.
-Please include the command line arguments:
--PuploadRepositoryUsername=[username] -PuploadRepositoryPassword=[password]""")
-        }
-    }
-
-    // See {@link nz.govt.nzqa.eqa.tools.build.BuildChecker#getSubprojectDependencies} for the reasoning as to why
-    // these subproject dependencies must be declared here
-    subprojectDependenciesMap = [
-            'm11n-tools-automation-core' : [  ],
-            'm11n-tools-automation-plugin' : [ project(':m11n-tools-automation-core') ]
-    ]
 }
 
 subprojects {
-    // we put these variables first so that the nz.govt.nzqa.eqa.tools.build.plugin can use them
-    group 'nz.govt.nzqa.m11n.tools'
-    description = 'NZQA Modernisation (m11n) automation tools'
+    group 'nz.govt.natlib.m11n.tools'
+    description = 'National Library of New Zealand Modernisation (m11n) automation tools'
 
-    // we put these variables first so that the nz.govt.nzqa.eqa.tools.build.plugin can use them
     project.ext {
-        vendor = "New Zealand Qualifications Authority"
+        vendor = "National Library of New Zealand"
 
-        // the version number is in the 1.0.* series
-        // if the build is built with the task 'release' then the version is 1.0.[latestVersion + 1]
-        // otherwise the build is built as a SNAPSHOT, which is the latest version that matches the wildcard
-        // See the documentation on nz.govt.nzqa.eqa.tools.build.version.BuildVersionFinder for more details
-        // since there is no default ('') (non-appendix) artifact, we choose one artifact appendix that will determine the versions
-        versionMask = "1.0.*"
+        versionNumber = "1.0.0-SNAPSHOT"
     }
 
     apply plugin: 'maven'
@@ -70,4 +20,5 @@ subprojects {
     configurations {
         publishableArtifacts
     }
+
 }

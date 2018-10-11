@@ -1,8 +1,11 @@
-# NZQA Modernisation (m11n) automation tools
+# National Library of New Zealand Modernisation (m11n) automation tools
 
 ## Synopsis
 
 This repository contains automation classes and tools that are available for gradle builds in a automation tools plugin.
+
+This project was originally created and used by the New Zealand Qualifications Authority, but has been repurposed for
+use by the National Library of New Zealand.
 
 Some of the classes here correlate with classes in the eqa-build-plugin project, the difference should be in the package
 name, where the eqa-build-classes are of package nz.govt.nzqa.eqa.tools.build.automation.* and the m11n-tools-automation
@@ -35,25 +38,17 @@ See the `build.gradle` file for the current jar version that will be generated.
 
 The artifacts are built using gradle and will deploy to a maven repository.
 
+### Complete build
 To do a complete build (including unit and code tests and javadoc):
 ```
 gradle [clean] build
 ```
 
-To build the artifacts only (with unit and code tests):
+### Complete build with upgrade-preparation warnings
+When gradle 5.x is release, some gradle features and certain build scripts will not work. In order to prepare for
+this eventuality, builds can include the `warning-mode` to notify in advance of changes that will need to happen.
 ```
-gradle [clean] artifactOnlyBuild
-```
-
-To upload the jar to maven (SNAPSHOT version):
-```
-gradle [clean artifactOnlyBuild] publishToMavenLocal
-```
-
-To create a release version, which is tagged and uploaded to nexus
-(note that 'release' and 'publish' must both be on the command line):
-```
-gradle [clean artifactOnlyBuild] release publish
+ gradle [clean] build --warning-mode all
 ```
 
 ## API Reference
@@ -79,9 +74,8 @@ gradle test
 ```
 
 ### Jacoco code coverage
-```
-gradle test jacocoTestReport
-```
+While the jacoco plugin is included in builds, there isn't currently any tasks associated with jacoco.
+TODO Add jacoco code coverage tasks.
 
 ### check
 Running `gradle check` runs both findBugs and PMD source code analyzer.
@@ -102,8 +96,12 @@ gradle pmdTest
 
 ## Contributors
 
-See git commits to see who contributors are. Issues are tracked through NZQA Jira.
+See git commits to see who contributors are. Issues are tracked through the git repository issue tracker.
 
 ## License
 
+### For commits up to and including October 10, 2018
 &copy; 2016&ndash;2018 New Zealand Qualification Authority. All rights reserved.
+
+### For commits after October 10, 2018
+&copy; 2018 National Library of New Zealand. All rights reserved. MIT license.
