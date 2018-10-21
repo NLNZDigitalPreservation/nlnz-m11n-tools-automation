@@ -32,7 +32,7 @@ apply plugin: 'pmd' // source code analyzer
 setVersion(project.ext.versionNumber)
 
 dependencies {
-    compile project(':nlnz-m11n-tools-automation-core')
+    compile project(':automation-core')
 
     compile gradleApi()
 }

@@ -1,4 +1,4 @@
-rootProject.name = 'nlnz-m11n-tools-automation'
+rootProject.name = 'automation'
 include ":core", ":plugin"
 
 // Correctly refer to the children build files
