@@ -25,6 +25,7 @@ class RepositoryWorkflow {
     String[] preserveBranchNames = [ ]
     String workParentFolderPath = '/tmp'
     String tempFolder = '/tmp'
+    String reportsFolderPath = '/tmp'
 
     String repositoryBaseName = ''
     Integer sequenceIndex = 0
@@ -53,6 +54,7 @@ class RepositoryWorkflow {
         repositoryProcessor.preserveBranchNames = preserveBranchNames
         repositoryProcessor.workParentFolderPath = workParentFolderPath
         repositoryProcessor.tempFolderPath = tempFolder
+        repositoryProcessor.reportsFolderPath = reportsFolderPath
         repositoryProcessor.setup()
 
         nextRepositoryName()
@@ -90,7 +92,7 @@ class RepositoryWorkflow {
 
         log.info("\n***************\ndoBigToSmallReport=${doBigToSmallReport}\n")
         if (doBigToSmallReport) {
-            File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName)
+            File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName, projectNameKey)
             log.info(bigToSmallReportFile.text)
         }
 

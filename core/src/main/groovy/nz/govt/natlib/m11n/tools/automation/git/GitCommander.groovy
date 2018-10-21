@@ -276,18 +276,19 @@ class GitCommander {
         return specificShellCommand.executeOnShellWithWorkingDirectory("git am --ignore-whitespace --whitespace=warn ${patchFile.absolutePath}", folder)
     }
 
-    File bigToSmallReport(String gitFolder, String workingDirectory) {
+    File bigToSmallReport(String gitFolder, String workingDirectory, String reportPrefix = "") {
         println("workingDirectory=${workingDirectory}")
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss")
         String reportDate = dateFormatter.format(new Date())
         String convertedFolderName = gitFolder.replace('/', '-').replace(' ', '_')
         File folder = new File(gitFolder)
+        String realReportPrefix = reportPrefix.length() > 0 ? "${reportPrefix}_" : ""
 
         // Because the -All-File-SHAs- and -Big-Objects- files may be too large for the command line,
         // output their sorted contents to separate files
 
         // Get a list of objects
-        String allFileShasReportFilenamePrefix = workingDirectory + File.separator + convertedFolderName + "-All-File-SHAs-"
+        String allFileShasReportFilenamePrefix = workingDirectory + File.separator + realReportPrefix + convertedFolderName + "-All-File-SHAs-"
         String allFileShasReportFilename = allFileShasReportFilenamePrefix + reportDate + ".txt"
         String allFileShasReportSortedFilename = allFileShasReportFilenamePrefix + "SORTED-" + reportDate + ".txt"
         String allFileShasReportCommand = "git rev-list --objects --all | sort -k 2 > ${allFileShasReportFilename}"
@@ -295,7 +296,7 @@ class GitCommander {
         shellCommand.executeOnShellWithWorkingDirectory("sort ${allFileShasReportFilename} > ${allFileShasReportSortedFilename}", folder)
 
         // Get the last object SHA for all committed files and sort them in biggest to smallest order
-        String bigObjectsReportFilenamePrefix = workingDirectory + File.separator + convertedFolderName + "-Big-Objects-"
+        String bigObjectsReportFilenamePrefix = workingDirectory + File.separator + realReportPrefix + convertedFolderName + "-Big-Objects-"
         String bigObjectsReportFilename = bigObjectsReportFilenamePrefix + reportDate + ".txt"
         String bigObjectsReportSortedFilename = bigObjectsReportFilenamePrefix + "SORTED-" + reportDate + ".txt"
         String bigObjectsCommand = "git gc && git verify-pack -v .git/objects/pack/pack-*.idx | " +
@@ -305,7 +306,7 @@ class GitCommander {
 
         // Take the ...-Big-Objects-....txt result and iterate through each line of it to find the SHA,
         // file size in bytes, and real file name (you also need the ...-All-File-SHAs-....txt output file from above):
-        String bigToSmallReportFilename = workingDirectory + File.separator + convertedFolderName +
+        String bigToSmallReportFilename = workingDirectory + File.separator + realReportPrefix + convertedFolderName +
                 "-Report-Big-To-Small-" + reportDate + ".txt"
         String bigToSmallReportCommand = "join ${bigObjectsReportSortedFilename} ${allFileShasReportSortedFilename} | " +
                 "sort -k 3 -n -r | cut -f 1,3,6- -d \\  > ${bigToSmallReportFilename}"
