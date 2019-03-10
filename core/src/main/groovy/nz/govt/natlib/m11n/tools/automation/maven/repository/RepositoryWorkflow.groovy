@@ -25,6 +25,7 @@ class RepositoryWorkflow {
     String[] preserveBranchNames = [ ]
     String workParentFolderPath = '/tmp'
     String tempFolder = '/tmp'
+    String reportsFolderPath = '/tmp'
 
     String repositoryBaseName = ''
     Integer sequenceIndex = 0
@@ -53,6 +54,7 @@ class RepositoryWorkflow {
         repositoryProcessor.preserveBranchNames = preserveBranchNames
         repositoryProcessor.workParentFolderPath = workParentFolderPath
         repositoryProcessor.tempFolderPath = tempFolder
+        repositoryProcessor.reportsFolderPath = reportsFolderPath
         repositoryProcessor.setup()
 
         nextRepositoryName()
@@ -90,7 +92,7 @@ class RepositoryWorkflow {
 
         log.info("\n***************\ndoBigToSmallReport=${doBigToSmallReport}\n")
         if (doBigToSmallReport) {
-            File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName)
+            File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName, "${projectNameKey}_pre-removal_")
             log.info(bigToSmallReportFile.text)
         }
 
@@ -107,7 +109,7 @@ class RepositoryWorkflow {
 
                 log.info("\n***************\ndoPostRemoveFoldersBigToSmallReport=${doPostRemoveFoldersBigToSmallReport}\n")
                 if (doPostRemoveFoldersBigToSmallReport) {
-                    File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName)
+                    File bigToSmallReportFile = repositoryProcessor.bigToSmallReport(currentRepositoryName, "${projectNameKey}_post-removal_")
                     log.info(bigToSmallReportFile.text)
                 }
             } else {

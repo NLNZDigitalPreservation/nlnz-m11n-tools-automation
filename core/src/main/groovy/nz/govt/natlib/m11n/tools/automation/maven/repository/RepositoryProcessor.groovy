@@ -16,6 +16,7 @@ class RepositoryProcessor {
     File patchesFolder
     String workParentFolderPath = "/tmp"
     String tempFolderPath = "/tmp"
+    String reportsFolderPath = "/tmp"
     GitCommander gitCommander = new GitCommander()
     ShellCommand shellCommand = new ShellCommand()
 
@@ -118,10 +119,10 @@ class RepositoryProcessor {
         return success
     }
 
-    File bigToSmallReport(String repositoryName) {
+    File bigToSmallReport(String repositoryName, String reportPrefix = "") {
         String gitFolder = workParentFolderPath + File.separator + repositoryName
 
-        return gitCommander.bigToSmallReport(gitFolder, tempFolderPath)
+        return gitCommander.bigToSmallReport(gitFolder, reportsFolderPath, reportPrefix)
     }
 
     String generatePatchesFolderPath(String repositoryName, String projectNameKey) {
