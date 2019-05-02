@@ -10,9 +10,15 @@ import java.text.SimpleDateFormat
 
 @Slf4j
 class Timekeeper {
-    DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z")
-    DecimalFormat PROCESSING_RATE_FORMAT = new DecimalFormat("#,###,###,###.000")
-    DecimalFormat PROCESSED = new DecimalFormat("###,###,###,###")
+    static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z")
+    static final DecimalFormat PROCESSING_RATE_FORMAT = new DecimalFormat("#,###,###,###.000")
+    static final DecimalFormat PROCESSED = new DecimalFormat("###,###,###,###")
+    int MILLISECONDS_PER_SECOND = 1000
+    int SECONDS_PER_MINUTE = 60
+    int MINUTES_PER_HOUR = 60
+    int MILLISECONDS_PER_MINUTE = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
+    int MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
+
     Date startDateTime = null
     Date stopDateTime = null
     Date lastElapsed = null
@@ -45,10 +51,11 @@ class Timekeeper {
 
     void logElapsed(boolean useDebug = false, long currentCount = 0L, boolean showRate = false) {
         TimeDuration elapsedTime = elapsedSinceLastElapsed()
-        String message = "elapsedTime=${elapsedTime}, totalTime=${totalTime()}, " +
+        TimeDuration totalTime = totalTime()
+        String message = "elapsedTime=${elapsedTime}, totalTime=${totalTime}, " +
                 "startTime=${TIMESTAMP_FORMAT.format(startDateTime)} [currentTime=${TIMESTAMP_FORMAT.format(new Date())}]"
         if (showRate) {
-            String totalProcessingRate = processingRate(currentCount, elapsedTime)
+            String totalProcessingRate = processingRate(currentCount, totalTime)
             String incrementalProcessingRate = processingRate(currentCount - lastCount, elapsedTime)
             String processingRateMessage = ", processed=${PROCESSED.format(currentCount)}, " +
                     "incremental rate=${incrementalProcessingRate}, total rate=${totalProcessingRate}"
@@ -63,23 +70,24 @@ class Timekeeper {
     }
 
     String processingRate(long processedCount, TimeDuration elapsedTime) {
+        long totalMilliseconds = elapsedTime.toMilliseconds()
         // We probably want a 2 to 3 digit rate
         if (elapsedTime.hours > 0) {
-            double ratePerHour = processedCount / elapsedTime.hours
+            double ratePerHour = (processedCount * MILLISECONDS_PER_HOUR) / totalMilliseconds
             if (ratePerHour < 59) {
                 String rate = PROCESSING_RATE_FORMAT.format(ratePerHour)
                 return "${rate}/hour"
             }
         }
         if (elapsedTime.minutes > 0) {
-            double ratePerMinute = processedCount / elapsedTime.minutes
+            double ratePerMinute = (processedCount * MILLISECONDS_PER_MINUTE) / totalMilliseconds
             if (ratePerMinute < 59) {
                 String rate = PROCESSING_RATE_FORMAT.format(ratePerMinute)
                 return "${rate}/minute"
             }
         }
         if (elapsedTime.millis > 0) {
-            double ratePerSecond = 1000 * processedCount / elapsedTime.millis
+            double ratePerSecond = (processedCount * MILLISECONDS_PER_SECOND) / totalMilliseconds
             String rate = PROCESSING_RATE_FORMAT.format(ratePerSecond)
             return "${rate}/second"
         }
