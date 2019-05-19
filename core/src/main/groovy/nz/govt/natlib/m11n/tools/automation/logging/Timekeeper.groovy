@@ -23,7 +23,7 @@ class Timekeeper {
     Date stopDateTime = null
     Date lastElapsed = null
     long lastCount = 0L
-
+    List<TimeElapsedMarker> timeElapsedMarkers = [ ]
 
     Timekeeper() {
         startDateTime = new Date()
@@ -47,6 +47,27 @@ class Timekeeper {
 
     TimeDuration totalTime() {
         return TimeCategory.minus(stopDateTime == null ? new Date() : stopDateTime, startDateTime)
+    }
+
+    void markElapsed(String marker, String markerDescription = null) {
+        TimeElapsedMarker timeElapsedMarker = new TimeElapsedMarker(elapsedSinceLastElapsed(), totalTime(), marker,
+                markerDescription)
+        timeElapsedMarkers.add(timeElapsedMarker)
+    }
+
+    void listMarkers(boolean useDebug = false) {
+        timeElapsedMarkers.each { TimeElapsedMarker timeElapsedMarker ->
+            String message = "${timeElapsedMarker.marker}: elapsedTime=${timeElapsedMarker.elapsedTime}, " +
+                    "totalTime=${timeElapsedMarker.totalTime}"
+            if (timeElapsedMarker.markerDescription != null && !timeElapsedMarker.markerDescription.isEmpty()) {
+                message += " - ${timeElapsedMarker.markerDescription}"
+            }
+            if (useDebug) {
+                log.debug(message)
+            } else {
+                log.info(message)
+            }
+        }
     }
 
     void logElapsed(boolean useDebug = false, long currentCount = 0L, boolean showRate = false) {
