@@ -46,12 +46,12 @@ dependencies {
     compile localGroovy()
 
     // Use the latest version
-    compile "com.google.guava:guava:+"
+    compile "com.google.guava:guava:28.0-jre"
     // Use the latest version
-    compile "org.apache.commons:commons-lang3:+"
-    compile "commons-io:commons-io:2.+"
+    compile "org.apache.commons:commons-lang3:3.9"
+    compile "commons-io:commons-io:2.6"
 
-    compileOnly 'org.slf4j:slf4j-api:1.7.+'
+    compileOnly 'org.slf4j:slf4j-api:1.7.26'
 
     // We use the awesome Spock testing and specification framework
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4', {
@@ -67,7 +67,7 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.10.19'
 
     // use sl4j logging for tests
-    testCompile 'org.slf4j:slf4j-log4j12:1.7.+'
+    testCompile 'org.slf4j:slf4j-log4j12:1.7.26'
 
 }
 

@@ -89,6 +89,10 @@ Building the NLNZ M11N Tools Automation from source requires the following:
 As the artifact targets are Java-based, it should be possible to build the artifacts on either Linux, Solaris or Windows
 targets.
 
+Dependencies
+~~~~~~~~~~~~
+All of this project's dependencies can be pulled from Maven Central.
+
 Development platforms
 ~~~~~~~~~~~~~~~~~~~~~
 The following platforms have been used during the development of the NLNZ M11N Tools Automation:
@@ -107,6 +111,10 @@ Build commands
 See the *Build commands for Gradle-based projects* section of the *Java Development Guide* of the
 *National Library of New Zealand Developer Guidelines* for a description of the build commands used for this project.
 These guidelines can be found at https://nlnz-developer-guidelines.readthedocs.io .
+
+The primary build command for this project is::
+
+    gradle clean build publishToMavenLocal
 
 Versioning
 ----------
